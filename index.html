@@ -1,1 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Портфолио — Иван Иванов</title>
+  <meta name="description" content="Портфолио веб-разработчика Ивана Иванова: проекты, навыки и контакты." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
 
+  <!-- ===== Шапка с меню ===== -->
+  <header>
+    <div class="container nav">
+      <a href="#home" class="logo">Иван<span>.</span></a>
+      <button class="burger" id="burger" aria-label="Открыть меню">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home">Главная</a></li>
+        <li><a href="#about">Обо мне</a></li>
+        <li><a href="#projects">Проекты</a></li>
+        <li><a href="#contact">Контакты</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- ===== Главный экран ===== -->
+  <section class="hero" id="home">
+    <div class="container hero-inner">
+      <p class="hello">Привет, меня зовут</p>
+      <h1>Иван Иванов — <span class="gradient">веб-разработчик</span></h1>
+      <p class="subtitle">
+        Создаю современные сайты и приложения. Здесь вы можете посмотреть мои работы
+        и связаться со мной для сотрудничества.
+      </p>
+      <a href="#projects" class="btn btn-primary">Смотреть работы</a>
+      <a href="#contact" class="btn btn-outline">Написать мне</a>
+    </div>
+  </section>
+
+  <!-- ===== Обо мне ===== -->
+  <section id="about">
+    <div class="container">
+      <h2 class="section-title reveal">Обо мне</h2>
+      <div class="about-grid reveal">
+        <div class="avatar">👨‍💻</div>
+        <div class="about-text">
+          <p>
+            Меня зовут Иван. Я занимаюсь созданием сайтов и веб-приложений.
+            Люблю чистый код, аккуратный дизайн и удобные интерфейсы.
+          </p>
+          <p>
+            В этом разделе расскажите о себе: чем занимаетесь, какой у вас опыт,
+            чему учитесь и что вам интересно. Это можно легко изменить в файле index.html.
+          </p>
+          <ul class="skills">
+            <li>HTML</li>
+            <li>CSS</li>
+            <li>JavaScript</li>
+            <li>Адаптивная верстка</li>
+            <li>Figma</li>
+            <li>Git</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Проекты ===== -->
+  <section id="projects">
+    <div class="container">
+      <h2 class="section-title reveal">Мои проекты</h2>
+      <div class="projects">
+        <article class="card reveal">
+          <div class="card-thumb thumb-1">🛒</div>
+          <div class="card-body">
+            <h3>Интернет-магазин</h3>
+            <p>Учебный проект: каталог товаров, корзина и оформление заказа.</p>
+            <div class="card-tags"><span>HTML</span><span>CSS</span><span>JavaScript</span></div>
+          </div>
+        </article>
+        <article class="card reveal">
+          <div class="card-thumb thumb-2">📝</div>
+          <div class="card-body">
+            <h3>Блог о путешествиях</h3>
+            <p>Личный блог со статьями, галереей фотографий и комментариями.</p>
+            <div class="card-tags"><span>HTML</span><span>CSS</span></div>
+          </div>
+        </article>
+        <article class="card reveal">
+          <div class="card-thumb thumb-3">📊</div>
+          <div class="card-body">
+            <h3>Дашборд статистики</h3>
+            <p>Панель с графиками и диаграммами на основе открытых данных.</p>
+            <div class="card-tags"><span>JavaScript</span><span>Chart.js</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Контакты ===== -->
+  <section id="contact">
+    <div class="container">
+      <h2 class="section-title reveal">Контакты</h2>
+      <div class="contact-box reveal">
+        <div class="contact-info">
+          <h3>Свяжитесь со мной</h3>
+          <ul>
+            <li>✉️ Email: <a href="mailto:ivan@example.com">ivan@example.com</a></li>
+            <li>📱 Телефон: <a href="tel:+79000000000">+7 (900) 000-00-00</a></li>
+            <li>💼 Telegram: <a href="https://t.me/username" target="_blank" rel="noopener">@username</a></li>
+            <li>🐙 GitHub: <a href="https://github.com/username" target="_blank" rel="noopener">github.com/username</a></li>
+          </ul>
+        </div>
+        <form id="contactForm">
+          <label for="name">Ваше имя</label>
+          <input type="text" id="name" name="name" placeholder="Как к вам обращаться?" required />
+          <label for="message">Сообщение</label>
+          <textarea id="message" name="message" rows="4" placeholder="Расскажите о вашем проекте..." required></textarea>
+          <button type="submit" class="btn btn-primary">Отправить</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Подвал ===== -->
+  <footer>
+    <div class="container">
+      © 2026 Иван Иванов · Сайт-портфолио
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
