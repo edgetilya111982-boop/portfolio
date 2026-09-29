@@ -1,2 +1,2 @@
-# Compressed archives
-*.zip!portfolio2.zip
+# Logs
+*.log
