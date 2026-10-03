@@ -11,34 +11,34 @@ function lerp(a, b, t) { return a + (b - a) * t }
 const KEYFRAMES = [
   // Section 0 – Hero: large centered head, ring behind
   {
-    cam: [0, 0.08, 2.4],
-    camTarget: [0, 0.06, 0],
-    modelPos: [0, -0.05, 0],
+    cam: [0, 0.15, 2.2],
+    camTarget: [0, 0.1, 0],
+    modelPos: [0, -0.1, 0],
     modelRot: [0, 0, 0],
-    ringPos: [0, 0.12, -0.4],
-    ringScale: 0.55,
+    ringPos: [0, 0.18, -0.4],
+    ringScale: 0.72,
     ringOpacity: 0.9,
     dofFocus: 0.12,
   },
   // Section 1 – Craft: head moves right, quarter-view
   {
-    cam: [0.2, 0.05, 2.8],
-    camTarget: [0.35, 0.0, 0],
-    modelPos: [0.45, -0.06, 0],
+    cam: [0.2, 0.1, 2.6],
+    camTarget: [0.35, 0.05, 0],
+    modelPos: [0.4, -0.1, 0],
     modelRot: [0, -0.4, 0],
-    ringPos: [0.45, 0.12, -0.35],
-    ringScale: 0.42,
+    ringPos: [0.4, 0.18, -0.35],
+    ringScale: 0.55,
     ringOpacity: 0.7,
     dofFocus: 0.10,
   },
   // Section 2 – Work: close-up, ring partly cropped
   {
-    cam: [0.1, 0.12, 1.7],
-    camTarget: [0.06, 0.1, 0],
-    modelPos: [0.1, 0.0, 0],
+    cam: [0.1, 0.2, 1.6],
+    camTarget: [0.06, 0.15, 0],
+    modelPos: [0.1, -0.05, 0],
     modelRot: [0, 0.12, 0],
-    ringPos: [0.08, 0.32, -0.3],
-    ringScale: 0.68,
+    ringPos: [0.08, 0.42, -0.3],
+    ringScale: 0.85,
     ringOpacity: 0.6,
     dofFocus: 0.14,
   },
@@ -157,7 +157,7 @@ function RobotModel({ url, kf, tilt }) {
     g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x, 0.07)
   })
 
-  return <primitive ref={groupRef} object={scene} />
+  return <primitive ref={groupRef} object={scene} scale={3.2} />
 }
 
 // ErrorBoundary for catching GLB load failures
