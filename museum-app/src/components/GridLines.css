@@ -1,0 +1,15 @@
+.grid-lines {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 0;
+  padding: 0 2.5rem;
+}
+
+.grid-line {
+  width: 1px;
+  height: 100%;
+  background: var(--grid-line);
+}

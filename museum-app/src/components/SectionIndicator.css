@@ -1,0 +1,47 @@
+.section-indicator {
+  position: fixed;
+  left: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.section-dot {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: default;
+}
+
+.section-dot__pip {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  transition: background 0.3s, transform 0.3s;
+  flex-shrink: 0;
+}
+
+.section-dot--active .section-dot__pip {
+  background: var(--accent-gold);
+  transform: scale(1.5);
+}
+
+.section-dot__label {
+  font-size: 0.55rem;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.section-dot--active .section-dot__label {
+  opacity: 1;
+  color: var(--accent-gold);
+}

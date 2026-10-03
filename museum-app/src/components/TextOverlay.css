@@ -1,0 +1,157 @@
+.text-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ─── Common ─── */
+.overlay-section {
+  position: absolute;
+  transition: opacity 0.1s linear;
+  will-change: opacity, transform;
+}
+
+.headline-large {
+  font-family: var(--font-serif);
+  font-size: clamp(2.8rem, 5.5vw, 5.2rem);
+  font-weight: 300;
+  line-height: 1.05;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.headline-large em {
+  font-style: italic;
+  color: var(--text-primary);
+}
+
+.headline-medium {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 3.2vw, 3rem);
+  font-weight: 300;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.headline-medium em {
+  font-style: italic;
+}
+
+.body-small {
+  font-size: 0.72rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-width: 26ch;
+}
+
+.label-tiny {
+  font-size: 0.55rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* ─── Hero ─── */
+.overlay-hero {
+  bottom: 12vh;
+  left: 6vw;
+  right: 0;
+}
+
+.overlay-hero__headline {
+  margin-bottom: 1.5rem;
+}
+
+.overlay-hero__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.overlay-hero__meta {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+/* ─── Details ─── */
+.overlay-details {
+  top: 50%;
+  left: 5vw;
+  transform: translateY(-50%);
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.overlay-details__left {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 340px;
+}
+
+.overlay-details__number {
+  color: var(--accent-gold);
+}
+
+.overlay-details__specs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border-left: 1px solid var(--grid-line);
+  padding-left: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.spec-row {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+}
+
+.spec-label {
+  font-size: 0.58rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  min-width: 52px;
+}
+
+.spec-value {
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  color: var(--text-primary);
+}
+
+.overlay-details__desc {
+  margin-top: 0.5rem;
+}
+
+/* ─── Discovery ─── */
+.overlay-discovery {
+  bottom: 10vh;
+  left: 5vw;
+  right: 5vw;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.overlay-discovery__left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.overlay-discovery__columns {
+  display: flex;
+  gap: 3rem;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.discovery-col {
+  max-width: 200px;
+}
