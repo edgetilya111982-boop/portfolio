@@ -93,17 +93,17 @@
   margin-bottom: 0.8rem;
 }
 
-.works-counter { color: var(--accent-gold); }
+.works-counter { color: var(--accent-gold); font-weight: 400; }
 
 .works-card {
   display: flex;
   gap: 2.5rem;
   align-items: flex-start;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--grid-line);
-  border-radius: 2px;
-  padding: 1.2rem;
-  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 1.4rem;
+  backdrop-filter: blur(16px);
 }
 
 .works-card__video {
@@ -127,11 +127,14 @@
 .works-card__title { margin: 0.3rem 0; }
 
 .works-card__tools {
-  color: var(--accent-ring);
+  color: #7bbde0;
   margin-bottom: 0.5rem;
 }
 
-.works-card__desc { max-width: 28ch; }
+.works-card__desc {
+  max-width: 28ch;
+  color: #e8e4de;
+}
 
 .works-nav {
   display: flex;
@@ -141,23 +144,24 @@
 }
 
 .works-nav__btn {
-  background: none;
-  border: 1px solid var(--grid-line);
-  color: var(--text-secondary);
-  width: 28px;
-  height: 28px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #ffffff;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 0.85rem;
-  transition: border-color 0.2s, color 0.2s;
-  border-radius: 1px;
+  font-size: 1.1rem;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  border-radius: 2px;
 }
 
 .works-nav__btn:hover {
   border-color: var(--accent-gold);
   color: var(--accent-gold);
+  background: rgba(0,0,0,0.6);
 }
 
 .works-nav__dots {
@@ -166,10 +170,10 @@
 }
 
 .works-nav__dot {
-  width: 5px;
-  height: 5px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--text-secondary);
+  background: rgba(255,255,255,0.4);
   border: none;
   cursor: pointer;
   transition: background 0.2s, transform 0.2s;
