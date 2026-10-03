@@ -8,9 +8,7 @@ import { useScrollProgress } from './hooks/useScrollProgress'
 import { useCursorTilt } from './hooks/useCursorTilt'
 import './App.css'
 
-// Set to '/statue.glb' after placing museum-app/public/statue.glb
-// (copy from C:\Users\zakir\Downloads\robot_head.glb)
-const MODEL_URL = null
+const MODEL_URL = '/robot_head.glb'
 
 export default function App() {
   const scrollData = useScrollProgress(3)
