@@ -8,8 +8,9 @@ import { useScrollProgress } from './hooks/useScrollProgress'
 import { useCursorTilt } from './hooks/useCursorTilt'
 import './App.css'
 
-// Model URL — robot_head.glb from Higgsfield / Meshy v7
-const MODEL_URL = '/statue.glb'
+// Set to '/statue.glb' after placing museum-app/public/statue.glb
+// (copy from C:\Users\zakir\Downloads\robot_head.glb)
+const MODEL_URL = null
 
 export default function App() {
   const scrollData = useScrollProgress(3)
