@@ -8,8 +8,8 @@ import { useScrollProgress } from './hooks/useScrollProgress'
 import { useCursorTilt } from './hooks/useCursorTilt'
 import './App.css'
 
-// Model URL — set to null to use fallback geometry until GLB is ready
-const MODEL_URL = null // Will be set to '/statue.glb' when available
+// Model URL — robot_head.glb from Higgsfield / Meshy v7
+const MODEL_URL = '/statue.glb'
 
 export default function App() {
   const scrollData = useScrollProgress(3)
