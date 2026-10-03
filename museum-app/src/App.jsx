@@ -28,8 +28,6 @@ export default function App() {
       <SectionIndicator section={scrollData.section} />
       <TextOverlay scrollData={scrollData} />
 
-      {/* Scroll spacer — 3 viewport heights */}
-      <div className="scroll-spacer" />
     </div>
   )
 }

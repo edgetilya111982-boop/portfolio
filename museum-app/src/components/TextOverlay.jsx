@@ -19,8 +19,7 @@ const WORKS = [
 ]
 
 // Section 0 — Hero / Intro
-function HeroText({ progress }) {
-  const opacity = Math.max(0, 1 - progress * 3)
+function HeroText({ opacity }) {
   return (
     <div className="overlay-section overlay-hero" style={{ opacity }}>
       <div className="overlay-hero__headline">
@@ -46,10 +45,8 @@ function HeroText({ progress }) {
 }
 
 // Section 1 — Works carousel
-function WorksText({ progress, visible }) {
+function WorksText({ opacity }) {
   const [current, setCurrent] = useState(0)
-  const opacity = visible ? Math.min(1, progress * 4) * Math.max(0, 1 - (progress - 0.85) * 8) : 0
-  const offsetY = visible ? (1 - Math.min(1, progress * 4)) * 30 : 30
 
   const prev = () => setCurrent(i => (i - 1 + WORKS.length) % WORKS.length)
   const next = () => setCurrent(i => (i + 1) % WORKS.length)
@@ -58,7 +55,7 @@ function WorksText({ progress, visible }) {
   return (
     <div
       className="overlay-section overlay-works"
-      style={{ opacity, transform: `translateY(${offsetY}px)`, pointerEvents: visible && opacity > 0.1 ? 'auto' : 'none' }}
+      style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}
     >
       <div className="works-header">
         <span className="label-tiny">Selected work</span>
@@ -102,12 +99,9 @@ function WorksText({ progress, visible }) {
 }
 
 // Section 2 — Contacts
-function ContactText({ progress, visible }) {
-  const opacity = visible ? Math.min(1, progress * 4) : 0
-  const offsetY = visible ? (1 - Math.min(1, progress * 4)) * 20 : 20
-
+function ContactText({ opacity }) {
   return (
-    <div className="overlay-section overlay-contact" style={{ opacity, transform: `translateY(${offsetY}px)`, pointerEvents: visible && opacity > 0.1 ? 'auto' : 'none' }}>
+    <div className="overlay-section overlay-contact" style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}>
       <div className="contact-inner">
         <span className="label-tiny">Get in touch</span>
         <h2 className="headline-large contact-headline">
@@ -129,19 +123,17 @@ function ContactText({ progress, visible }) {
 }
 
 export default function TextOverlay({ scrollData }) {
-  const { section, progress } = scrollData
+  const { raw } = scrollData
+  // opacity peaks at 1 when raw == section index, fades within ±0.5
+  const heroOp    = Math.max(0, 1 - Math.abs(raw - 0) * 2.5)
+  const worksOp   = Math.max(0, 1 - Math.abs(raw - 1) * 2.5)
+  const contactOp = Math.max(0, 1 - Math.abs(raw - 2) * 2.5)
 
   return (
     <div className="text-overlay">
-      <HeroText progress={section === 0 ? progress : section > 0 ? 1 : 0} />
-      <WorksText
-        progress={section === 1 ? progress : section > 1 ? 1 : 0}
-        visible={section === 1 || (section === 0 && progress > 0.6)}
-      />
-      <ContactText
-        progress={section === 2 ? progress : 0}
-        visible={section === 2 || (section === 1 && progress > 0.75)}
-      />
+      <HeroText opacity={heroOp} />
+      <WorksText opacity={worksOp} />
+      <ContactText opacity={contactOp} />
     </div>
   )
 }
