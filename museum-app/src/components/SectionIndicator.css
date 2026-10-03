@@ -46,3 +46,13 @@
   opacity: 1;
   color: var(--accent-gold);
 }
+
+@media (max-width: 640px) {
+  .section-indicator {
+    right: 0.8rem;
+    gap: 1rem;
+  }
+  .section-dot__label {
+    display: none;
+  }
+}

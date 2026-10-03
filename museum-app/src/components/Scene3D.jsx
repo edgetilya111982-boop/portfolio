@@ -19,8 +19,8 @@ const KEYFRAMES = [
     ringScale: 0.72,
     ringOpacity: 0.9,
     dofFocus: 0.12,
-    ambientIntensity: 0.04,
-    lightIntensity: 0.5,
+    ambientIntensity: 0.18,
+    lightIntensity: 1.2,
   },
   // Section 1 – Craft: emerging from shadow
   {

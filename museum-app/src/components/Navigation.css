@@ -105,3 +105,13 @@
   border-color: var(--accent-gold);
   color: var(--accent-gold);
 }
+
+@media (max-width: 640px) {
+  .nav {
+    padding: 0 1.2rem;
+  }
+  .nav__links,
+  .nav__cta {
+    display: none;
+  }
+}
