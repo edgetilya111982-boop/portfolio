@@ -8,7 +8,7 @@ import { useScrollProgress } from './hooks/useScrollProgress'
 import { useCursorTilt } from './hooks/useCursorTilt'
 import './App.css'
 
-const MODEL_URL = '/robot_head.glb'
+const MODEL_URL = `${import.meta.env.BASE_URL}robot_head.glb`
 
 export default function App() {
   const scrollData = useScrollProgress(3)

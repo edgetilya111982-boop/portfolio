@@ -7,14 +7,14 @@ const WORKS = [
     title: 'Анимация',
     tools: 'Higgsfield AI',
     desc: 'AI-анимация, где каждый кадр рождается из идеи — без рук, только воображение.',
-    video: '/work_01.mp4',
+    video: `${import.meta.env.BASE_URL}work_01.mp4`,
   },
   {
     num: '02',
     title: 'Рекламный ролик',
     tools: 'Higgsfield AI',
     desc: 'Кинематографичный ролик, созданный целиком инструментами генеративного ИИ.',
-    video: '/work_02.mp4',
+    video: `${import.meta.env.BASE_URL}work_02.mp4`,
   },
 ]
 
