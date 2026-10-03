@@ -2,11 +2,10 @@ import React from 'react'
 import './Navigation.css'
 
 const NAV_LINKS = [
-  { label: 'Home',    section: 0 },
-  { label: 'Work',    section: 1 },
-  { label: 'About',   section: 0 },
-  { label: 'Tools',   section: 1 },
-  { label: 'Contact', section: 2 },
+  { label: 'Главная', section: 0 },
+  { label: 'Работы',  section: 1 },
+  { label: 'Обо мне', section: 0 },
+  { label: 'Контакты', section: 2 },
 ]
 
 function goto(index) {
@@ -20,7 +19,7 @@ export default function Navigation() {
         <span className="nav__logo-mark">◈</span>
         <div className="nav__logo-text">
           <span className="nav__logo-name">ZAK</span>
-          <span className="nav__logo-sub">AI CREATOR</span>
+          <span className="nav__logo-sub">AI-ДИЗАЙНЕР</span>
         </div>
       </div>
       <ul className="nav__links">
@@ -37,7 +36,7 @@ export default function Navigation() {
         ))}
       </ul>
       <div className="nav__cta">
-        <button className="nav__btn" onClick={() => goto(2)}>Let's create →</button>
+        <button className="nav__btn" onClick={() => goto(2)}>Создадим вместе →</button>
       </div>
     </nav>
   )

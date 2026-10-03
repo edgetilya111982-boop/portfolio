@@ -4,38 +4,39 @@ import './TextOverlay.css'
 const WORKS = [
   {
     num: '01',
-    title: 'Animation',
+    title: 'Анимация',
     tools: 'Higgsfield AI',
-    desc: 'AI-driven animation — motion and atmosphere generated frame by frame.',
+    desc: 'AI-анимация, где каждый кадр рождается из идеи — без рук, только воображение.',
     video: '/work_01.mp4',
   },
   {
     num: '02',
-    title: 'Ad Creative',
+    title: 'Рекламный ролик',
     tools: 'Higgsfield AI',
-    desc: 'Cinematic ad reel created entirely with generative AI tools.',
+    desc: 'Кинематографичный ролик, созданный целиком инструментами генеративного ИИ.',
     video: '/work_02.mp4',
   },
 ]
 
-// Section 0 — Hero / Intro
+// Section 0 — Hero
 function HeroText({ opacity }) {
   return (
     <div className="overlay-section overlay-hero" style={{ opacity }}>
       <div className="overlay-hero__headline">
         <h1 className="headline-large">
-          I build things<br />
-          <em>AI has never<br />built before.</em>
+          Я создаю образы,<br />
+          которые ИИ<br />
+          <span className="hero-accent">ещё не видел.</span>
         </h1>
       </div>
       <div className="overlay-hero__body">
         <p className="body-small">
-          Zak — AI creator pushing the edge<br />
-          of generative media, 3D and<br />
-          interactive experience.
+          Zak — AI-дизайнер, саунд-дизайнер<br />
+          и автор визуального контента.<br />
+          Строю будущее инструментами ИИ.
         </p>
         <div className="overlay-hero__meta">
-          <span className="label-tiny">Available for projects</span>
+          <span className="label-tiny">Открыт к проектам</span>
           <span className="label-tiny">·</span>
           <span className="label-tiny">2024</span>
         </div>
@@ -58,7 +59,7 @@ function WorksText({ opacity }) {
       style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}
     >
       <div className="works-header">
-        <span className="label-tiny">Selected work</span>
+        <span className="label-tiny">Избранные работы</span>
         <span className="label-tiny works-counter">{current + 1} / {WORKS.length}</span>
       </div>
 
@@ -81,18 +82,18 @@ function WorksText({ opacity }) {
       </div>
 
       <div className="works-nav">
-        <button className="works-nav__btn" onClick={prev} aria-label="Previous">←</button>
+        <button className="works-nav__btn" onClick={prev} aria-label="Назад">←</button>
         <div className="works-nav__dots">
           {WORKS.map((_, i) => (
             <button
               key={i}
               className={`works-nav__dot ${i === current ? 'works-nav__dot--active' : ''}`}
               onClick={() => setCurrent(i)}
-              aria-label={`Work ${i + 1}`}
+              aria-label={`Работа ${i + 1}`}
             />
           ))}
         </div>
-        <button className="works-nav__btn" onClick={next} aria-label="Next">→</button>
+        <button className="works-nav__btn" onClick={next} aria-label="Вперёд">→</button>
       </div>
     </div>
   )
@@ -103,10 +104,15 @@ function ContactText({ opacity }) {
   return (
     <div className="overlay-section overlay-contact" style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}>
       <div className="contact-inner">
-        <span className="label-tiny">Get in touch</span>
+        <span className="label-tiny">Связаться</span>
         <h2 className="headline-large contact-headline">
-          Let's create<br /><em>something new.</em>
+          Создадим<br />
+          <span className="hero-accent">что‑то невероятное.</span>
         </h2>
+        <p className="body-small contact-sub">
+          Есть идея? Я знаю, как сделать её реальной.<br />
+          Дизайн, анимация, саунд — всё в одном месте.
+        </p>
         <div className="contact-links">
           <a href="https://t.me/zakinskiy" className="contact-link" target="_blank" rel="noreferrer">
             <span className="contact-link__label label-tiny">Telegram</span>
@@ -124,7 +130,6 @@ function ContactText({ opacity }) {
 
 export default function TextOverlay({ scrollData }) {
   const { raw } = scrollData
-  // opacity peaks at 1 when raw == section index, fades within ±0.5
   const heroOp    = Math.max(0, 1 - Math.abs(raw - 0) * 2.5)
   const worksOp   = Math.max(0, 1 - Math.abs(raw - 1) * 2.5)
   const contactOp = Math.max(0, 1 - Math.abs(raw - 2) * 2.5)
