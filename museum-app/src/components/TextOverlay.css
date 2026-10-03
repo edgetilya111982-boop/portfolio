@@ -106,13 +106,45 @@
   backdrop-filter: blur(16px);
 }
 
-.works-card__video {
+.works-card__video-wrap {
+  position: relative;
   width: min(48vw, 560px);
   height: min(27vw, 315px);
-  object-fit: cover;
-  border-radius: 1px;
   flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.works-card__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
   background: #000;
+}
+
+.works-card__fullscreen-hint {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 3px;
+  font-size: 1.1rem;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.works-card__video-wrap:hover .works-card__fullscreen-hint {
+  opacity: 1;
 }
 
 .works-card__info {
@@ -264,7 +296,7 @@
     gap: 1rem;
   }
 
-  .works-card__video {
+  .works-card__video-wrap {
     width: 100%;
     height: 44vw;
   }

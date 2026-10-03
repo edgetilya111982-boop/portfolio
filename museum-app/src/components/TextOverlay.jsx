@@ -79,17 +79,29 @@ function WorksText({ opacity }) {
       </div>
 
       <div className="works-card">
-        <video
-          ref={videoRef}
-          className="works-card__video"
-          src={loaded ? w.video : undefined}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          key={w.video}
-        />
+        <div
+          className="works-card__video-wrap"
+          onClick={() => {
+            const v = videoRef.current
+            if (!v) return
+            if (v.requestFullscreen) v.requestFullscreen()
+            else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen()
+            else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen()
+          }}
+        >
+          <video
+            ref={videoRef}
+            className="works-card__video"
+            src={loaded ? w.video : undefined}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            key={w.video}
+          />
+          <div className="works-card__fullscreen-hint">⛶</div>
+        </div>
         <div className="works-card__info">
           <span className="works-card__num label-tiny">{w.num}</span>
           <h2 className="works-card__title headline-medium">{w.title}</h2>
