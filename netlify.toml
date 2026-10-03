@@ -3,6 +3,9 @@
   command = "npm run build"
   publish = "museum-app/dist"
 
+[build.environment]
+  NODE_VERSION = "22"
+
 [[headers]]
   for = "/*"
   [headers.values]
