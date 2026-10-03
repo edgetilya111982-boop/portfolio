@@ -14,11 +14,12 @@
 
 .headline-large {
   font-family: var(--font-serif);
-  font-size: clamp(2.2rem, 4.2vw, 4.4rem);
+  font-size: clamp(2.6rem, 4.8vw, 5rem);
   font-weight: 200;
   line-height: 1.1;
   color: var(--text-primary);
   letter-spacing: -0.02em;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.9), 0 1px 6px rgba(0,0,0,0.7);
 }
 
 .hero-accent {
@@ -28,27 +29,30 @@
 
 .headline-medium {
   font-family: var(--font-serif);
-  font-size: clamp(1.4rem, 2.4vw, 2.2rem);
+  font-size: clamp(1.6rem, 2.8vw, 2.6rem);
   font-weight: 300;
   line-height: 1.15;
   color: var(--text-primary);
   letter-spacing: -0.01em;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.9), 0 1px 4px rgba(0,0,0,0.7);
 }
 
 .body-small {
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   font-weight: 300;
   line-height: 1.7;
   color: var(--text-secondary);
   max-width: 26ch;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.95);
 }
 
 .label-tiny {
-  font-size: 0.55rem;
+  font-size: 0.65rem;
   font-weight: 400;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--text-secondary);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.95);
 }
 
 /* ─── Hero ─── */
@@ -56,6 +60,9 @@
   bottom: 12vh;
   left: 6vw;
   right: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.55) 0%, transparent 70%);
+  padding: 1.8rem 2rem 1.8rem 1.2rem;
+  border-radius: 4px;
 }
 
 .overlay-hero__headline { margin-bottom: 1.5rem; }
@@ -178,6 +185,9 @@
 .overlay-contact {
   bottom: 10vh;
   left: 6vw;
+  background: linear-gradient(90deg, rgba(0,0,0,0.55) 0%, transparent 70%);
+  padding: 1.8rem 2rem 1.8rem 1.2rem;
+  border-radius: 4px;
 }
 
 .contact-inner {
