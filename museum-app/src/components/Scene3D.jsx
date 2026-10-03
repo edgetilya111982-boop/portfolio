@@ -114,7 +114,27 @@ function GlowRing({ position, scale, opacity }) {
   )
 }
 
-// ── Fallback box-head (shows when GLB is missing/loading) ────────────────────
+// ── Loading spinner (shows while GLB is downloading) ─────────────────────────
+function LoadingSpinner() {
+  const ref = useRef()
+  useFrame(({ clock }) => {
+    if (ref.current) ref.current.rotation.z = clock.getElapsedTime() * 1.5
+  })
+  return (
+    <group>
+      <mesh ref={ref}>
+        <torusGeometry args={[0.18, 0.008, 8, 60]} />
+        <meshBasicMaterial color="#c9a96e" transparent opacity={0.7} />
+      </mesh>
+      <mesh>
+        <torusGeometry args={[0.18, 0.002, 8, 60]} />
+        <meshBasicMaterial color="#4a7fa5" transparent opacity={0.3} />
+      </mesh>
+    </group>
+  )
+}
+
+// ── Fallback box-head (shows when GLB fails to load) ─────────────────────────
 function FallbackHead({ kf, tilt }) {
   const groupRef = useRef()
   const mat = useMemo(() => new THREE.MeshStandardMaterial({
@@ -134,18 +154,10 @@ function FallbackHead({ kf, tilt }) {
       <mesh material={mat} position={[0, 0.04, 0]}><boxGeometry args={[0.2, 0.22, 0.18]} /></mesh>
       <mesh material={mat} position={[0, 0.17, 0]}><boxGeometry args={[0.18, 0.06, 0.16]} /></mesh>
       <mesh material={mat} position={[0, -0.1, 0]}><boxGeometry args={[0.15, 0.04, 0.14]} /></mesh>
-      {/* eye rings */}
       {[-0.052, 0.052].map((x, i) => (
         <mesh key={i} position={[x, 0.03, 0.093]}>
           <torusGeometry args={[0.026, 0.004, 8, 32]} />
           <meshStandardMaterial color="#c9a000" metalness={1} roughness={0.1} />
-        </mesh>
-      ))}
-      {/* khaki panels */}
-      {[-0.092, 0.092].map((x, i) => (
-        <mesh key={i} position={[x, 0.05, 0]}>
-          <boxGeometry args={[0.018, 0.06, 0.16]} />
-          <meshStandardMaterial color="#4a4a2a" metalness={0.3} roughness={0.6} />
         </mesh>
       ))}
       <mesh material={mat} position={[0, -0.165, 0]}>
@@ -219,7 +231,7 @@ function SceneContent({ scrollData, tilt, modelUrl, mobile }) {
 
       {modelUrl ? (
         <GLBErrorBoundary fallback={fallback}>
-          <Suspense fallback={fallback}>
+          <Suspense fallback={<LoadingSpinner />}>
             <RobotModel url={modelUrl} kf={kf} tilt={tilt} />
           </Suspense>
         </GLBErrorBoundary>

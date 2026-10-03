@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import './TextOverlay.css'
 
 const WORKS = [
@@ -48,6 +48,21 @@ function HeroText({ opacity }) {
 // Section 1 — Works carousel
 function WorksText({ opacity }) {
   const [current, setCurrent] = useState(0)
+  const [loaded, setLoaded] = useState(false)
+  const videoRef = useRef(null)
+
+  // Start loading video only when section becomes visible
+  useEffect(() => {
+    if (opacity > 0.1 && !loaded) setLoaded(true)
+  }, [opacity, loaded])
+
+  // Play/pause based on visibility
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    if (opacity > 0.3) { v.play().catch(() => {}) }
+    else v.pause()
+  }, [opacity])
 
   const prev = () => setCurrent(i => (i - 1 + WORKS.length) % WORKS.length)
   const next = () => setCurrent(i => (i + 1) % WORKS.length)
@@ -65,13 +80,14 @@ function WorksText({ opacity }) {
 
       <div className="works-card">
         <video
+          ref={videoRef}
           className="works-card__video"
-          src={w.video}
+          src={loaded ? w.video : undefined}
           autoPlay
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           key={w.video}
         />
         <div className="works-card__info">

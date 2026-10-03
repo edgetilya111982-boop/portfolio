@@ -6,9 +6,13 @@ import Scene3D from './components/Scene3D'
 import TextOverlay from './components/TextOverlay'
 import { useScrollProgress } from './hooks/useScrollProgress'
 import { useCursorTilt } from './hooks/useCursorTilt'
+import { useGLTF } from '@react-three/drei'
 import './App.css'
 
 const MODEL_URL = `${import.meta.env.BASE_URL}robot_head.glb`
+
+// Start loading GLB immediately, before React even renders the canvas
+useGLTF.preload(MODEL_URL)
 
 export default function App() {
   const scrollData = useScrollProgress(3)
