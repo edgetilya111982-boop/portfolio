@@ -1,12 +1,13 @@
 .section-indicator {
   position: fixed;
-  left: 2rem;
+  right: 2rem;
   top: 50%;
   transform: translateY(-50%);
   z-index: 50;
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+  align-items: flex-end;
 }
 
 .section-dot {

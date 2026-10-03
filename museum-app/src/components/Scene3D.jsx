@@ -18,7 +18,7 @@ const KEYFRAMES = [
     ringPos: [0, 0.12, -0.4],
     ringScale: 0.55,
     ringOpacity: 0.9,
-    dofFocus: 0.028,
+    dofFocus: 0.12,
   },
   // Section 1 – Craft: head moves right, quarter-view
   {
@@ -29,7 +29,7 @@ const KEYFRAMES = [
     ringPos: [0.45, 0.12, -0.35],
     ringScale: 0.42,
     ringOpacity: 0.7,
-    dofFocus: 0.032,
+    dofFocus: 0.10,
   },
   // Section 2 – Work: close-up, ring partly cropped
   {
@@ -40,7 +40,7 @@ const KEYFRAMES = [
     ringPos: [0.08, 0.32, -0.3],
     ringScale: 0.68,
     ringOpacity: 0.6,
-    dofFocus: 0.020,
+    dofFocus: 0.14,
   },
 ]
 
@@ -213,7 +213,7 @@ function SceneContent({ scrollData, tilt, modelUrl }) {
 
       {/* Post-processing */}
       <EffectComposer>
-        <DepthOfField focusDistance={kf.dofFocus} focalLength={0.015} bokehScale={1.8} />
+        <DepthOfField focusDistance={kf.dofFocus} focalLength={0.008} bokehScale={0.6} />
         <Bloom intensity={1.4} luminanceThreshold={0.35} luminanceSmoothing={0.9} radius={0.85} />
         <Noise opacity={0.028} />
         <Vignette eskil={false} offset={0.18} darkness={0.75} />
