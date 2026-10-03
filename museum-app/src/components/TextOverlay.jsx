@@ -1,5 +1,22 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './TextOverlay.css'
+
+const WORKS = [
+  {
+    num: '01',
+    title: 'Animation',
+    tools: 'Higgsfield AI',
+    desc: 'AI-driven animation — motion and atmosphere generated frame by frame.',
+    video: '/work_01.mp4',
+  },
+  {
+    num: '02',
+    title: 'Ad Creative',
+    tools: 'Higgsfield AI',
+    desc: 'Cinematic ad reel created entirely with generative AI tools.',
+    video: '/work_02.mp4',
+  },
+]
 
 // Section 0 — Hero / Intro
 function HeroText({ progress }) {
@@ -28,80 +45,82 @@ function HeroText({ progress }) {
   )
 }
 
-// Section 1 — Craft / About
-function CraftText({ progress, visible }) {
-  const opacity = visible ? Math.min(1, progress * 4) * Math.max(0, 1 - (progress - 0.8) * 10) : 0
-  const offsetX = visible ? (1 - Math.min(1, progress * 4)) * -30 : -30
+// Section 1 — Works carousel
+function WorksText({ progress, visible }) {
+  const [current, setCurrent] = useState(0)
+  const opacity = visible ? Math.min(1, progress * 4) * Math.max(0, 1 - (progress - 0.85) * 8) : 0
+  const offsetY = visible ? (1 - Math.min(1, progress * 4)) * 30 : 30
+
+  const prev = () => setCurrent(i => (i - 1 + WORKS.length) % WORKS.length)
+  const next = () => setCurrent(i => (i + 1) % WORKS.length)
+  const w = WORKS[current]
+
   return (
-    <div className="overlay-section overlay-details" style={{ opacity, transform: `translateX(${offsetX}px)` }}>
-      <div className="overlay-details__left">
-        <span className="label-tiny overlay-details__number">ZAK</span>
-        <h2 className="headline-medium">
-          AI Creator<br />
-          <em>&amp; Generative<br />Artist</em>
-        </h2>
-        <div className="overlay-details__specs">
-          <div className="spec-row">
-            <span className="spec-label">Focus</span>
-            <span className="spec-value">AI-driven 3D & video</span>
-          </div>
-          <div className="spec-row">
-            <span className="spec-label">Tools</span>
-            <span className="spec-value">Higgsfield, Meshy, R3F</span>
-          </div>
-          <div className="spec-row">
-            <span className="spec-label">Style</span>
-            <span className="spec-value">Dark, cinematic, precise</span>
-          </div>
+    <div
+      className="overlay-section overlay-works"
+      style={{ opacity, transform: `translateY(${offsetY}px)`, pointerEvents: visible && opacity > 0.1 ? 'auto' : 'none' }}
+    >
+      <div className="works-header">
+        <span className="label-tiny">Selected work</span>
+        <span className="label-tiny works-counter">{current + 1} / {WORKS.length}</span>
+      </div>
+
+      <div className="works-card">
+        <video
+          className="works-card__video"
+          src={w.video}
+          autoPlay
+          muted
+          loop
+          playsInline
+          key={w.video}
+        />
+        <div className="works-card__info">
+          <span className="works-card__num label-tiny">{w.num}</span>
+          <h2 className="works-card__title headline-medium">{w.title}</h2>
+          <span className="works-card__tools label-tiny">{w.tools}</span>
+          <p className="works-card__desc body-small">{w.desc}</p>
         </div>
-        <div className="overlay-details__desc">
-          <p className="body-small">
-            I work at the intersection of artificial
-            intelligence and creative direction —
-            producing visuals, experiences and
-            worlds that feel genuinely new.
-          </p>
-          <p className="body-small" style={{ marginTop: '0.75rem' }}>
-            Every project starts with a question
-            machines haven't answered yet.
-          </p>
+      </div>
+
+      <div className="works-nav">
+        <button className="works-nav__btn" onClick={prev} aria-label="Previous">←</button>
+        <div className="works-nav__dots">
+          {WORKS.map((_, i) => (
+            <button
+              key={i}
+              className={`works-nav__dot ${i === current ? 'works-nav__dot--active' : ''}`}
+              onClick={() => setCurrent(i)}
+              aria-label={`Work ${i + 1}`}
+            />
+          ))}
         </div>
+        <button className="works-nav__btn" onClick={next} aria-label="Next">→</button>
       </div>
     </div>
   )
 }
 
-// Section 2 — Work / CTA
-function WorkText({ progress, visible }) {
+// Section 2 — Contacts
+function ContactText({ progress, visible }) {
   const opacity = visible ? Math.min(1, progress * 4) : 0
   const offsetY = visible ? (1 - Math.min(1, progress * 4)) * 20 : 20
+
   return (
-    <div className="overlay-section overlay-discovery" style={{ opacity, transform: `translateY(${offsetY}px)` }}>
-      <div className="overlay-discovery__left">
-        <span className="label-tiny">Selected work</span>
-        <h2 className="headline-medium">
-          Creating at the<br />
-          <em>frontier of what<br />AI can make</em>
+    <div className="overlay-section overlay-contact" style={{ opacity, transform: `translateY(${offsetY}px)`, pointerEvents: visible && opacity > 0.1 ? 'auto' : 'none' }}>
+      <div className="contact-inner">
+        <span className="label-tiny">Get in touch</span>
+        <h2 className="headline-large contact-headline">
+          Let's create<br /><em>something new.</em>
         </h2>
-      </div>
-      <div className="overlay-discovery__columns">
-        <div className="discovery-col">
-          <p className="body-small">
-            Generative 3D characters,
-            cinematic AI video, interactive
-            web experiences and brand
-            identities built with AI-first tools.
-          </p>
-        </div>
-        <div className="discovery-col">
-          <p className="body-small">
-            Open to collaborations,
-            commissions and experiments.
-            If you have an idea that needs
-            a creative partner — let's talk.
-          </p>
-          <a href="#" className="cta-link" onClick={e => e.preventDefault()}>
-            Get in touch →
+        <div className="contact-links">
+          <a href="https://t.me/zakinskiy" className="contact-link" target="_blank" rel="noreferrer">
+            <span className="contact-link__label label-tiny">Telegram</span>
+            <span className="contact-link__value">@zakinskiy</span>
+          </a>
+          <a href="mailto:qeepil@bk.ru" className="contact-link">
+            <span className="contact-link__label label-tiny">Email</span>
+            <span className="contact-link__value">qeepil@bk.ru</span>
           </a>
         </div>
       </div>
@@ -115,13 +134,13 @@ export default function TextOverlay({ scrollData }) {
   return (
     <div className="text-overlay">
       <HeroText progress={section === 0 ? progress : section > 0 ? 1 : 0} />
-      <CraftText
+      <WorksText
         progress={section === 1 ? progress : section > 1 ? 1 : 0}
         visible={section === 1 || (section === 0 && progress > 0.6)}
       />
-      <WorkText
+      <ContactText
         progress={section === 2 ? progress : 0}
-        visible={section === 2 || (section === 1 && progress > 0.7)}
+        visible={section === 2 || (section === 1 && progress > 0.75)}
       />
     </div>
   )
