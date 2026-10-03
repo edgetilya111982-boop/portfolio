@@ -70,16 +70,29 @@ export function useScrollProgress(sectionCount) {
       if (e.key === 'ArrowUp' || e.key === 'PageUp') go(-1)
     }
 
+    function onGoto(e) {
+      const idx = Math.max(0, Math.min(sectionCount - 1, e.detail.index))
+      if (idx === st.target && !st.locked) return
+      st.target = idx
+      st.startPos = st.current
+      st.startTime = null
+      st.locked = true
+      if (st.rafId) cancelAnimationFrame(st.rafId)
+      st.rafId = requestAnimationFrame(tick)
+    }
+
     window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('touchstart', onTouchStart, { passive: true })
     window.addEventListener('touchend', onTouchEnd, { passive: true })
     window.addEventListener('keydown', onKey)
+    window.addEventListener('goto-section', onGoto)
 
     return () => {
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchend', onTouchEnd)
       window.removeEventListener('keydown', onKey)
+      window.removeEventListener('goto-section', onGoto)
       if (st.rafId) cancelAnimationFrame(st.rafId)
     }
   }, [sectionCount])

@@ -86,15 +86,28 @@ function GlowRing({ position, scale, opacity }) {
 
   return (
     <group position={position}>
+      {/* Core ring */}
       <mesh ref={ringRef} scale={scale}>
-        <torusGeometry args={[1, 0.006, 16, 120]} />
-        <meshBasicMaterial color="#4a7fa5" transparent opacity={opacity} />
+        <torusGeometry args={[1, 0.007, 16, 120]} />
+        <meshBasicMaterial color="#6ab4e8" transparent opacity={opacity} />
       </mesh>
-      <mesh ref={glowRef} scale={scale * 1.04}>
-        <torusGeometry args={[1, 0.028, 8, 100]} />
-        <meshBasicMaterial color="#2a5f85" transparent opacity={opacity * 0.28} />
+      {/* Inner glow halo */}
+      <mesh ref={glowRef} scale={scale * 1.03}>
+        <torusGeometry args={[1, 0.032, 8, 100]} />
+        <meshBasicMaterial color="#4a9fd4" transparent opacity={opacity * 0.5} />
       </mesh>
-      <pointLight color="#4a7fa5" intensity={opacity * 2.5} distance={2} decay={2} />
+      {/* Outer soft glow */}
+      <mesh scale={scale * 1.08}>
+        <torusGeometry args={[1, 0.07, 8, 100]} />
+        <meshBasicMaterial color="#1a5f8a" transparent opacity={opacity * 0.18} />
+      </mesh>
+      {/* Wide diffuse glow */}
+      <mesh scale={scale * 1.18}>
+        <torusGeometry args={[1, 0.14, 8, 80]} />
+        <meshBasicMaterial color="#0d3a5c" transparent opacity={opacity * 0.08} />
+      </mesh>
+      <pointLight color="#4a9fd4" intensity={opacity * 5.0} distance={3.5} decay={2} />
+      <pointLight color="#2a6fa0" intensity={opacity * 3.0} distance={5.0} decay={2} position={[0, 0, 0.2]} />
     </group>
   )
 }
