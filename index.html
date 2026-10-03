@@ -1,1 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Портфолио — Иван Иванов</title>
+  <meta name="description" content="Портфолио веб-разработчика Ивана Иванова: проекты, услуги и контакты." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
 
+  <!-- ===== Шапка с меню ===== -->
+  <header>
+    <div class="container nav">
+      <a href="#home" class="logo">Иван<span>.</span></a>
+      <button class="burger" id="burger" aria-label="Открыть меню">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home">Главная</a></li>
+        <li><a href="#about">Обо мне</a></li>
+        <li><a href="#services">Услуги</a></li>
+        <li><a href="#projects">Проекты</a></li>
+        <li><a href="#contact">Контакты</a></li>
+        <li><a href="#contact" class="nav-cta">Давайте обсудим</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- ===== Главный экран ===== -->
+  <section class="hero" id="home">
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <p class="eyebrow reveal">Креативный разработчик</p>
+        <h1 class="reveal">Создаю сайты,<br />которые<br /><em>выделяются</em><br />и приносят<br />результат</h1>
+        <p class="subtitle reveal">
+          Я помогаю амбициозным проектам находить свою аудиторию через
+          брендинг, дизайн и современные цифровые решения.
+        </p>
+        <a href="#contact" class="btn btn-primary reveal">Написать мне</a>
+      </div>
+      <div class="hero-visual reveal">
+        <div class="collage">
+          <div class="tile t1"></div>
+          <div class="tile t2"></div>
+          <div class="tile t3"></div>
+          <div class="badge"><strong>9+</strong><span>лет опыта</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Статистика ===== -->
+  <section class="stats" id="about">
+    <div class="container stats-grid">
+      <div class="stat reveal"><span class="num" data-count="500" data-suffix="+">0</span><p>проектов выполнено</p></div>
+      <div class="stat reveal"><span class="num" data-count="98" data-suffix="%">0</span><p>довольных клиентов</p></div>
+      <div class="stat reveal"><span class="num" data-count="9" data-suffix="+">0</span><p>лет опыта</p></div>
+      <div class="stat reveal"><span class="num" data-count="350" data-suffix="+">0</span><p>постоянных партнёров</p></div>
+    </div>
+  </section>
+
+  <!-- ===== Что я делаю ===== -->
+  <section class="section" id="services">
+    <div class="container">
+      <p class="eyebrow reveal">Что я делаю</p>
+      <h2 class="reveal">Строю бренды,<br />которые растут<br />и запоминаются</h2>
+      <p class="section-desc reveal">Изучите мои услуги.</p>
+
+      <div class="services-grid">
+        <article class="service-card reveal">
+          <span class="s-num">01</span>
+          <h3>Брендинговая стратегия</h3>
+          <p>Определяю позиционирование и стратегию вашего бренда, чтобы он рос уверенно и заметно.</p>
+          <a href="#contact" class="s-link">Подробнее <i>→</i></a>
+        </article>
+        <article class="service-card reveal">
+          <span class="s-num">02</span>
+          <h3>Визуальная айдентика</h3>
+          <p>Разрабатываю системы дизайна, которые делают бренд узнаваемым и незабываемым.</p>
+          <a href="#contact" class="s-link">Подробнее <i>→</i></a>
+        </article>
+        <article class="service-card reveal">
+          <span class="s-num">03</span>
+          <h3>Веб-дизайн</h3>
+          <p>Создаю современные сайты, ориентированные на конверсию, которые вовлекают пользователей.</p>
+          <a href="#contact" class="s-link">Подробнее <i>→</i></a>
+        </article>
+        <article class="service-card reveal">
+          <span class="s-num">04</span>
+          <h3>Моушн и контент</h3>
+          <p>Делаю цепляющую моушн-графику и контент, который оживляет ваш бренд.</p>
+          <a href="#contact" class="s-link">Подробнее <i>→</i></a>
+        </article>
+        <article class="service-card reveal">
+          <span class="s-num">05</span>
+          <h3>Креативное направление</h3>
+          <p>Формирую стиль, настроение и голос бренда во всех точках контакта с аудиторией.</p>
+          <a href="#contact" class="s-link">Подробнее <i>→</i></a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Проекты / кейсы ===== -->
+  <section class="section" id="projects">
+    <div class="container">
+      <p class="eyebrow reveal">Кейсы</p>
+      <h2 class="reveal">Работы,<br />которые говорят<br />сами за себя</h2>
+
+      <div class="cases-slider">
+        <button class="arrow prev" id="prevCase" aria-label="Предыдущий проект">←</button>
+        <button class="arrow next" id="nextCase" aria-label="Следующий проект">→</button>
+        <div class="cases-track" id="casesTrack">
+          <article class="case">
+            <div class="thumb th1"></div>
+            <h3>Nexora</h3>
+            <p>Айдентика бренда</p>
+          </article>
+          <article class="case">
+            <div class="thumb th2"></div>
+            <h3>Velmora</h3>
+            <p>Веб-дизайн и цифровой опыт</p>
+          </article>
+          <article class="case">
+            <div class="thumb th3"></div>
+            <h3>Orvion</h3>
+            <p>Айдентика бренда</p>
+          </article>
+          <article class="case">
+            <div class="thumb th4"></div>
+            <h3>Lunara</h3>
+            <p>Моушн-дизайн</p>
+          </article>
+          <article class="case">
+            <div class="thumb th5"></div>
+            <h3>Chehova</h3>
+            <p>Веб-разработка</p>
+          </article>
+          <article class="case">
+            <div class="thumb th6"></div>
+            <h3>Quantia</h3>
+            <p>Креативная кампания</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Контакты ===== -->
+  <section class="section contact" id="contact">
+    <div class="container">
+      <h2 class="reveal">Готовы создать<br />что-то особенное?</h2>
+      <form id="contactForm" class="reveal">
+        <input type="text" id="nameInput" placeholder="Ваше имя" required />
+        <input type="email" id="emailInput" placeholder="Email" required />
+        <textarea id="msgInput" rows="4" placeholder="Расскажите о проекте" required></textarea>
+        <button type="submit" class="btn btn-primary">Отправить</button>
+        <p class="form-note" id="formNote"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== Футер ===== -->
+  <footer>
+    <div class="container footer-grid">
+      <div class="f-col brand-col">
+        <a href="#home" class="logo">Иван<span>.</span></a>
+        <p>© 2026 Портфолио Ивана Иванова.<br />Все права защищены.</p>
+      </div>
+      <div class="f-col">
+        <h4>Компания</h4>
+        <a href="#about">Обо мне</a>
+        <a href="#services">Услуги</a>
+        <a href="#projects">Проекты</a>
+      </div>
+      <div class="f-col">
+        <h4>Услуги</h4>
+        <a href="#services">Дизайн</a>
+        <a href="#services">Разработка</a>
+        <a href="#services">Брендинг</a>
+      </div>
+      <div class="f-col">
+        <h4>Ресурсы</h4>
+        <a href="#">Блог</a>
+        <a href="#">Гайд по стилю</a>
+        <a href="#">Кейсы</a>
+      </div>
+      <div class="f-col">
+        <h4>Связаться</h4>
+        <a href="mailto:hello@example.com">hello@example.com</a>
+        <a href="tel:+70000000000">+7 000 000-00-00</a>
+        <a href="#">Telegram</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

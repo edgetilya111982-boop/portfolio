@@ -1,0 +1,20 @@
+.app {
+  position: relative;
+  min-height: 300vh;
+  background: var(--bg-outer);
+}
+
+.app__bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  /* Radial gradient: slightly lighter center */
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, #12161f 0%, #080b12 100%);
+}
+
+.scroll-spacer {
+  position: relative;
+  height: 300vh;
+  pointer-events: none;
+  z-index: -1;
+}
