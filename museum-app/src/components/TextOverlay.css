@@ -38,16 +38,16 @@
 }
 
 .body-small {
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 300;
   line-height: 1.7;
   color: var(--text-secondary);
-  max-width: 26ch;
+  max-width: 32ch;
   text-shadow: 0 1px 8px rgba(0,0,0,0.95);
 }
 
 .label-tiny {
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 400;
   letter-spacing: 0.2em;
   text-transform: uppercase;
