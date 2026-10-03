@@ -71,6 +71,7 @@ function WorksText({ opacity }) {
           muted
           loop
           playsInline
+          preload="auto"
           key={w.video}
         />
         <div className="works-card__info">

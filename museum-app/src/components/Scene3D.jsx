@@ -5,6 +5,8 @@ import { EffectComposer, Bloom, Vignette, Noise, DepthOfField } from '@react-thr
 import * as THREE from 'three'
 import './Scene3D.css'
 
+const isMobile = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
+
 function lerp(a, b, t) { return a + (b - a) * t }
 
 // Scene keyframes
@@ -198,7 +200,7 @@ function CameraController({ kf }) {
 }
 
 // ── Scene ─────────────────────────────────────────────────────────────────────
-function SceneContent({ scrollData, tilt, modelUrl }) {
+function SceneContent({ scrollData, tilt, modelUrl, mobile }) {
   const { section, progress } = scrollData
   const kf = getCurrentKF(section, progress)
 
@@ -208,16 +210,13 @@ function SceneContent({ scrollData, tilt, modelUrl }) {
     <>
       <CameraController kf={kf} />
 
-      {/* Lighting — animated by scroll */}
       <ambientLight intensity={kf.ambientIntensity} />
       <directionalLight position={[-1.5, 1.5, 1.5]} intensity={kf.lightIntensity} color="#f5e8d0" />
       <directionalLight position={[1.5, 0.5, -1.5]} intensity={kf.lightIntensity * 0.45} color="#a0c8ff" />
-      <directionalLight position={[0, -0.8, 1]} intensity={kf.lightIntensity * 0.2} color="#ffffff" />
+      {!mobile && <directionalLight position={[0, -0.8, 1]} intensity={kf.lightIntensity * 0.2} color="#ffffff" />}
 
-      {/* Ring */}
       <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} />
 
-      {/* Model — tries GLB, falls back to geometry on any error or absence */}
       {modelUrl ? (
         <GLBErrorBoundary fallback={fallback}>
           <Suspense fallback={fallback}>
@@ -226,26 +225,38 @@ function SceneContent({ scrollData, tilt, modelUrl }) {
         </GLBErrorBoundary>
       ) : fallback}
 
-      {/* Post-processing */}
-      <EffectComposer>
-        <DepthOfField focusDistance={kf.dofFocus} focalLength={0.008} bokehScale={0.6} />
-        <Bloom intensity={1.4} luminanceThreshold={0.35} luminanceSmoothing={0.9} radius={0.85} />
-        <Noise opacity={0.028} />
-        <Vignette eskil={false} offset={0.18} darkness={0.75} />
-      </EffectComposer>
+      {mobile ? (
+        <EffectComposer>
+          <Bloom intensity={0.8} luminanceThreshold={0.5} radius={0.5} />
+          <Vignette eskil={false} offset={0.2} darkness={0.65} />
+        </EffectComposer>
+      ) : (
+        <EffectComposer>
+          <DepthOfField focusDistance={kf.dofFocus} focalLength={0.008} bokehScale={0.6} />
+          <Bloom intensity={1.4} luminanceThreshold={0.35} luminanceSmoothing={0.9} radius={0.85} />
+          <Noise opacity={0.028} />
+          <Vignette eskil={false} offset={0.18} darkness={0.75} />
+        </EffectComposer>
+      )}
     </>
   )
 }
 
 export default function Scene3D({ scrollData, tilt, modelUrl }) {
+  const mobile = isMobile()
   return (
     <div className="scene-canvas">
       <Canvas
         camera={{ position: [0, 0.08, 2.4], fov: 36, near: 0.05, far: 30 }}
-        dpr={[1, 2]}
-        gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.15 }}
+        dpr={mobile ? 1 : [1, 2]}
+        gl={{
+          antialias: !mobile,
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.15,
+          powerPreference: mobile ? 'low-power' : 'high-performance',
+        }}
       >
-        <SceneContent scrollData={scrollData} tilt={tilt} modelUrl={modelUrl} />
+        <SceneContent scrollData={scrollData} tilt={tilt} modelUrl={modelUrl} mobile={mobile} />
       </Canvas>
     </div>
   )
