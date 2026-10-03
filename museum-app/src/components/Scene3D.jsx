@@ -138,14 +138,8 @@ function RobotModel({ url, kf, tilt }) {
   const groupRef = useRef()
 
   useMemo(() => {
-    const mat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#1a1512'),
-      metalness: 0.65,
-      roughness: 0.3,
-      envMapIntensity: 1.2,
-    })
     scene.traverse(child => {
-      if (child.isMesh) { child.material = mat; child.castShadow = true }
+      if (child.isMesh) child.castShadow = true
     })
   }, [scene])
 
@@ -194,10 +188,10 @@ function SceneContent({ scrollData, tilt, modelUrl }) {
       <CameraController kf={kf} />
 
       {/* Lighting */}
-      <ambientLight intensity={0.12} />
-      <directionalLight position={[-1.5, 1.5, 1.5]} intensity={2.2} color="#f5e8d0" />
-      <directionalLight position={[1.5, 0.5, -1.5]} intensity={0.9} color="#a0c8ff" />
-      <directionalLight position={[0, -0.8, 1]} intensity={0.3} color="#ffffff" />
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[-1.5, 1.5, 1.5]} intensity={3.0} color="#ffffff" />
+      <directionalLight position={[1.5, 0.5, -1.5]} intensity={1.5} color="#c0d8ff" />
+      <directionalLight position={[0, -0.8, 1]} intensity={0.8} color="#ffffff" />
 
       {/* Ring */}
       <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} />
