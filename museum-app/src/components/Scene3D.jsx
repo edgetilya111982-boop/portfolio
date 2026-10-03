@@ -9,7 +9,7 @@ function lerp(a, b, t) { return a + (b - a) * t }
 
 // Scene keyframes
 const KEYFRAMES = [
-  // Section 0 – Hero: large centered head, ring behind
+  // Section 0 – Hero: head in shadow, mysterious
   {
     cam: [0, 0.15, 2.2],
     camTarget: [0, 0.1, 0],
@@ -19,8 +19,10 @@ const KEYFRAMES = [
     ringScale: 0.72,
     ringOpacity: 0.9,
     dofFocus: 0.12,
+    ambientIntensity: 0.04,
+    lightIntensity: 0.5,
   },
-  // Section 1 – Craft: head moves right, quarter-view
+  // Section 1 – Craft: emerging from shadow
   {
     cam: [0.2, 0.1, 2.6],
     camTarget: [0.35, 0.05, 0],
@@ -30,8 +32,10 @@ const KEYFRAMES = [
     ringScale: 0.55,
     ringOpacity: 0.7,
     dofFocus: 0.10,
+    ambientIntensity: 0.25,
+    lightIntensity: 2.2,
   },
-  // Section 2 – Work: close-up, ring partly cropped
+  // Section 2 – Work: fully lit, close-up
   {
     cam: [0.1, 0.2, 1.6],
     camTarget: [0.06, 0.15, 0],
@@ -41,6 +45,8 @@ const KEYFRAMES = [
     ringScale: 0.85,
     ringOpacity: 0.6,
     dofFocus: 0.14,
+    ambientIntensity: 0.5,
+    lightIntensity: 3.2,
   },
 ]
 
@@ -53,9 +59,11 @@ function interpolateKF(kf0, kf1, t) {
     modelPos:    l3(kf0.modelPos, kf1.modelPos, s),
     modelRot:    l3(kf0.modelRot, kf1.modelRot, s),
     ringPos:     l3(kf0.ringPos, kf1.ringPos, s),
-    ringScale:   lerp(kf0.ringScale,   kf1.ringScale,   s),
-    ringOpacity: lerp(kf0.ringOpacity, kf1.ringOpacity, s),
-    dofFocus:    lerp(kf0.dofFocus,    kf1.dofFocus,    s),
+    ringScale:        lerp(kf0.ringScale,        kf1.ringScale,        s),
+    ringOpacity:      lerp(kf0.ringOpacity,      kf1.ringOpacity,      s),
+    dofFocus:         lerp(kf0.dofFocus,         kf1.dofFocus,         s),
+    ambientIntensity: lerp(kf0.ambientIntensity, kf1.ambientIntensity, s),
+    lightIntensity:   lerp(kf0.lightIntensity,   kf1.lightIntensity,   s),
   }
 }
 
@@ -187,11 +195,11 @@ function SceneContent({ scrollData, tilt, modelUrl }) {
     <>
       <CameraController kf={kf} />
 
-      {/* Lighting */}
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[-1.5, 1.5, 1.5]} intensity={3.0} color="#ffffff" />
-      <directionalLight position={[1.5, 0.5, -1.5]} intensity={1.5} color="#c0d8ff" />
-      <directionalLight position={[0, -0.8, 1]} intensity={0.8} color="#ffffff" />
+      {/* Lighting — animated by scroll */}
+      <ambientLight intensity={kf.ambientIntensity} />
+      <directionalLight position={[-1.5, 1.5, 1.5]} intensity={kf.lightIntensity} color="#f5e8d0" />
+      <directionalLight position={[1.5, 0.5, -1.5]} intensity={kf.lightIntensity * 0.45} color="#a0c8ff" />
+      <directionalLight position={[0, -0.8, 1]} intensity={kf.lightIntensity * 0.2} color="#ffffff" />
 
       {/* Ring */}
       <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} />
