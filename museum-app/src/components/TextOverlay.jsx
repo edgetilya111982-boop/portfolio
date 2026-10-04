@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import './TextOverlay.css'
 
 const WORKS = [
@@ -92,7 +93,7 @@ function WorksText({ opacity }) {
 
   return (
     <>
-      {modal && (
+      {modal && createPortal(
         <div className="video-modal">
           <div className="video-modal__bar">
             <button className="video-modal__close" onClick={closeModal} aria-label="Закрыть">
@@ -106,7 +107,8 @@ function WorksText({ opacity }) {
             playsInline
             controls
           />
-        </div>
+        </div>,
+        document.body
       )}
 
       <div
