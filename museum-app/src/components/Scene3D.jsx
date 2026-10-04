@@ -215,9 +215,6 @@ function PhotoCard({ kf, tilt }) {
   const backMat  = useMemo(() => new THREE.MeshStandardMaterial({
     color: '#0a0a0a', roughness: 0.9, metalness: 0.05,
   }), [])
-  const frameMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#c9a86c', roughness: 0.15, metalness: 1.0,
-  }), [])
 
   // BoxGeometry face order: +X, -X, +Y, -Y, +Z (front), -Z (back)
   const slabMats = useMemo(() => [
@@ -240,16 +237,10 @@ function PhotoCard({ kf, tilt }) {
     g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x * 2.5, 0.07)
   })
 
-  const W = 0.72, H = 0.88, T = 0.022
   return (
     <group ref={groupRef}>
-      {/* main slab */}
       <mesh castShadow material={slabMats}>
-        <boxGeometry args={[W, H, T]} />
-      </mesh>
-      {/* thin gold border frame (slightly larger box, front face hidden by slab) */}
-      <mesh position={[0, 0, T / 2 - 0.001]} material={frameMat}>
-        <boxGeometry args={[W + 0.012, H + 0.012, 0.003]} />
+        <boxGeometry args={[0.72, 0.88, 0.022]} />
       </mesh>
     </group>
   )
