@@ -127,7 +127,7 @@ function VideoGlowRing({ position, scale, opacity }) {
   const texture = useVideoTexture(RING_URL_WEBM, { loop: true, muted: true, start: true, playsInline: true })
   return (
     <group position={position}>
-      <mesh scale={scale * 1.9} renderOrder={-1}>
+      <mesh scale={scale * 1.9} renderOrder={2}>
         <planeGeometry args={[2, 2]} />
         <meshBasicMaterial
           map={texture}
@@ -151,24 +151,24 @@ function ProceduralGlowRing({ position, scale, opacity }) {
   const s = scale * 1.9
   const add = THREE.AdditiveBlending
   return (
-    <group ref={ref} position={position} renderOrder={-1}>
+    <group ref={ref} position={position} renderOrder={2}>
       {/* outer soft halo */}
-      <mesh scale={s} renderOrder={-1}>
+      <mesh scale={s} renderOrder={2}>
         <torusGeometry args={[0.68, 0.08, 8, 120]} />
         <meshBasicMaterial color="#0d2a55" transparent opacity={opacity * 0.35} blending={add} depthWrite={false} depthTest={false} />
       </mesh>
       {/* mid glow */}
-      <mesh scale={s} renderOrder={-1}>
+      <mesh scale={s} renderOrder={2}>
         <torusGeometry args={[0.68, 0.032, 8, 120]} />
         <meshBasicMaterial color="#2255aa" transparent opacity={opacity * 0.6} blending={add} depthWrite={false} depthTest={false} />
       </mesh>
       {/* core ring */}
-      <mesh scale={s} renderOrder={-1}>
+      <mesh scale={s} renderOrder={2}>
         <torusGeometry args={[0.68, 0.013, 8, 120]} />
         <meshBasicMaterial color="#4488dd" transparent opacity={opacity * 0.95} blending={add} depthWrite={false} depthTest={false} />
       </mesh>
       {/* bright highlight */}
-      <mesh scale={s} renderOrder={-1}>
+      <mesh scale={s} renderOrder={2}>
         <torusGeometry args={[0.68, 0.005, 8, 120]} />
         <meshBasicMaterial color="#99ccff" transparent opacity={opacity * 0.75} blending={add} depthWrite={false} depthTest={false} />
       </mesh>
@@ -210,7 +210,6 @@ function PhotoCard({ kf, tilt }) {
   const mat = useMemo(() => new THREE.MeshBasicMaterial({
     map:        texture,
     transparent: true,
-    alphaTest:  0.05,
     depthWrite: false,
     side:       THREE.DoubleSide,
   }), [texture])
