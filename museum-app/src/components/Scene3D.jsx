@@ -5,7 +5,7 @@ import { EffectComposer, Bloom, Vignette, Noise, DepthOfField } from '@react-thr
 import * as THREE from 'three'
 import './Scene3D.css'
 
-const PHOTO_URL    = `${import.meta.env.BASE_URL}photo.webp`
+const PHOTO_URL    = `${import.meta.env.BASE_URL}photo_nobg.png`
 const RING_URL_WEBM = `${import.meta.env.BASE_URL}ring.webm`
 
 const isMobile = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
@@ -19,7 +19,7 @@ const KEYFRAMES = [
     cam: [-0.15, 0.15, 2.3],
     camTarget: [-0.1, 0.1, 0],
     modelPos: [0.38, 0.10, 0],
-    modelRot: [0.06, -0.42, 0],
+    modelRot: [0, -0.15, 0],
     ringPos: [0.38, 0.10, -0.4],
     ringScale: 0.72,
     ringOpacity: 0.9,
@@ -202,29 +202,18 @@ function LoadingSpinner() {
   )
 }
 
-// ── Photo card — thin metallic slab with portrait, tracks mouse ──────────────
+// ── Cutout photo — transparent PNG floating in scene, tracks mouse ────────────
 function PhotoCard({ kf, tilt }) {
   const groupRef = useRef()
-  const texture = useTexture(PHOTO_URL)
+  const texture  = useTexture(PHOTO_URL)
 
-  // Front face — unlit so photo shows at full native brightness
-  const frontMat = useMemo(() => new THREE.MeshBasicMaterial({ map: texture }), [texture])
-  // Edge — warm chrome with emissive so it glows even without direct light hitting it
-  const edgeMat  = useMemo(() => new THREE.MeshStandardMaterial({
-    color:            '#d4c4a0',
-    emissive:         '#5a4520',
-    emissiveIntensity: 0.4,
-    roughness:        0.05,
-    metalness:        1.0,
-  }), [])
-  const backMat   = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#0d0a06', roughness: 0.8, metalness: 0.15,
-  }), [])
-
-  // BoxGeometry face order: +X -X +Y -Y +Z(front) -Z(back)
-  const mats = useMemo(() => [
-    edgeMat, edgeMat, edgeMat, edgeMat, frontMat, backMat,
-  ], [edgeMat, frontMat, backMat])
+  const mat = useMemo(() => new THREE.MeshBasicMaterial({
+    map:        texture,
+    transparent: true,
+    alphaTest:  0.05,
+    depthWrite: false,
+    side:       THREE.DoubleSide,
+  }), [texture])
 
   useFrame(({ clock }) => {
     if (!groupRef.current) return
@@ -232,7 +221,7 @@ function PhotoCard({ kf, tilt }) {
     g.position.lerp(
       new THREE.Vector3(
         kf.modelPos[0],
-        kf.modelPos[1] + Math.sin(clock.getElapsedTime() * 0.85) * 0.008,
+        kf.modelPos[1] + Math.sin(clock.getElapsedTime() * 0.85) * 0.01,
         kf.modelPos[2]
       ),
       0.07
@@ -241,11 +230,10 @@ function PhotoCard({ kf, tilt }) {
     g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x * 2.5, 0.07)
   })
 
-  // T=0.055 → sin(24°)×0.055 ≈ 22px edge visible at resting tilt
   return (
     <group ref={groupRef}>
-      <mesh castShadow material={mats}>
-        <boxGeometry args={[0.72, 0.72, 0.055]} />
+      <mesh material={mat}>
+        <planeGeometry args={[0.78, 0.78]} />
       </mesh>
     </group>
   )
@@ -276,8 +264,6 @@ function SceneContent({ scrollData, tilt, mobile }) {
       <directionalLight position={[-1.5, 1.5, 1.5]} intensity={kf.lightIntensity} color="#f5e8d0" />
       <directionalLight position={[1.5, 0.5, -1.5]} intensity={kf.lightIntensity * 0.45} color="#a0c8ff" />
       {!mobile && <directionalLight position={[0, -0.8, 1]} intensity={kf.lightIntensity * 0.2} color="#ffffff" />}
-      {/* Side light to catch metallic slab edge */}
-      <pointLight position={[1.8, 0.4, 0.6]} intensity={kf.lightIntensity * 1.8} color="#f0ddb0" distance={4} />
 
       <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} mobile={mobile} />
 
