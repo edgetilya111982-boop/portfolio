@@ -125,7 +125,7 @@ function getCurrentKF(section, progress, mobile = false) {
 
 // ── Glowing ring (video texture, AdditiveBlending so black = transparent) ─────
 function GlowRing({ position, scale, opacity }) {
-  const texture = useVideoTexture(RING_URL, { loop: true, muted: true, start: true })
+  const texture = useVideoTexture(RING_URL, { loop: true, muted: true, start: true, playsInline: true })
 
   return (
     <group position={position}>

@@ -117,16 +117,19 @@ function WorksText({ opacity }) {
   return (
     <>
       {modal && (
-        <div className="video-modal" onClick={closeModal}>
+        <div className="video-modal">
+          <div className="video-modal__bar">
+            <button className="video-modal__close" onClick={closeModal} aria-label="Закрыть">
+              ✕ Закрыть
+            </button>
+          </div>
           <video
             ref={modalVideoRef}
             className="video-modal__video"
             src={w.video}
             playsInline
             controls
-            onClick={e => e.stopPropagation()}
           />
-          <button className="video-modal__close" onClick={closeModal} aria-label="Закрыть">✕</button>
         </div>
       )}
 
