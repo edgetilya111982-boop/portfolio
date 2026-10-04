@@ -6,7 +6,8 @@ import * as THREE from 'three'
 import './Scene3D.css'
 
 const HEAD_URL = `${import.meta.env.BASE_URL}head.glb`
-const RING_URL = `${import.meta.env.BASE_URL}ring.webm`
+const RING_URL_WEBM = `${import.meta.env.BASE_URL}ring.webm`
+const RING_URL_MP4  = `${import.meta.env.BASE_URL}ring.mp4`
 useGLTF.preload(HEAD_URL)
 
 const isMobile = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
@@ -124,8 +125,9 @@ function getCurrentKF(section, progress, mobile = false) {
 }
 
 // ── Glowing ring (video texture, AdditiveBlending so black = transparent) ─────
-function GlowRing({ position, scale, opacity }) {
-  const texture = useVideoTexture(RING_URL, { loop: true, muted: true, start: true, playsInline: true })
+function GlowRing({ position, scale, opacity, mobile }) {
+  const url = mobile ? RING_URL_MP4 : RING_URL_WEBM
+  const texture = useVideoTexture(url, { loop: true, muted: true, start: true, playsInline: true })
 
   return (
     <group position={position}>
@@ -273,7 +275,7 @@ function SceneContent({ scrollData, tilt, mobile }) {
       <directionalLight position={[1.5, 0.5, -1.5]} intensity={kf.lightIntensity * 0.45} color="#a0c8ff" />
       {!mobile && <directionalLight position={[0, -0.8, 1]} intensity={kf.lightIntensity * 0.2} color="#ffffff" />}
 
-      <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} />
+      <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} mobile={mobile} />
 
       <GLBErrorBoundary fallback={fallback}>
         <Suspense fallback={<LoadingSpinner />}>
