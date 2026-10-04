@@ -175,14 +175,16 @@ function HeadModel({ url, kf, tilt }) {
     scene.traverse(child => {
       if (!child.isMesh) return
       child.castShadow = true
-      // Override glossy Tripo defaults → matte natural skin
       const m = child.material
-      if (m) {
-        m.roughness = 0.82
-        m.metalness = 0.0
-        m.envMapIntensity = 0.25
-        m.needsUpdate = true
-      }
+      if (!m) return
+      // GLB bakes roughnessMap/metalnessMap from Tripo → must null them out
+      // otherwise scalar roughness is multiplied by the (low) texture value
+      m.roughnessMap = null
+      m.metalnessMap = null
+      m.roughness = 0.85
+      m.metalness = 0.04
+      m.envMapIntensity = 0.1
+      m.needsUpdate = true
     })
   }, [scene])
 
@@ -198,7 +200,7 @@ function HeadModel({ url, kf, tilt }) {
     g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] - Math.PI / 2 + tilt.x * 0.45, 0.07)
   })
 
-  return <primitive ref={groupRef} object={scene} scale={0.65} />
+  return <primitive ref={groupRef} object={scene} scale={0.88} />
 }
 
 // ErrorBoundary for catching GLB load failures
