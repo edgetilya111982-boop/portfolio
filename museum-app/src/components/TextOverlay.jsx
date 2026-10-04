@@ -45,8 +45,6 @@ function HeroText({ opacity }) {
   )
 }
 
-const isMobileDevice = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
-
 // Section 1 — Works carousel
 function WorksText({ opacity }) {
   const [current, setCurrent] = useState(0)
@@ -69,7 +67,7 @@ function WorksText({ opacity }) {
     else v.pause()
   }, [opacity])
 
-  // Play modal video with sound when it mounts
+  // Play modal video with sound when modal opens
   useEffect(() => {
     if (!modal || !modalVideoRef.current) return
     const mv = modalVideoRef.current
@@ -90,29 +88,7 @@ function WorksText({ opacity }) {
     setModal(false)
   }
 
-  const handleVideoClick = () => {
-    if (isMobileDevice()) {
-      setModal(true)
-      return
-    }
-    const v = videoRef.current
-    if (!v) return
-    v.muted = false
-    v.volume = 1
-    v.play().catch(() => {})
-    const onFsChange = () => {
-      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        if (videoRef.current) videoRef.current.muted = true
-        document.removeEventListener('fullscreenchange', onFsChange)
-        document.removeEventListener('webkitfullscreenchange', onFsChange)
-      }
-    }
-    document.addEventListener('fullscreenchange', onFsChange)
-    document.addEventListener('webkitfullscreenchange', onFsChange)
-    if (v.requestFullscreen) v.requestFullscreen()
-    else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen()
-    else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen()
-  }
+  const handleVideoClick = () => setModal(true)
 
   return (
     <>
