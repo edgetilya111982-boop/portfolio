@@ -19,7 +19,7 @@ const KEYFRAMES = [
     cam: [-0.15, 0.15, 2.3],
     camTarget: [-0.1, 0.1, 0],
     modelPos: [0.38, 0.10, 0],
-    modelRot: [0.05, -0.28, 0],
+    modelRot: [0.06, -0.42, 0],
     ringPos: [0.38, 0.10, -0.4],
     ringScale: 0.72,
     ringOpacity: 0.9,
@@ -207,18 +207,22 @@ function PhotoCard({ kf, tilt }) {
   const groupRef = useRef()
   const texture = useTexture(PHOTO_URL)
 
-  // MeshBasicMaterial on front = unlit, photo at full native brightness
+  // Front face — unlit so photo shows at full native brightness
   const frontMat = useMemo(() => new THREE.MeshBasicMaterial({ map: texture }), [texture])
-  // Warm chrome edge — visibly catches the scene warm key light
-  const edgeMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#c8b89a', roughness: 0.06, metalness: 1.0,
+  // Edge — warm chrome with emissive so it glows even without direct light hitting it
+  const edgeMat  = useMemo(() => new THREE.MeshStandardMaterial({
+    color:            '#d4c4a0',
+    emissive:         '#5a4520',
+    emissiveIntensity: 0.4,
+    roughness:        0.05,
+    metalness:        1.0,
   }), [])
-  const backMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#1a1410', roughness: 0.7, metalness: 0.3,
+  const backMat   = useMemo(() => new THREE.MeshStandardMaterial({
+    color: '#0d0a06', roughness: 0.8, metalness: 0.15,
   }), [])
 
-  // BoxGeometry face order: +X, -X, +Y, -Y, +Z (front), -Z (back)
-  const slabMats = useMemo(() => [
+  // BoxGeometry face order: +X -X +Y -Y +Z(front) -Z(back)
+  const mats = useMemo(() => [
     edgeMat, edgeMat, edgeMat, edgeMat, frontMat, backMat,
   ], [edgeMat, frontMat, backMat])
 
@@ -233,16 +237,15 @@ function PhotoCard({ kf, tilt }) {
       ),
       0.07
     )
-    // × 2.5 amplifies ±0.08 rad input to ±0.2 rad (≈±11°) — visible tracking
     g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y * 2.5, 0.07)
     g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x * 2.5, 0.07)
   })
 
-  // Square 1:1, T=0.022 units ≈ 4 mm at scene scale
+  // T=0.055 → sin(24°)×0.055 ≈ 22px edge visible at resting tilt
   return (
     <group ref={groupRef}>
-      <mesh castShadow material={slabMats}>
-        <boxGeometry args={[0.72, 0.72, 0.022]} />
+      <mesh castShadow material={mats}>
+        <boxGeometry args={[0.72, 0.72, 0.055]} />
       </mesh>
     </group>
   )
@@ -273,6 +276,8 @@ function SceneContent({ scrollData, tilt, mobile }) {
       <directionalLight position={[-1.5, 1.5, 1.5]} intensity={kf.lightIntensity} color="#f5e8d0" />
       <directionalLight position={[1.5, 0.5, -1.5]} intensity={kf.lightIntensity * 0.45} color="#a0c8ff" />
       {!mobile && <directionalLight position={[0, -0.8, 1]} intensity={kf.lightIntensity * 0.2} color="#ffffff" />}
+      {/* Side light to catch metallic slab edge */}
+      <pointLight position={[1.8, 0.4, 0.6]} intensity={kf.lightIntensity * 1.8} color="#f0ddb0" distance={4} />
 
       <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} mobile={mobile} />
 
