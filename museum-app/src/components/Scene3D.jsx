@@ -6,7 +6,7 @@ import * as THREE from 'three'
 import './Scene3D.css'
 
 const HEAD_URL = `${import.meta.env.BASE_URL}head.glb`
-const RING_URL = `${import.meta.env.BASE_URL}ring.mp4`
+const RING_URL = `${import.meta.env.BASE_URL}ring.webm`
 useGLTF.preload(HEAD_URL)
 
 const isMobile = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
