@@ -18,7 +18,7 @@ const KEYFRAMES = [
   {
     cam: [-0.15, 0.15, 2.3],
     camTarget: [-0.1, 0.1, 0],
-    modelPos: [0.38, -0.1, 0],
+    modelPos: [0.38, 0.05, 0],
     modelRot: [0, -0.15, 0],
     ringPos: [0.38, 0.18, -0.4],
     ringScale: 0.72,
@@ -27,11 +27,11 @@ const KEYFRAMES = [
     ambientIntensity: 0.18,
     lightIntensity: 1.2,
   },
-  // Section 1 – Works: head stays right
+  // Section 1 – Works: head on right
   {
     cam: [-0.1, 0.1, 2.5],
-    camTarget: [0.22, 0.05, 0],
-    modelPos: [0.42, -0.1, 0],
+    camTarget: [0.38, 0.05, 0],
+    modelPos: [0.42, 0.05, 0],
     modelRot: [0, 0.08, 0],
     ringPos: [0.42, 0.18, -0.38],
     ringScale: 0.68,
@@ -40,11 +40,11 @@ const KEYFRAMES = [
     ambientIntensity: 0.25,
     lightIntensity: 2.2,
   },
-  // Section 2 – Contact: head stays right
+  // Section 2 – Contact: head on right
   {
     cam: [-0.15, 0.1, 2.4],
-    camTarget: [0.25, 0.06, 0],
-    modelPos: [0.4, -0.1, 0],
+    camTarget: [0.38, 0.06, 0],
+    modelPos: [0.4, 0.05, 0],
     modelRot: [0, -0.05, 0],
     ringPos: [0.4, 0.18, -0.38],
     ringScale: 0.72,
@@ -107,8 +107,8 @@ function GlowRing({ position, scale, opacity }) {
         <torusGeometry args={[1, 0.14, 8, 80]} />
         <meshBasicMaterial color="#0d3a5c" transparent opacity={opacity * 0.08} />
       </mesh>
-      <pointLight color="#4a9fd4" intensity={opacity * 5.0} distance={3.5} decay={2} />
-      <pointLight color="#2a6fa0" intensity={opacity * 3.0} distance={5.0} decay={2} position={[0, 0, 0.2]} />
+      <pointLight color="#4a9fd4" intensity={opacity * 10.0} distance={3.5} decay={2} />
+      <pointLight color="#2a6fa0" intensity={opacity * 6.0} distance={5.0} decay={2} position={[0, 0, 0.2]} />
     </group>
   )
 }
@@ -197,7 +197,7 @@ function HeadModel({ url, kf, tilt }) {
     )
     // -PI/2 rotates Tripo model to face camera (фас); tilt gives mouse tracking
     g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y * 0.45, 0.07)
-    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] - Math.PI / 2 + tilt.x * 0.45, 0.07)
+    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] - Math.PI / 2 - 0.25 + tilt.x * 0.45, 0.07)
   })
 
   return <primitive ref={groupRef} object={scene} scale={0.88} />
@@ -242,6 +242,13 @@ function SceneContent({ scrollData, tilt, mobile }) {
       {!mobile && <directionalLight position={[0, -0.8, 1]} intensity={kf.lightIntensity * 0.2} color="#ffffff" />}
 
       <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} />
+      <pointLight
+        color="#6ab4e8"
+        intensity={kf.ringOpacity * 4.0}
+        distance={2.5}
+        decay={2}
+        position={[kf.ringPos[0] - 0.3, kf.ringPos[1], kf.ringPos[2] + 0.6]}
+      />
 
       <GLBErrorBoundary fallback={fallback}>
         <Suspense fallback={<LoadingSpinner />}>
