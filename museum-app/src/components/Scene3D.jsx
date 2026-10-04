@@ -27,31 +27,31 @@ const KEYFRAMES = [
     ambientIntensity: 0.18,
     lightIntensity: 1.2,
   },
-  // Section 1 – Craft: emerging from shadow
+  // Section 1 – Works: head stays right
   {
-    cam: [0.2, 0.1, 2.6],
-    camTarget: [0.35, 0.05, 0],
-    modelPos: [0.4, -0.1, 0],
-    modelRot: [0, -0.4, 0],
-    ringPos: [0.4, 0.18, -0.35],
-    ringScale: 0.55,
-    ringOpacity: 0.7,
+    cam: [-0.1, 0.1, 2.5],
+    camTarget: [0.22, 0.05, 0],
+    modelPos: [0.42, -0.1, 0],
+    modelRot: [0, 0.08, 0],
+    ringPos: [0.42, 0.18, -0.38],
+    ringScale: 0.68,
+    ringOpacity: 0.75,
     dofFocus: 0.10,
     ambientIntensity: 0.25,
     lightIntensity: 2.2,
   },
-  // Section 2 – Work: fully lit, close-up
+  // Section 2 – Contact: head stays right
   {
-    cam: [0.1, 0.2, 1.6],
-    camTarget: [0.06, 0.15, 0],
-    modelPos: [0.1, -0.05, 0],
-    modelRot: [0, 0.12, 0],
-    ringPos: [0.08, 0.42, -0.3],
-    ringScale: 0.85,
-    ringOpacity: 0.6,
-    dofFocus: 0.14,
-    ambientIntensity: 0.5,
-    lightIntensity: 3.2,
+    cam: [-0.15, 0.1, 2.4],
+    camTarget: [0.25, 0.06, 0],
+    modelPos: [0.4, -0.1, 0],
+    modelRot: [0, -0.05, 0],
+    ringPos: [0.4, 0.18, -0.38],
+    ringScale: 0.72,
+    ringOpacity: 0.85,
+    dofFocus: 0.12,
+    ambientIntensity: 0.35,
+    lightIntensity: 2.8,
   },
 ]
 
@@ -173,7 +173,16 @@ function HeadModel({ url, kf, tilt }) {
 
   useMemo(() => {
     scene.traverse(child => {
-      if (child.isMesh) child.castShadow = true
+      if (!child.isMesh) return
+      child.castShadow = true
+      // Override glossy Tripo defaults → matte natural skin
+      const m = child.material
+      if (m) {
+        m.roughness = 0.82
+        m.metalness = 0.0
+        m.envMapIntensity = 0.25
+        m.needsUpdate = true
+      }
     })
   }, [scene])
 
