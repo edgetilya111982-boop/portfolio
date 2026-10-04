@@ -91,7 +91,7 @@ function GlowRing({ position, scale, opacity }) {
 
   return (
     <group position={position}>
-      <mesh ref={meshRef} scale={scale * 1.55}>
+      <mesh ref={meshRef} scale={scale * 1.9}>
         <planeGeometry args={[2, 2]} />
         <meshBasicMaterial
           map={texture}
