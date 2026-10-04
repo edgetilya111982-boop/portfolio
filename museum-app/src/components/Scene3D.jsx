@@ -13,11 +13,11 @@ function lerp(a, b, t) { return a + (b - a) * t }
 const KEYFRAMES = [
   // Section 0 – Hero: head in shadow, mysterious
   {
-    cam: [0, 0.15, 2.2],
-    camTarget: [0, 0.1, 0],
-    modelPos: [0, -0.1, 0],
-    modelRot: [0, 0, 0],
-    ringPos: [0, 0.18, -0.4],
+    cam: [-0.15, 0.15, 2.3],
+    camTarget: [-0.1, 0.1, 0],
+    modelPos: [0.38, -0.1, 0],
+    modelRot: [0, -0.15, 0],
+    ringPos: [0.38, 0.18, -0.4],
     ringScale: 0.72,
     ringOpacity: 0.9,
     dofFocus: 0.12,
