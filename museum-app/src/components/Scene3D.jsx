@@ -124,14 +124,11 @@ function getCurrentKF(section, progress, mobile = false) {
   return interpolateKF(kf0, kf1, progress)
 }
 
-// ── Glowing ring (video texture, AdditiveBlending so black = transparent) ─────
-function GlowRing({ position, scale, opacity, mobile }) {
-  const url = mobile ? RING_URL_MP4 : RING_URL_WEBM
-  const texture = useVideoTexture(url, { loop: true, muted: true, start: true, playsInline: true })
-
+// ── Glowing ring — video texture (desktop) ───────────────────────────────────
+function VideoGlowRing({ position, scale, opacity }) {
+  const texture = useVideoTexture(RING_URL_WEBM, { loop: true, muted: true, start: true, playsInline: true })
   return (
     <group position={position}>
-      {/* renderOrder=-1 → renders before head; depthTest=false → head always draws on top */}
       <mesh scale={scale * 1.9} renderOrder={-1}>
         <planeGeometry args={[2, 2]} />
         <meshBasicMaterial
@@ -145,6 +142,46 @@ function GlowRing({ position, scale, opacity, mobile }) {
       </mesh>
     </group>
   )
+}
+
+// ── Glowing ring — programmatic (mobile, always works) ───────────────────────
+function ProceduralGlowRing({ position, scale, opacity }) {
+  const ref = useRef()
+  useFrame(({ clock }) => {
+    if (ref.current) ref.current.rotation.z = clock.getElapsedTime() * 0.14
+  })
+  const s = scale * 1.9
+  const add = THREE.AdditiveBlending
+  return (
+    <group ref={ref} position={position} renderOrder={-1}>
+      {/* outer soft halo */}
+      <mesh scale={s} renderOrder={-1}>
+        <torusGeometry args={[0.68, 0.08, 8, 120]} />
+        <meshBasicMaterial color="#0d2a55" transparent opacity={opacity * 0.35} blending={add} depthWrite={false} depthTest={false} />
+      </mesh>
+      {/* mid glow */}
+      <mesh scale={s} renderOrder={-1}>
+        <torusGeometry args={[0.68, 0.032, 8, 120]} />
+        <meshBasicMaterial color="#2255aa" transparent opacity={opacity * 0.6} blending={add} depthWrite={false} depthTest={false} />
+      </mesh>
+      {/* core ring */}
+      <mesh scale={s} renderOrder={-1}>
+        <torusGeometry args={[0.68, 0.013, 8, 120]} />
+        <meshBasicMaterial color="#4488dd" transparent opacity={opacity * 0.95} blending={add} depthWrite={false} depthTest={false} />
+      </mesh>
+      {/* bright highlight */}
+      <mesh scale={s} renderOrder={-1}>
+        <torusGeometry args={[0.68, 0.005, 8, 120]} />
+        <meshBasicMaterial color="#99ccff" transparent opacity={opacity * 0.75} blending={add} depthWrite={false} depthTest={false} />
+      </mesh>
+    </group>
+  )
+}
+
+function GlowRing({ position, scale, opacity, mobile }) {
+  return mobile
+    ? <ProceduralGlowRing position={position} scale={scale} opacity={opacity} />
+    : <VideoGlowRing position={position} scale={scale} opacity={opacity} />
 }
 
 // ── Loading spinner ───────────────────────────────────────────────────────────
