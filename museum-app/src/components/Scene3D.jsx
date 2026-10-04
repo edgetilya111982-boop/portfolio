@@ -1,9 +1,10 @@
-import React, { useRef, useMemo, Suspense, useState, useEffect } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useGLTF } from '@react-three/drei'
+import React, { useRef, useMemo, Suspense } from 'react'
+import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
 import { EffectComposer, Bloom, Vignette, Noise, DepthOfField } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import './Scene3D.css'
+
+const PORTRAIT_URL = `${import.meta.env.BASE_URL}portrait.webp`
 
 const isMobile = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
 
@@ -134,6 +135,91 @@ function LoadingSpinner() {
   )
 }
 
+// ── Holographic portrait ──────────────────────────────────────────────────────
+function HolographicPortrait({ kf, tilt }) {
+  const groupRef = useRef()
+  const matRef  = useRef()
+  const texture = useLoader(THREE.TextureLoader, PORTRAIT_URL)
+
+  useMemo(() => {
+    // Composite image has 4 panels; panel 3 (front face) starts at ~50% → 75%
+    texture.offset.set(0.50, 0.0)
+    texture.repeat.set(0.25, 1.0)
+    texture.wrapS = THREE.ClampToEdgeWrapping
+    texture.wrapT = THREE.ClampToEdgeWrapping
+  }, [texture])
+
+  const uniforms = useMemo(() => ({
+    map:  { value: texture },
+    time: { value: 0 },
+  }), [texture])
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime()
+    if (matRef.current) matRef.current.uniforms.time.value = t
+    if (!groupRef.current) return
+    const g = groupRef.current
+    g.position.lerp(
+      new THREE.Vector3(kf.modelPos[0], kf.modelPos[1] + Math.sin(t * 0.85) * 0.022, kf.modelPos[2]),
+      0.07
+    )
+    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x * 0.25, 0.07)
+    g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y * 0.15, 0.07)
+  })
+
+  const vert = `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `
+  const frag = `
+    uniform sampler2D map;
+    uniform float time;
+    varying vec2 vUv;
+    void main() {
+      vec4 col = texture2D(map, vUv);
+      // Blue holographic tint
+      col.rgb = mix(col.rgb, vec3(0.12, 0.42, 0.88), 0.20);
+      // Oval vignette fade so portrait floats naturally
+      vec2 c = vUv - 0.5;
+      float fade = 1.0 - smoothstep(0.26, 0.50, length(c * vec2(0.95, 1.25)));
+      // Subtle animated scanlines
+      float scan = sin(vUv.y * 180.0 + time * 2.5) * 0.022;
+      col.rgb += scan;
+      gl_FragColor = vec4(col.rgb, fade);
+    }
+  `
+
+  return (
+    <group ref={groupRef}>
+      {/* Portrait with holographic shader */}
+      <mesh>
+        <planeGeometry args={[0.52, 0.68]} />
+        <shaderMaterial
+          ref={matRef}
+          transparent
+          uniforms={uniforms}
+          vertexShader={vert}
+          fragmentShader={frag}
+        />
+      </mesh>
+      {/* Inner cyan border glow */}
+      <mesh position={[0, 0, -0.003]}>
+        <planeGeometry args={[0.57, 0.73]} />
+        <meshBasicMaterial color="#4a9fd4" transparent opacity={0.30} />
+      </mesh>
+      {/* Outer soft glow */}
+      <mesh position={[0, 0, -0.007]}>
+        <planeGeometry args={[0.65, 0.82]} />
+        <meshBasicMaterial color="#1a3a5c" transparent opacity={0.18} />
+      </mesh>
+      <pointLight color="#4a9fd4" intensity={0.7} distance={1.8} decay={2} />
+    </group>
+  )
+}
+
 // ── Fallback box-head (shows when GLB fails to load) ─────────────────────────
 function FallbackHead({ kf, tilt }) {
   const groupRef = useRef()
@@ -212,7 +298,7 @@ function CameraController({ kf }) {
 }
 
 // ── Scene ─────────────────────────────────────────────────────────────────────
-function SceneContent({ scrollData, tilt, modelUrl, mobile }) {
+function SceneContent({ scrollData, tilt, mobile }) {
   const { section, progress } = scrollData
   const kf = getCurrentKF(section, progress)
 
@@ -229,13 +315,9 @@ function SceneContent({ scrollData, tilt, modelUrl, mobile }) {
 
       <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} />
 
-      {modelUrl ? (
-        <GLBErrorBoundary fallback={fallback}>
-          <Suspense fallback={<LoadingSpinner />}>
-            <RobotModel url={modelUrl} kf={kf} tilt={tilt} />
-          </Suspense>
-        </GLBErrorBoundary>
-      ) : fallback}
+      <Suspense fallback={<LoadingSpinner />}>
+        <HolographicPortrait kf={kf} tilt={tilt} />
+      </Suspense>
 
       {mobile ? (
         <EffectComposer>
@@ -268,7 +350,7 @@ export default function Scene3D({ scrollData, tilt, modelUrl }) {
           powerPreference: mobile ? 'low-power' : 'high-performance',
         }}
       >
-        <SceneContent scrollData={scrollData} tilt={tilt} modelUrl={modelUrl} mobile={mobile} />
+        <SceneContent scrollData={scrollData} tilt={tilt} mobile={mobile} />
       </Canvas>
     </div>
   )
