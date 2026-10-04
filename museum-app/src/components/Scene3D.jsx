@@ -27,10 +27,10 @@ const KEYFRAMES = [
     ambientIntensity: 0.18,
     lightIntensity: 1.2,
   },
-  // Section 1 – Works: head on right, in ring center
+  // Section 1 – Works: camera looks left so head at 0.42 appears on right
   {
-    cam: [-0.1, 0.1, 2.5],
-    camTarget: [0.40, 0.08, 0],
+    cam: [-0.15, 0.1, 2.5],
+    camTarget: [-0.08, 0.08, 0],
     modelPos: [0.42, 0.10, 0],
     modelRot: [0, 0.08, 0],
     ringPos: [0.42, 0.10, -0.38],
@@ -40,10 +40,10 @@ const KEYFRAMES = [
     ambientIntensity: 0.25,
     lightIntensity: 2.2,
   },
-  // Section 2 – Contact: head further right, in ring center
+  // Section 2 – Contact: head further right
   {
-    cam: [-0.05, 0.1, 2.4],
-    camTarget: [0.50, 0.08, 0],
+    cam: [-0.15, 0.1, 2.4],
+    camTarget: [-0.05, 0.08, 0],
     modelPos: [0.52, 0.10, 0],
     modelRot: [0, -0.05, 0],
     ringPos: [0.52, 0.10, -0.38],
@@ -91,33 +91,26 @@ function GlowRing({ position, scale, opacity }) {
 
   return (
     <group position={position}>
-      {/* core line — very bright white-blue for bloom pick-up */}
+      {/* core — near-white so bloom threshold fires */}
       <mesh ref={ringRef} scale={scale}>
-        <torusGeometry args={[1, 0.009, 16, 120]} />
-        <meshBasicMaterial color="#d8f0ff" transparent opacity={opacity} />
+        <torusGeometry args={[1, 0.010, 16, 120]} />
+        <meshBasicMaterial color="#e8f6ff" transparent opacity={opacity} />
       </mesh>
-      {/* first glow halo */}
-      <mesh ref={glowRef} scale={scale * 1.03}>
-        <torusGeometry args={[1, 0.04, 8, 100]} />
-        <meshBasicMaterial color="#88ccf0" transparent opacity={opacity * 0.6} />
+      {/* first soft halo */}
+      <mesh ref={glowRef} scale={scale * 1.04}>
+        <torusGeometry args={[1, 0.045, 8, 100]} />
+        <meshBasicMaterial color="#90caee" transparent opacity={opacity * 0.65} />
       </mesh>
       {/* second halo */}
-      <mesh scale={scale * 1.10}>
-        <torusGeometry args={[1, 0.09, 8, 100]} />
-        <meshBasicMaterial color="#3a8abf" transparent opacity={opacity * 0.22} />
+      <mesh scale={scale * 1.12}>
+        <torusGeometry args={[1, 0.10, 8, 100]} />
+        <meshBasicMaterial color="#3a7aaa" transparent opacity={opacity * 0.25} />
       </mesh>
       {/* outer atmospheric halo */}
-      <mesh scale={scale * 1.22}>
-        <torusGeometry args={[1, 0.18, 8, 80]} />
-        <meshBasicMaterial color="#103a60" transparent opacity={opacity * 0.10} />
+      <mesh scale={scale * 1.26}>
+        <torusGeometry args={[1, 0.20, 8, 80]} />
+        <meshBasicMaterial color="#0e2f50" transparent opacity={opacity * 0.12} />
       </mesh>
-      {/* inner sphere — gives the "glowing sphere" look that bloom amplifies */}
-      <mesh scale={scale * 0.96}>
-        <sphereGeometry args={[1, 20, 20]} />
-        <meshBasicMaterial color="#0a2540" transparent opacity={opacity * 0.18} side={2} />
-      </mesh>
-      <pointLight color="#5ab8f0" intensity={opacity * 8.0} distance={3.5} decay={2} />
-      <pointLight color="#2a6fa0" intensity={opacity * 4.0} distance={5.5} decay={2} position={[0, 0, 0.3]} />
     </group>
   )
 }
@@ -266,7 +259,7 @@ function SceneContent({ scrollData, tilt, mobile }) {
       ) : (
         <EffectComposer>
           <DepthOfField focusDistance={kf.dofFocus} focalLength={0.008} bokehScale={0.6} />
-          <Bloom intensity={1.4} luminanceThreshold={0.35} luminanceSmoothing={0.9} radius={0.85} />
+          <Bloom intensity={2.2} luminanceThreshold={0.25} luminanceSmoothing={0.85} radius={1.1} />
           <Noise opacity={0.028} />
           <Vignette eskil={false} offset={0.18} darkness={0.75} />
         </EffectComposer>
