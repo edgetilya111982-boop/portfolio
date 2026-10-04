@@ -1,14 +1,12 @@
 import React, { useRef, useMemo, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useGLTF, useVideoTexture } from '@react-three/drei'
+import { useTexture, useVideoTexture } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette, Noise, DepthOfField } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import './Scene3D.css'
 
-const HEAD_URL = `${import.meta.env.BASE_URL}head.glb`
+const PHOTO_URL    = `${import.meta.env.BASE_URL}photo.webp`
 const RING_URL_WEBM = `${import.meta.env.BASE_URL}ring.webm`
-const RING_URL_MP4  = `${import.meta.env.BASE_URL}ring.mp4`
-useGLTF.preload(HEAD_URL)
 
 const isMobile = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
 
@@ -204,84 +202,44 @@ function LoadingSpinner() {
   )
 }
 
-// ── Fallback box-head (shows when GLB fails to load) ─────────────────────────
-function FallbackHead({ kf, tilt }) {
+// ── Photo card — thin slab with portrait on front face ───────────────────────
+function PhotoCard({ kf, tilt }) {
   const groupRef = useRef()
-  const mat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#1a1512'), metalness: 0.65, roughness: 0.3,
+  const texture = useTexture(PHOTO_URL)
+
+  const edgeMat = useMemo(() => new THREE.MeshStandardMaterial({
+    color: new THREE.Color('#1a1a1a'), roughness: 0.55, metalness: 0.5,
   }), [])
+  const backMat = useMemo(() => new THREE.MeshStandardMaterial({
+    color: new THREE.Color('#111111'), roughness: 0.9, metalness: 0.1,
+  }), [])
+  const frontMat = useMemo(() => new THREE.MeshStandardMaterial({
+    map: texture, roughness: 0.42, metalness: 0.04,
+  }), [texture])
 
-  useFrame(() => {
-    if (!groupRef.current) return
-    const g = groupRef.current
-    g.position.lerp(new THREE.Vector3(...kf.modelPos), 0.07)
-    g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y, 0.07)
-    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x, 0.07)
-  })
-
-  return (
-    <group ref={groupRef}>
-      <mesh material={mat} position={[0, 0.04, 0]}><boxGeometry args={[0.2, 0.22, 0.18]} /></mesh>
-      <mesh material={mat} position={[0, 0.17, 0]}><boxGeometry args={[0.18, 0.06, 0.16]} /></mesh>
-      <mesh material={mat} position={[0, -0.1, 0]}><boxGeometry args={[0.15, 0.04, 0.14]} /></mesh>
-      {[-0.052, 0.052].map((x, i) => (
-        <mesh key={i} position={[x, 0.03, 0.093]}>
-          <torusGeometry args={[0.026, 0.004, 8, 32]} />
-          <meshStandardMaterial color="#c9a000" metalness={1} roughness={0.1} />
-        </mesh>
-      ))}
-      <mesh material={mat} position={[0, -0.165, 0]}>
-        <cylinderGeometry args={[0.055, 0.065, 0.08, 8]} />
-      </mesh>
-    </group>
-  )
-}
-
-// ── Real GLB head model ───────────────────────────────────────────────────────
-function HeadModel({ url, kf, tilt }) {
-  const { scene } = useGLTF(url)
-  const groupRef = useRef()
-
-  useMemo(() => {
-    scene.traverse(child => {
-      if (!child.isMesh) return
-      child.castShadow = true
-      const m = child.material
-      if (!m) return
-      // GLB bakes roughnessMap/metalnessMap from Tripo → must null them out
-      // otherwise scalar roughness is multiplied by the (low) texture value
-      m.roughnessMap = null
-      m.metalnessMap = null
-      m.roughness = 0.85
-      m.metalness = 0.04
-      m.envMapIntensity = 0.1
-      m.needsUpdate = true
-    })
-  }, [scene])
+  // BoxGeometry face order: +X, -X, +Y, -Y, +Z (front), -Z (back)
+  const materials = useMemo(() => [
+    edgeMat, edgeMat, edgeMat, edgeMat, frontMat, backMat,
+  ], [edgeMat, frontMat, backMat])
 
   useFrame(({ clock }) => {
     if (!groupRef.current) return
     const g = groupRef.current
     g.position.lerp(
-      new THREE.Vector3(kf.modelPos[0], kf.modelPos[1] + Math.sin(clock.getElapsedTime() * 0.85) * 0.012, kf.modelPos[2]),
+      new THREE.Vector3(kf.modelPos[0], kf.modelPos[1] + Math.sin(clock.getElapsedTime() * 0.85) * 0.008, kf.modelPos[2]),
       0.07
     )
-    // -PI/2 rotates Tripo model to face camera (фас); tilt gives mouse tracking
-    g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y * 0.45, 0.07)
-    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] - Math.PI / 2 - 0.25 + tilt.x * 0.45, 0.07)
+    g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y * 0.35, 0.07)
+    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x * 0.35, 0.07)
   })
 
-  return <primitive ref={groupRef} object={scene} scale={0.88} />
-}
-
-// ErrorBoundary for catching GLB load failures
-class GLBErrorBoundary extends React.Component {
-  constructor(props) { super(props); this.state = { failed: false } }
-  static getDerivedStateFromError() { return { failed: true } }
-  render() {
-    if (this.state.failed) return this.props.fallback
-    return this.props.children
-  }
+  return (
+    <group ref={groupRef}>
+      <mesh castShadow material={materials}>
+        <boxGeometry args={[0.75, 0.75, 0.018]} />
+      </mesh>
+    </group>
+  )
 }
 
 // ── Camera controller ─────────────────────────────────────────────────────────
@@ -301,8 +259,6 @@ function SceneContent({ scrollData, tilt, mobile }) {
   const { section, progress } = scrollData
   const kf = getCurrentKF(section, progress, mobile)
 
-  const fallback = <FallbackHead kf={kf} tilt={tilt} />
-
   return (
     <>
       <CameraController kf={kf} />
@@ -314,11 +270,9 @@ function SceneContent({ scrollData, tilt, mobile }) {
 
       <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} mobile={mobile} />
 
-      <GLBErrorBoundary fallback={fallback}>
-        <Suspense fallback={<LoadingSpinner />}>
-          <HeadModel url={HEAD_URL} kf={kf} tilt={tilt} />
-        </Suspense>
-      </GLBErrorBoundary>
+      <Suspense fallback={<LoadingSpinner />}>
+        <PhotoCard kf={kf} tilt={tilt} />
+      </Suspense>
 
       {mobile ? (
         <EffectComposer>
