@@ -1,10 +1,12 @@
 import React, { useRef, useMemo, Suspense } from 'react'
-import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { useGLTF } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette, Noise, DepthOfField } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import './Scene3D.css'
 
-const PORTRAIT_URL = `${import.meta.env.BASE_URL}portrait.webp`
+const HEAD_URL = `${import.meta.env.BASE_URL}head.glb`
+useGLTF.preload(HEAD_URL)
 
 const isMobile = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
 
@@ -57,11 +59,11 @@ function interpolateKF(kf0, kf1, t) {
   const l3 = (a, b, t) => [lerp(a[0],b[0],t), lerp(a[1],b[1],t), lerp(a[2],b[2],t)]
   const s = t * t * (3 - 2 * t) // smoothstep
   return {
-    cam:         l3(kf0.cam, kf1.cam, s),
-    camTarget:   l3(kf0.camTarget, kf1.camTarget, s),
-    modelPos:    l3(kf0.modelPos, kf1.modelPos, s),
-    modelRot:    l3(kf0.modelRot, kf1.modelRot, s),
-    ringPos:     l3(kf0.ringPos, kf1.ringPos, s),
+    cam:              l3(kf0.cam, kf1.cam, s),
+    camTarget:        l3(kf0.camTarget, kf1.camTarget, s),
+    modelPos:         l3(kf0.modelPos, kf1.modelPos, s),
+    modelRot:         l3(kf0.modelRot, kf1.modelRot, s),
+    ringPos:          l3(kf0.ringPos, kf1.ringPos, s),
     ringScale:        lerp(kf0.ringScale,        kf1.ringScale,        s),
     ringOpacity:      lerp(kf0.ringOpacity,      kf1.ringOpacity,      s),
     dofFocus:         lerp(kf0.dofFocus,         kf1.dofFocus,         s),
@@ -89,22 +91,18 @@ function GlowRing({ position, scale, opacity }) {
 
   return (
     <group position={position}>
-      {/* Core ring */}
       <mesh ref={ringRef} scale={scale}>
         <torusGeometry args={[1, 0.007, 16, 120]} />
         <meshBasicMaterial color="#6ab4e8" transparent opacity={opacity} />
       </mesh>
-      {/* Inner glow halo */}
       <mesh ref={glowRef} scale={scale * 1.03}>
         <torusGeometry args={[1, 0.032, 8, 100]} />
         <meshBasicMaterial color="#4a9fd4" transparent opacity={opacity * 0.5} />
       </mesh>
-      {/* Outer soft glow */}
       <mesh scale={scale * 1.08}>
         <torusGeometry args={[1, 0.07, 8, 100]} />
         <meshBasicMaterial color="#1a5f8a" transparent opacity={opacity * 0.18} />
       </mesh>
-      {/* Wide diffuse glow */}
       <mesh scale={scale * 1.18}>
         <torusGeometry args={[1, 0.14, 8, 80]} />
         <meshBasicMaterial color="#0d3a5c" transparent opacity={opacity * 0.08} />
@@ -115,7 +113,7 @@ function GlowRing({ position, scale, opacity }) {
   )
 }
 
-// ── Loading spinner (shows while GLB is downloading) ─────────────────────────
+// ── Loading spinner ───────────────────────────────────────────────────────────
 function LoadingSpinner() {
   const ref = useRef()
   useFrame(({ clock }) => {
@@ -131,91 +129,6 @@ function LoadingSpinner() {
         <torusGeometry args={[0.18, 0.002, 8, 60]} />
         <meshBasicMaterial color="#4a7fa5" transparent opacity={0.3} />
       </mesh>
-    </group>
-  )
-}
-
-// ── Holographic portrait ──────────────────────────────────────────────────────
-function HolographicPortrait({ kf, tilt }) {
-  const groupRef = useRef()
-  const matRef  = useRef()
-  const texture = useLoader(THREE.TextureLoader, PORTRAIT_URL)
-
-  useMemo(() => {
-    // Composite image has 4 panels; panel 3 (front face) starts at ~50% → 75%
-    texture.offset.set(0.50, 0.0)
-    texture.repeat.set(0.25, 1.0)
-    texture.wrapS = THREE.ClampToEdgeWrapping
-    texture.wrapT = THREE.ClampToEdgeWrapping
-  }, [texture])
-
-  const uniforms = useMemo(() => ({
-    map:  { value: texture },
-    time: { value: 0 },
-  }), [texture])
-
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime()
-    if (matRef.current) matRef.current.uniforms.time.value = t
-    if (!groupRef.current) return
-    const g = groupRef.current
-    g.position.lerp(
-      new THREE.Vector3(kf.modelPos[0], kf.modelPos[1] + Math.sin(t * 0.85) * 0.022, kf.modelPos[2]),
-      0.07
-    )
-    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x * 0.25, 0.07)
-    g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y * 0.15, 0.07)
-  })
-
-  const vert = `
-    varying vec2 vUv;
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `
-  const frag = `
-    uniform sampler2D map;
-    uniform float time;
-    varying vec2 vUv;
-    void main() {
-      vec4 col = texture2D(map, vUv);
-      // Blue holographic tint
-      col.rgb = mix(col.rgb, vec3(0.12, 0.42, 0.88), 0.20);
-      // Oval vignette fade so portrait floats naturally
-      vec2 c = vUv - 0.5;
-      float fade = 1.0 - smoothstep(0.26, 0.50, length(c * vec2(0.95, 1.25)));
-      // Subtle animated scanlines
-      float scan = sin(vUv.y * 180.0 + time * 2.5) * 0.022;
-      col.rgb += scan;
-      gl_FragColor = vec4(col.rgb, fade);
-    }
-  `
-
-  return (
-    <group ref={groupRef}>
-      {/* Portrait with holographic shader */}
-      <mesh>
-        <planeGeometry args={[0.52, 0.68]} />
-        <shaderMaterial
-          ref={matRef}
-          transparent
-          uniforms={uniforms}
-          vertexShader={vert}
-          fragmentShader={frag}
-        />
-      </mesh>
-      {/* Inner cyan border glow */}
-      <mesh position={[0, 0, -0.003]}>
-        <planeGeometry args={[0.57, 0.73]} />
-        <meshBasicMaterial color="#4a9fd4" transparent opacity={0.30} />
-      </mesh>
-      {/* Outer soft glow */}
-      <mesh position={[0, 0, -0.007]}>
-        <planeGeometry args={[0.65, 0.82]} />
-        <meshBasicMaterial color="#1a3a5c" transparent opacity={0.18} />
-      </mesh>
-      <pointLight color="#4a9fd4" intensity={0.7} distance={1.8} decay={2} />
     </group>
   )
 }
@@ -253,8 +166,8 @@ function FallbackHead({ kf, tilt }) {
   )
 }
 
-// ── Real GLB model ────────────────────────────────────────────────────────────
-function RobotModel({ url, kf, tilt }) {
+// ── Real GLB head model ───────────────────────────────────────────────────────
+function HeadModel({ url, kf, tilt }) {
   const { scene } = useGLTF(url)
   const groupRef = useRef()
 
@@ -264,10 +177,13 @@ function RobotModel({ url, kf, tilt }) {
     })
   }, [scene])
 
-  useFrame(() => {
+  useFrame(({ clock }) => {
     if (!groupRef.current) return
     const g = groupRef.current
-    g.position.lerp(new THREE.Vector3(...kf.modelPos), 0.07)
+    g.position.lerp(
+      new THREE.Vector3(kf.modelPos[0], kf.modelPos[1] + Math.sin(clock.getElapsedTime() * 0.85) * 0.012, kf.modelPos[2]),
+      0.07
+    )
     g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y, 0.07)
     g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x, 0.07)
   })
@@ -315,9 +231,11 @@ function SceneContent({ scrollData, tilt, mobile }) {
 
       <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} />
 
-      <Suspense fallback={<LoadingSpinner />}>
-        <HolographicPortrait kf={kf} tilt={tilt} />
-      </Suspense>
+      <GLBErrorBoundary fallback={fallback}>
+        <Suspense fallback={<LoadingSpinner />}>
+          <HeadModel url={HEAD_URL} kf={kf} tilt={tilt} />
+        </Suspense>
+      </GLBErrorBoundary>
 
       {mobile ? (
         <EffectComposer>
@@ -336,7 +254,7 @@ function SceneContent({ scrollData, tilt, mobile }) {
   )
 }
 
-export default function Scene3D({ scrollData, tilt, modelUrl }) {
+export default function Scene3D({ scrollData, tilt }) {
   const mobile = isMobile()
   return (
     <div className="scene-canvas">
