@@ -18,35 +18,35 @@ const KEYFRAMES = [
   {
     cam: [-0.15, 0.15, 2.3],
     camTarget: [-0.1, 0.1, 0],
-    modelPos: [0.38, 0.05, 0],
+    modelPos: [0.38, 0.10, 0],
     modelRot: [0, -0.15, 0],
-    ringPos: [0.38, 0.18, -0.4],
+    ringPos: [0.38, 0.10, -0.4],
     ringScale: 0.72,
     ringOpacity: 0.9,
     dofFocus: 0.12,
     ambientIntensity: 0.18,
     lightIntensity: 1.2,
   },
-  // Section 1 – Works: head on right
+  // Section 1 – Works: head on right, in ring center
   {
     cam: [-0.1, 0.1, 2.5],
-    camTarget: [0.38, 0.05, 0],
-    modelPos: [0.42, 0.05, 0],
+    camTarget: [0.40, 0.08, 0],
+    modelPos: [0.42, 0.10, 0],
     modelRot: [0, 0.08, 0],
-    ringPos: [0.42, 0.18, -0.38],
+    ringPos: [0.42, 0.10, -0.38],
     ringScale: 0.68,
     ringOpacity: 0.75,
     dofFocus: 0.10,
     ambientIntensity: 0.25,
     lightIntensity: 2.2,
   },
-  // Section 2 – Contact: head on right
+  // Section 2 – Contact: head further right, in ring center
   {
-    cam: [-0.15, 0.1, 2.4],
-    camTarget: [0.38, 0.06, 0],
-    modelPos: [0.4, 0.05, 0],
+    cam: [-0.05, 0.1, 2.4],
+    camTarget: [0.50, 0.08, 0],
+    modelPos: [0.52, 0.10, 0],
     modelRot: [0, -0.05, 0],
-    ringPos: [0.4, 0.18, -0.38],
+    ringPos: [0.52, 0.10, -0.38],
     ringScale: 0.72,
     ringOpacity: 0.85,
     dofFocus: 0.12,
@@ -91,24 +91,33 @@ function GlowRing({ position, scale, opacity }) {
 
   return (
     <group position={position}>
+      {/* core line — very bright white-blue for bloom pick-up */}
       <mesh ref={ringRef} scale={scale}>
-        <torusGeometry args={[1, 0.007, 16, 120]} />
-        <meshBasicMaterial color="#6ab4e8" transparent opacity={opacity} />
+        <torusGeometry args={[1, 0.009, 16, 120]} />
+        <meshBasicMaterial color="#d8f0ff" transparent opacity={opacity} />
       </mesh>
+      {/* first glow halo */}
       <mesh ref={glowRef} scale={scale * 1.03}>
-        <torusGeometry args={[1, 0.032, 8, 100]} />
-        <meshBasicMaterial color="#4a9fd4" transparent opacity={opacity * 0.5} />
+        <torusGeometry args={[1, 0.04, 8, 100]} />
+        <meshBasicMaterial color="#88ccf0" transparent opacity={opacity * 0.6} />
       </mesh>
-      <mesh scale={scale * 1.08}>
-        <torusGeometry args={[1, 0.07, 8, 100]} />
-        <meshBasicMaterial color="#1a5f8a" transparent opacity={opacity * 0.18} />
+      {/* second halo */}
+      <mesh scale={scale * 1.10}>
+        <torusGeometry args={[1, 0.09, 8, 100]} />
+        <meshBasicMaterial color="#3a8abf" transparent opacity={opacity * 0.22} />
       </mesh>
-      <mesh scale={scale * 1.18}>
-        <torusGeometry args={[1, 0.14, 8, 80]} />
-        <meshBasicMaterial color="#0d3a5c" transparent opacity={opacity * 0.08} />
+      {/* outer atmospheric halo */}
+      <mesh scale={scale * 1.22}>
+        <torusGeometry args={[1, 0.18, 8, 80]} />
+        <meshBasicMaterial color="#103a60" transparent opacity={opacity * 0.10} />
       </mesh>
-      <pointLight color="#4a9fd4" intensity={opacity * 10.0} distance={3.5} decay={2} />
-      <pointLight color="#2a6fa0" intensity={opacity * 6.0} distance={5.0} decay={2} position={[0, 0, 0.2]} />
+      {/* inner sphere — gives the "glowing sphere" look that bloom amplifies */}
+      <mesh scale={scale * 0.96}>
+        <sphereGeometry args={[1, 20, 20]} />
+        <meshBasicMaterial color="#0a2540" transparent opacity={opacity * 0.18} side={2} />
+      </mesh>
+      <pointLight color="#5ab8f0" intensity={opacity * 8.0} distance={3.5} decay={2} />
+      <pointLight color="#2a6fa0" intensity={opacity * 4.0} distance={5.5} decay={2} position={[0, 0, 0.3]} />
     </group>
   )
 }
@@ -242,13 +251,6 @@ function SceneContent({ scrollData, tilt, mobile }) {
       {!mobile && <directionalLight position={[0, -0.8, 1]} intensity={kf.lightIntensity * 0.2} color="#ffffff" />}
 
       <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} />
-      <pointLight
-        color="#6ab4e8"
-        intensity={kf.ringOpacity * 4.0}
-        distance={2.5}
-        decay={2}
-        position={[kf.ringPos[0] - 0.3, kf.ringPos[1], kf.ringPos[2] + 0.6]}
-      />
 
       <GLBErrorBoundary fallback={fallback}>
         <Suspense fallback={<LoadingSpinner />}>
