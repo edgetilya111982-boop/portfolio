@@ -184,11 +184,12 @@ function HeadModel({ url, kf, tilt }) {
       new THREE.Vector3(kf.modelPos[0], kf.modelPos[1] + Math.sin(clock.getElapsedTime() * 0.85) * 0.012, kf.modelPos[2]),
       0.07
     )
-    g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y, 0.07)
-    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x, 0.07)
+    // Math.PI flips the Tripo model to face forward; tilt gives mouse tracking
+    g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y * 0.45, 0.07)
+    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + Math.PI + tilt.x * 0.45, 0.07)
   })
 
-  return <primitive ref={groupRef} object={scene} scale={3.2} />
+  return <primitive ref={groupRef} object={scene} scale={0.48} />
 }
 
 // ErrorBoundary for catching GLB load failures
