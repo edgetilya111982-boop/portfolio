@@ -1,11 +1,12 @@
 import React, { useRef, useMemo, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useGLTF } from '@react-three/drei'
+import { useGLTF, useTexture } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette, Noise, DepthOfField } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import './Scene3D.css'
 
 const HEAD_URL = `${import.meta.env.BASE_URL}head.glb`
+const RING_URL = `${import.meta.env.BASE_URL}ring.webp`
 useGLTF.preload(HEAD_URL)
 
 const isMobile = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
@@ -78,38 +79,27 @@ function getCurrentKF(section, progress) {
   return interpolateKF(kf0, kf1, progress)
 }
 
-// ── Glowing ring ──────────────────────────────────────────────────────────────
+// ── Glowing ring (image-based, AdditiveBlending so black = transparent) ───────
 function GlowRing({ position, scale, opacity }) {
-  const ringRef = useRef()
-  const glowRef = useRef()
+  const texture = useTexture(RING_URL)
+  const meshRef = useRef()
 
   useFrame(({ clock }) => {
-    if (ringRef.current) ringRef.current.rotation.z = clock.getElapsedTime() * 0.08
-    if (glowRef.current)
-      glowRef.current.material.opacity = opacity * (0.85 + Math.sin(clock.getElapsedTime() * 1.2) * 0.15)
+    if (meshRef.current)
+      meshRef.current.rotation.z = clock.getElapsedTime() * 0.04
   })
 
   return (
     <group position={position}>
-      {/* core — near-white so bloom threshold fires */}
-      <mesh ref={ringRef} scale={scale}>
-        <torusGeometry args={[1, 0.010, 16, 120]} />
-        <meshBasicMaterial color="#e8f6ff" transparent opacity={opacity} />
-      </mesh>
-      {/* first soft halo */}
-      <mesh ref={glowRef} scale={scale * 1.04}>
-        <torusGeometry args={[1, 0.045, 8, 100]} />
-        <meshBasicMaterial color="#90caee" transparent opacity={opacity * 0.65} />
-      </mesh>
-      {/* second halo */}
-      <mesh scale={scale * 1.12}>
-        <torusGeometry args={[1, 0.10, 8, 100]} />
-        <meshBasicMaterial color="#3a7aaa" transparent opacity={opacity * 0.25} />
-      </mesh>
-      {/* outer atmospheric halo */}
-      <mesh scale={scale * 1.26}>
-        <torusGeometry args={[1, 0.20, 8, 80]} />
-        <meshBasicMaterial color="#0e2f50" transparent opacity={opacity * 0.12} />
+      <mesh ref={meshRef} scale={scale * 1.55}>
+        <planeGeometry args={[2, 2]} />
+        <meshBasicMaterial
+          map={texture}
+          transparent
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          opacity={opacity}
+        />
       </mesh>
     </group>
   )
@@ -259,7 +249,7 @@ function SceneContent({ scrollData, tilt, mobile }) {
       ) : (
         <EffectComposer>
           <DepthOfField focusDistance={kf.dofFocus} focalLength={0.008} bokehScale={0.6} />
-          <Bloom intensity={2.2} luminanceThreshold={0.25} luminanceSmoothing={0.85} radius={1.1} />
+          <Bloom intensity={0.5} luminanceThreshold={0.6} luminanceSmoothing={0.9} radius={0.5} />
           <Noise opacity={0.028} />
           <Vignette eskil={false} offset={0.18} darkness={0.75} />
         </EffectComposer>
