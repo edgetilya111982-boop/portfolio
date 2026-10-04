@@ -84,6 +84,9 @@ function WorksText({ opacity }) {
           onClick={() => {
             const v = videoRef.current
             if (!v) return
+            v.muted = false
+            v.volume = 1
+            v.play().catch(() => {})
             if (v.requestFullscreen) v.requestFullscreen()
             else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen()
             else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen()
