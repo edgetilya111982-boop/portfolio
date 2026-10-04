@@ -1,12 +1,12 @@
 import React, { useRef, useMemo, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useGLTF, useTexture } from '@react-three/drei'
+import { useGLTF, useVideoTexture } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette, Noise, DepthOfField } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import './Scene3D.css'
 
 const HEAD_URL = `${import.meta.env.BASE_URL}head.glb`
-const RING_URL = `${import.meta.env.BASE_URL}ring.webp`
+const RING_URL = `${import.meta.env.BASE_URL}ring.mp4`
 useGLTF.preload(HEAD_URL)
 
 const isMobile = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
@@ -79,19 +79,13 @@ function getCurrentKF(section, progress) {
   return interpolateKF(kf0, kf1, progress)
 }
 
-// ── Glowing ring (image-based, AdditiveBlending so black = transparent) ───────
+// ── Glowing ring (video texture, AdditiveBlending so black = transparent) ─────
 function GlowRing({ position, scale, opacity }) {
-  const texture = useTexture(RING_URL)
-  const meshRef = useRef()
-
-  useFrame(({ clock }) => {
-    if (meshRef.current)
-      meshRef.current.rotation.z = clock.getElapsedTime() * 0.04
-  })
+  const texture = useVideoTexture(RING_URL, { loop: true, muted: true, start: true })
 
   return (
     <group position={position}>
-      <mesh ref={meshRef} scale={scale * 1.9}>
+      <mesh scale={scale * 1.9}>
         <planeGeometry args={[2, 2]} />
         <meshBasicMaterial
           map={texture}
