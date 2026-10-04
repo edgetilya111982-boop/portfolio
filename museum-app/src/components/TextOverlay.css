@@ -60,9 +60,8 @@
   bottom: 12vh;
   left: 6vw;
   right: 0;
-  background: linear-gradient(90deg, rgba(0,0,0,0.55) 0%, transparent 70%);
+  background: none;
   padding: 1.8rem 2rem 1.8rem 1.2rem;
-  border-radius: 4px;
 }
 
 .overlay-hero__headline { margin-bottom: 1.5rem; }
@@ -99,11 +98,10 @@
   display: flex;
   gap: 2.5rem;
   align-items: flex-start;
-  background: rgba(0,0,0,0.55);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: transparent;
+  border: none;
   border-radius: 4px;
   padding: 1.4rem;
-  backdrop-filter: blur(16px);
 }
 
 .works-card__video-wrap {
