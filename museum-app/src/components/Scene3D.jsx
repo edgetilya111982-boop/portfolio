@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, Suspense, useEffect } from 'react'
+import React, { useRef, useMemo, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useGLTF, useVideoTexture } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette, Noise, DepthOfField } from '@react-three/postprocessing'
@@ -13,9 +13,9 @@ const isMobile = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.te
 
 function lerp(a, b, t) { return a + (b - a) * t }
 
-// Scene keyframes
+// Desktop keyframes (head on right side)
 const KEYFRAMES = [
-  // Section 0 – Hero: head in shadow, mysterious
+  // Section 0 – Hero
   {
     cam: [-0.15, 0.15, 2.3],
     camTarget: [-0.1, 0.1, 0],
@@ -28,7 +28,7 @@ const KEYFRAMES = [
     ambientIntensity: 0.18,
     lightIntensity: 1.2,
   },
-  // Section 1 – Works: camera looks left so head at 0.42 appears on right
+  // Section 1 – Works
   {
     cam: [-0.15, 0.1, 2.5],
     camTarget: [-0.08, 0.08, 0],
@@ -41,7 +41,7 @@ const KEYFRAMES = [
     ambientIntensity: 0.25,
     lightIntensity: 2.2,
   },
-  // Section 2 – Contact: head further right
+  // Section 2 – Contact
   {
     cam: [-0.15, 0.1, 2.4],
     camTarget: [-0.05, 0.08, 0],
@@ -49,6 +49,49 @@ const KEYFRAMES = [
     modelRot: [0, -0.05, 0],
     ringPos: [0.52, 0.10, -0.38],
     ringScale: 0.72,
+    ringOpacity: 0.85,
+    dofFocus: 0.12,
+    ambientIntensity: 0.35,
+    lightIntensity: 2.8,
+  },
+]
+
+// Mobile keyframes (head centered, fits portrait viewport)
+const MOBILE_KEYFRAMES = [
+  // Section 0 – Hero
+  {
+    cam: [0, 0.12, 2.7],
+    camTarget: [0, 0.08, 0],
+    modelPos: [0, 0.08, 0],
+    modelRot: [0, -0.15, 0],
+    ringPos: [0, 0.08, -0.4],
+    ringScale: 0.65,
+    ringOpacity: 0.9,
+    dofFocus: 0.12,
+    ambientIntensity: 0.18,
+    lightIntensity: 1.2,
+  },
+  // Section 1 – Works
+  {
+    cam: [0, 0.08, 2.8],
+    camTarget: [0, 0.06, 0],
+    modelPos: [0.05, 0.08, 0],
+    modelRot: [0, 0.08, 0],
+    ringPos: [0.05, 0.08, -0.38],
+    ringScale: 0.62,
+    ringOpacity: 0.75,
+    dofFocus: 0.10,
+    ambientIntensity: 0.25,
+    lightIntensity: 2.2,
+  },
+  // Section 2 – Contact
+  {
+    cam: [0, 0.08, 2.7],
+    camTarget: [0, 0.06, 0],
+    modelPos: [0.08, 0.08, 0],
+    modelRot: [0, -0.05, 0],
+    ringPos: [0.08, 0.08, -0.38],
+    ringScale: 0.65,
     ringOpacity: 0.85,
     dofFocus: 0.12,
     ambientIntensity: 0.35,
@@ -73,9 +116,10 @@ function interpolateKF(kf0, kf1, t) {
   }
 }
 
-function getCurrentKF(section, progress) {
-  const kf0 = KEYFRAMES[section]
-  const kf1 = KEYFRAMES[Math.min(section + 1, KEYFRAMES.length - 1)]
+function getCurrentKF(section, progress, mobile = false) {
+  const frames = mobile ? MOBILE_KEYFRAMES : KEYFRAMES
+  const kf0 = frames[section]
+  const kf1 = frames[Math.min(section + 1, frames.length - 1)]
   return interpolateKF(kf0, kf1, progress)
 }
 
@@ -216,7 +260,7 @@ function CameraController({ kf }) {
 // ── Scene ─────────────────────────────────────────────────────────────────────
 function SceneContent({ scrollData, tilt, mobile }) {
   const { section, progress } = scrollData
-  const kf = getCurrentKF(section, progress)
+  const kf = getCurrentKF(section, progress, mobile)
 
   const fallback = <FallbackHead kf={kf} tilt={tilt} />
 
@@ -256,20 +300,6 @@ function SceneContent({ scrollData, tilt, mobile }) {
 
 export default function Scene3D({ scrollData, tilt }) {
   const mobile = isMobile()
-
-  useEffect(() => {
-    const audio = new Audio(`${import.meta.env.BASE_URL}ring.webm`)
-    audio.loop = true
-    audio.volume = 0.45
-    const start = () => audio.play().catch(() => {})
-    document.addEventListener('pointerdown', start, { once: true })
-    document.addEventListener('scroll', start, { once: true })
-    return () => {
-      audio.pause()
-      document.removeEventListener('pointerdown', start)
-      document.removeEventListener('scroll', start)
-    }
-  }, [])
 
   return (
     <div className="scene-canvas">
