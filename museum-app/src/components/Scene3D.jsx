@@ -19,7 +19,7 @@ const KEYFRAMES = [
     cam: [-0.15, 0.15, 2.3],
     camTarget: [-0.1, 0.1, 0],
     modelPos: [0.38, 0.10, 0],
-    modelRot: [0, -0.15, 0],
+    modelRot: [0.05, -0.28, 0],
     ringPos: [0.38, 0.10, -0.4],
     ringScale: 0.72,
     ringOpacity: 0.9,
@@ -209,11 +209,12 @@ function PhotoCard({ kf, tilt }) {
 
   // MeshBasicMaterial on front = unlit, photo at full native brightness
   const frontMat = useMemo(() => new THREE.MeshBasicMaterial({ map: texture }), [texture])
-  const edgeMat  = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#1e1e1e', roughness: 0.25, metalness: 0.85,
+  // Warm chrome edge — visibly catches the scene warm key light
+  const edgeMat = useMemo(() => new THREE.MeshStandardMaterial({
+    color: '#c8b89a', roughness: 0.06, metalness: 1.0,
   }), [])
-  const backMat  = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#0a0a0a', roughness: 0.9, metalness: 0.05,
+  const backMat = useMemo(() => new THREE.MeshStandardMaterial({
+    color: '#1a1410', roughness: 0.7, metalness: 0.3,
   }), [])
 
   // BoxGeometry face order: +X, -X, +Y, -Y, +Z (front), -Z (back)
@@ -237,10 +238,11 @@ function PhotoCard({ kf, tilt }) {
     g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x * 2.5, 0.07)
   })
 
+  // Square 1:1, T=0.022 units ≈ 4 mm at scene scale
   return (
     <group ref={groupRef}>
       <mesh castShadow material={slabMats}>
-        <boxGeometry args={[0.72, 0.88, 0.022]} />
+        <boxGeometry args={[0.72, 0.72, 0.022]} />
       </mesh>
     </group>
   )
