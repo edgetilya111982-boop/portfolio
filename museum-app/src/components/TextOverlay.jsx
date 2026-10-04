@@ -45,89 +45,139 @@ function HeroText({ opacity }) {
   )
 }
 
+const isMobileDevice = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
+
 // Section 1 — Works carousel
 function WorksText({ opacity }) {
   const [current, setCurrent] = useState(0)
   const [loaded, setLoaded] = useState(false)
+  const [modal, setModal] = useState(false)
   const videoRef = useRef(null)
+  const modalVideoRef = useRef(null)
 
   // Start loading video only when section becomes visible
   useEffect(() => {
     if (opacity > 0.1 && !loaded) setLoaded(true)
   }, [opacity, loaded])
 
-  // Play/pause based on visibility
+  // Play/pause preview video (always muted)
   useEffect(() => {
     const v = videoRef.current
     if (!v) return
+    v.muted = true
     if (opacity > 0.3) { v.play().catch(() => {}) }
     else v.pause()
   }, [opacity])
+
+  // Play modal video with sound when it mounts
+  useEffect(() => {
+    if (!modal || !modalVideoRef.current) return
+    const mv = modalVideoRef.current
+    mv.muted = false
+    mv.volume = 1
+    mv.play().catch(() => {})
+  }, [modal])
 
   const prev = () => setCurrent(i => (i - 1 + WORKS.length) % WORKS.length)
   const next = () => setCurrent(i => (i + 1) % WORKS.length)
   const w = WORKS[current]
 
+  const closeModal = () => {
+    if (modalVideoRef.current) {
+      modalVideoRef.current.pause()
+      modalVideoRef.current.muted = true
+    }
+    setModal(false)
+  }
+
+  const handleVideoClick = () => {
+    if (isMobileDevice()) {
+      setModal(true)
+      return
+    }
+    const v = videoRef.current
+    if (!v) return
+    v.muted = false
+    v.volume = 1
+    v.play().catch(() => {})
+    const onFsChange = () => {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (videoRef.current) videoRef.current.muted = true
+        document.removeEventListener('fullscreenchange', onFsChange)
+        document.removeEventListener('webkitfullscreenchange', onFsChange)
+      }
+    }
+    document.addEventListener('fullscreenchange', onFsChange)
+    document.addEventListener('webkitfullscreenchange', onFsChange)
+    if (v.requestFullscreen) v.requestFullscreen()
+    else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen()
+    else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen()
+  }
+
   return (
-    <div
-      className="overlay-section overlay-works"
-      style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}
-    >
-      <div className="works-header">
-        <span className="label-tiny">Избранные работы</span>
-        <span className="label-tiny works-counter">{current + 1} / {WORKS.length}</span>
-      </div>
-
-      <div className="works-card">
-        <div
-          className="works-card__video-wrap"
-          onClick={() => {
-            const v = videoRef.current
-            if (!v) return
-            v.muted = false
-            v.volume = 1
-            v.play().catch(() => {})
-            if (v.requestFullscreen) v.requestFullscreen()
-            else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen()
-            else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen()
-          }}
-        >
+    <>
+      {modal && (
+        <div className="video-modal" onClick={closeModal}>
           <video
-            ref={videoRef}
-            className="works-card__video"
-            src={loaded ? w.video : undefined}
-            autoPlay
-            muted
-            loop
+            ref={modalVideoRef}
+            className="video-modal__video"
+            src={w.video}
             playsInline
-            preload="metadata"
-            key={w.video}
+            controls
+            onClick={e => e.stopPropagation()}
           />
-          <div className="works-card__fullscreen-hint">⛶</div>
+          <button className="video-modal__close" onClick={closeModal} aria-label="Закрыть">✕</button>
         </div>
-        <div className="works-card__info">
-          <span className="works-card__num label-tiny">{w.num}</span>
-          <h2 className="works-card__title headline-medium">{w.title}</h2>
-          <span className="works-card__tools label-tiny">{w.tools}</span>
-          <p className="works-card__desc body-small">{w.desc}</p>
-        </div>
-      </div>
+      )}
 
-      <div className="works-nav">
-        <button className="works-nav__btn" onClick={prev} aria-label="Назад">←</button>
-        <div className="works-nav__dots">
-          {WORKS.map((_, i) => (
-            <button
-              key={i}
-              className={`works-nav__dot ${i === current ? 'works-nav__dot--active' : ''}`}
-              onClick={() => setCurrent(i)}
-              aria-label={`Работа ${i + 1}`}
-            />
-          ))}
+      <div
+        className="overlay-section overlay-works"
+        style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}
+      >
+        <div className="works-header">
+          <span className="label-tiny">Избранные работы</span>
+          <span className="label-tiny works-counter">{current + 1} / {WORKS.length}</span>
         </div>
-        <button className="works-nav__btn" onClick={next} aria-label="Вперёд">→</button>
+
+        <div className="works-card">
+          <div className="works-card__video-wrap" onClick={handleVideoClick}>
+            <video
+              ref={videoRef}
+              className="works-card__video"
+              src={loaded ? w.video : undefined}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              key={w.video}
+            />
+            <div className="works-card__fullscreen-hint">⛶</div>
+          </div>
+          <div className="works-card__info">
+            <span className="works-card__num label-tiny">{w.num}</span>
+            <h2 className="works-card__title headline-medium">{w.title}</h2>
+            <span className="works-card__tools label-tiny">{w.tools}</span>
+            <p className="works-card__desc body-small">{w.desc}</p>
+          </div>
+        </div>
+
+        <div className="works-nav">
+          <button className="works-nav__btn" onClick={prev} aria-label="Назад">←</button>
+          <div className="works-nav__dots">
+            {WORKS.map((_, i) => (
+              <button
+                key={i}
+                className={`works-nav__dot ${i === current ? 'works-nav__dot--active' : ''}`}
+                onClick={() => setCurrent(i)}
+                aria-label={`Работа ${i + 1}`}
+              />
+            ))}
+          </div>
+          <button className="works-nav__btn" onClick={next} aria-label="Вперёд">→</button>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

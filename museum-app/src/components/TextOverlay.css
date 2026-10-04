@@ -269,6 +269,41 @@
   letter-spacing: 0.02em;
 }
 
+/* ─── Video modal (mobile fullscreen replacement) ─── */
+.video-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.97);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-modal__video {
+  width: 100%;
+  max-height: 100dvh;
+  object-fit: contain;
+  display: block;
+}
+
+.video-modal__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* ─── Mobile ─── */
 @media (max-width: 640px) {
   .headline-large  { font-size: 2.4rem; }
