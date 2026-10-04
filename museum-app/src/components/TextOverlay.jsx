@@ -59,21 +59,23 @@ function WorksText({ opacity }) {
     if (opacity > 0.1 && !loaded) setLoaded(true)
   }, [opacity, loaded])
 
-  // Play/pause preview video (always muted)
+  // Play/pause preview video (always muted, pause when modal open)
   useEffect(() => {
     const v = videoRef.current
     if (!v) return
     v.muted = true
-    if (opacity > 0.3) { v.play().catch(() => {}) }
+    if (!modal && opacity > 0.3) { v.play().catch(() => {}) }
     else v.pause()
-  }, [opacity])
+  }, [opacity, modal])
 
   // Play modal video with sound when modal opens
   useEffect(() => {
-    if (!modal || !modalVideoRef.current) return
+    if (!modal) return
     const mv = modalVideoRef.current
+    if (!mv) return
     mv.muted = false
     mv.volume = 1
+    mv.currentTime = 0
     mv.play().catch(() => {})
   }, [modal])
 
@@ -94,19 +96,21 @@ function WorksText({ opacity }) {
   return (
     <>
       {modal && createPortal(
-        <div className="video-modal">
-          <div className="video-modal__bar">
-            <button className="video-modal__close" onClick={closeModal} aria-label="Закрыть">
-              ✕ Закрыть
-            </button>
-          </div>
+        <div className="video-modal" onClick={closeModal}>
           <video
             ref={modalVideoRef}
             className="video-modal__video"
             src={w.video}
             playsInline
-            controls
+            onClick={e => e.stopPropagation()}
           />
+          <button
+            className="video-modal__close"
+            onClick={closeModal}
+            aria-label="Закрыть"
+          >
+            ✕&nbsp;&nbsp;Закрыть
+          </button>
         </div>,
         document.body
       )}

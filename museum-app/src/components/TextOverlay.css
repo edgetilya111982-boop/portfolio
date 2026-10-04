@@ -269,50 +269,49 @@
   letter-spacing: 0.02em;
 }
 
-/* ─── Video modal (mobile fullscreen replacement) ─── */
+/* ─── Video modal ─── */
 .video-modal {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 9999;
   background: #000;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   pointer-events: all;
-}
-
-.video-modal__bar {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0.75rem 1rem;
-  background: #111;
-  min-height: 52px;
-}
-
-.video-modal__close {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1.1rem;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 24px;
-  color: #fff;
-  font-size: 0.95rem;
-  font-family: inherit;
-  letter-spacing: 0.05em;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .video-modal__video {
-  flex: 1;
   width: 100%;
-  min-height: 0;
+  max-height: 75dvh;
   object-fit: contain;
   display: block;
   background: #000;
+  cursor: default;
+}
+
+.video-modal__close {
+  position: fixed;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  padding: 1rem 2.5rem;
+  background: #fff;
+  border: none;
+  border-radius: 50px;
+  color: #000;
+  font-size: 1.1rem;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  pointer-events: all;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
 }
 
 /* ─── Mobile ─── */
