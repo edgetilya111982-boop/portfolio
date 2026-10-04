@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, Suspense } from 'react'
+import React, { useRef, useMemo, Suspense, useEffect } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useGLTF, useVideoTexture } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette, Noise, DepthOfField } from '@react-three/postprocessing'
@@ -85,13 +85,15 @@ function GlowRing({ position, scale, opacity }) {
 
   return (
     <group position={position}>
-      <mesh scale={scale * 1.9}>
+      {/* renderOrder=-1 → renders before head; depthTest=false → head always draws on top */}
+      <mesh scale={scale * 1.9} renderOrder={-1}>
         <planeGeometry args={[2, 2]} />
         <meshBasicMaterial
           map={texture}
           transparent
           blending={THREE.AdditiveBlending}
           depthWrite={false}
+          depthTest={false}
           opacity={opacity}
         />
       </mesh>
@@ -254,6 +256,21 @@ function SceneContent({ scrollData, tilt, mobile }) {
 
 export default function Scene3D({ scrollData, tilt }) {
   const mobile = isMobile()
+
+  useEffect(() => {
+    const audio = new Audio(`${import.meta.env.BASE_URL}ring.webm`)
+    audio.loop = true
+    audio.volume = 0.45
+    const start = () => audio.play().catch(() => {})
+    document.addEventListener('pointerdown', start, { once: true })
+    document.addEventListener('scroll', start, { once: true })
+    return () => {
+      audio.pause()
+      document.removeEventListener('pointerdown', start)
+      document.removeEventListener('scroll', start)
+    }
+  }, [])
+
   return (
     <div className="scene-canvas">
       <Canvas
