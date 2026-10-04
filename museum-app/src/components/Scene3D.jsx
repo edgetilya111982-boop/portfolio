@@ -202,23 +202,25 @@ function LoadingSpinner() {
   )
 }
 
-// ── Photo card — thin slab with portrait on front face ───────────────────────
+// ── Photo card — thin metallic slab with portrait, tracks mouse ──────────────
 function PhotoCard({ kf, tilt }) {
   const groupRef = useRef()
   const texture = useTexture(PHOTO_URL)
 
-  const edgeMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#1a1a1a'), roughness: 0.55, metalness: 0.5,
+  // MeshBasicMaterial on front = unlit, photo at full native brightness
+  const frontMat = useMemo(() => new THREE.MeshBasicMaterial({ map: texture }), [texture])
+  const edgeMat  = useMemo(() => new THREE.MeshStandardMaterial({
+    color: '#1e1e1e', roughness: 0.25, metalness: 0.85,
   }), [])
-  const backMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#111111'), roughness: 0.9, metalness: 0.1,
+  const backMat  = useMemo(() => new THREE.MeshStandardMaterial({
+    color: '#0a0a0a', roughness: 0.9, metalness: 0.05,
   }), [])
-  const frontMat = useMemo(() => new THREE.MeshStandardMaterial({
-    map: texture, roughness: 0.42, metalness: 0.04,
-  }), [texture])
+  const frameMat = useMemo(() => new THREE.MeshStandardMaterial({
+    color: '#c9a86c', roughness: 0.15, metalness: 1.0,
+  }), [])
 
   // BoxGeometry face order: +X, -X, +Y, -Y, +Z (front), -Z (back)
-  const materials = useMemo(() => [
+  const slabMats = useMemo(() => [
     edgeMat, edgeMat, edgeMat, edgeMat, frontMat, backMat,
   ], [edgeMat, frontMat, backMat])
 
@@ -226,17 +228,28 @@ function PhotoCard({ kf, tilt }) {
     if (!groupRef.current) return
     const g = groupRef.current
     g.position.lerp(
-      new THREE.Vector3(kf.modelPos[0], kf.modelPos[1] + Math.sin(clock.getElapsedTime() * 0.85) * 0.008, kf.modelPos[2]),
+      new THREE.Vector3(
+        kf.modelPos[0],
+        kf.modelPos[1] + Math.sin(clock.getElapsedTime() * 0.85) * 0.008,
+        kf.modelPos[2]
+      ),
       0.07
     )
-    g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y * 0.35, 0.07)
-    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x * 0.35, 0.07)
+    // × 2.5 amplifies ±0.08 rad input to ±0.2 rad (≈±11°) — visible tracking
+    g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y * 2.5, 0.07)
+    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x * 2.5, 0.07)
   })
 
+  const W = 0.72, H = 0.88, T = 0.022
   return (
     <group ref={groupRef}>
-      <mesh castShadow material={materials}>
-        <boxGeometry args={[0.75, 0.75, 0.018]} />
+      {/* main slab */}
+      <mesh castShadow material={slabMats}>
+        <boxGeometry args={[W, H, T]} />
+      </mesh>
+      {/* thin gold border frame (slightly larger box, front face hidden by slab) */}
+      <mesh position={[0, 0, T / 2 - 0.001]} material={frameMat}>
+        <boxGeometry args={[W + 0.012, H + 0.012, 0.003]} />
       </mesh>
     </group>
   )
