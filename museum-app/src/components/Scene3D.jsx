@@ -20,7 +20,7 @@ const KEYFRAMES = [
     camTarget: [-0.1, 0.1, 0],
     modelPos: [0.38, 0.10, 0],
     modelRot: [0, -0.15, 0],
-    ringPos: [0.38, 0.10, -0.4],
+    ringPos: [0.38, 0.10, -0.02],
     ringScale: 0.72,
     ringOpacity: 0.9,
     dofFocus: 0.12,
@@ -33,7 +33,7 @@ const KEYFRAMES = [
     camTarget: [-0.08, 0.08, 0],
     modelPos: [0.42, 0.10, 0],
     modelRot: [0, 0.08, 0],
-    ringPos: [0.42, 0.10, -0.38],
+    ringPos: [0.42, 0.10, -0.02],
     ringScale: 0.68,
     ringOpacity: 0.75,
     dofFocus: 0.10,
@@ -46,7 +46,7 @@ const KEYFRAMES = [
     camTarget: [-0.05, 0.08, 0],
     modelPos: [0.52, 0.10, 0],
     modelRot: [0, -0.05, 0],
-    ringPos: [0.52, 0.10, -0.38],
+    ringPos: [0.52, 0.10, -0.02],
     ringScale: 0.72,
     ringOpacity: 0.85,
     dofFocus: 0.12,
@@ -63,7 +63,7 @@ const MOBILE_KEYFRAMES = [
     camTarget: [0, 0.08, 0],
     modelPos: [0, 0.08, 0],
     modelRot: [0, -0.15, 0],
-    ringPos: [0, 0.08, -0.4],
+    ringPos: [0, 0.08, -0.02],
     ringScale: 0.65,
     ringOpacity: 0.9,
     dofFocus: 0.12,
@@ -76,7 +76,7 @@ const MOBILE_KEYFRAMES = [
     camTarget: [0, 0.06, 0],
     modelPos: [0.05, 0.08, 0],
     modelRot: [0, 0.08, 0],
-    ringPos: [0.05, 0.08, -0.38],
+    ringPos: [0.05, 0.08, -0.02],
     ringScale: 0.62,
     ringOpacity: 0.75,
     dofFocus: 0.10,
@@ -89,7 +89,7 @@ const MOBILE_KEYFRAMES = [
     camTarget: [0, 0.06, 0],
     modelPos: [0.08, 0.08, 0],
     modelRot: [0, -0.05, 0],
-    ringPos: [0.08, 0.08, -0.38],
+    ringPos: [0.08, 0.08, -0.02],
     ringScale: 0.65,
     ringOpacity: 0.85,
     dofFocus: 0.12,
@@ -215,10 +215,9 @@ uniform sampler2D map;
 varying vec2 vUv;
 void main() {
   vec4 tex = texture2D(map, vUv);
-  // elliptical radial fade: centre stays opaque, edges dissolve
-  vec2 centered = (vUv - 0.5) * vec2(1.0, 1.15);
-  float r = length(centered);
-  float fade = smoothstep(0.54, 0.24, r);
+  // thin circular fade — only the outermost 8% of radius dissolves
+  float r = length(vUv - 0.5);
+  float fade = smoothstep(0.50, 0.42, r);
   gl_FragColor = vec4(tex.rgb, tex.a * fade);
 }
 `
