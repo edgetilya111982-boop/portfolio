@@ -203,15 +203,37 @@ function LoadingSpinner() {
 }
 
 // ── Cutout photo — transparent PNG floating in scene, tracks mouse ────────────
+const PHOTO_VERT = `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`
+const PHOTO_FRAG = `
+uniform sampler2D map;
+varying vec2 vUv;
+void main() {
+  vec4 tex = texture2D(map, vUv);
+  // elliptical radial fade: centre stays opaque, edges dissolve
+  vec2 centered = (vUv - 0.5) * vec2(1.0, 1.15);
+  float r = length(centered);
+  float fade = smoothstep(0.54, 0.24, r);
+  gl_FragColor = vec4(tex.rgb, tex.a * fade);
+}
+`
+
 function PhotoCard({ kf, tilt }) {
   const groupRef = useRef()
   const texture  = useTexture(PHOTO_URL)
 
-  const mat = useMemo(() => new THREE.MeshBasicMaterial({
-    map:        texture,
+  const mat = useMemo(() => new THREE.ShaderMaterial({
+    uniforms:    { map: { value: texture } },
+    vertexShader:   PHOTO_VERT,
+    fragmentShader: PHOTO_FRAG,
     transparent: true,
-    depthWrite: false,
-    side:       THREE.DoubleSide,
+    depthWrite:  false,
+    side:        THREE.DoubleSide,
   }), [texture])
 
   useFrame(({ clock }) => {
