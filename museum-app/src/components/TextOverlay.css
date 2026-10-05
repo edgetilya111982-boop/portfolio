@@ -24,7 +24,10 @@
 
 .hero-accent {
   font-weight: 500;
-  color: var(--accent-gold);
+  background: linear-gradient(90deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .headline-medium {
@@ -92,7 +95,7 @@
   margin-bottom: 0.8rem;
 }
 
-.works-counter { color: var(--accent-gold); font-weight: 400; }
+.works-counter { color: var(--accent-blue); font-weight: 400; }
 
 .works-card {
   display: flex;
@@ -152,7 +155,7 @@
   padding-top: 0.4rem;
 }
 
-.works-card__num { color: var(--accent-gold); }
+.works-card__num { color: var(--accent-blue); }
 
 .works-card__title { margin: 0.3rem 0; }
 
@@ -189,9 +192,10 @@
 }
 
 .works-nav__btn:hover {
-  border-color: var(--accent-gold);
-  color: var(--accent-gold);
-  background: rgba(0,0,0,0.6);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  background: rgba(0, 196, 255, 0.08);
+  box-shadow: 0 0 12px rgba(0, 196, 255, 0.2);
 }
 
 .works-nav__dots {
@@ -211,8 +215,9 @@
 }
 
 .works-nav__dot--active {
-  background: var(--accent-gold);
+  background: var(--accent-blue);
   transform: scale(1.4);
+  box-shadow: 0 0 8px var(--accent-blue);
 }
 
 /* ─── Contact ─── */
@@ -257,7 +262,7 @@
   transition: border-color 0.2s;
 }
 
-.contact-link:hover { border-color: var(--accent-gold); }
+.contact-link:hover { border-color: var(--accent-blue); }
 
 .contact-link__label { color: var(--text-secondary); }
 

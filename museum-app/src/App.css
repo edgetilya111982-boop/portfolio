@@ -8,8 +8,10 @@
   position: fixed;
   inset: 0;
   z-index: 0;
-  /* Radial gradient: slightly lighter center */
-  background: radial-gradient(ellipse 80% 60% at 50% 40%, #12161f 0%, #080b12 100%);
+  background:
+    radial-gradient(ellipse 60% 50% at 70% 45%, rgba(37, 99, 255, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 35% at 30% 60%, rgba(122, 47, 255, 0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 60% at 50% 40%, #0d1128 0%, #06091a 100%);
 }
 
 .scroll-spacer {

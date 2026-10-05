@@ -16,10 +16,14 @@ export default function Navigation() {
   return (
     <nav className="nav">
       <div className="nav__logo" onClick={() => goto(0)} style={{ cursor: 'pointer' }}>
-        <span className="nav__logo-mark">◈</span>
+        <img
+          src={`${import.meta.env.BASE_URL}logo_dz.png`}
+          alt="Digital Zak"
+          className="nav__logo-img"
+        />
         <div className="nav__logo-text">
-          <span className="nav__logo-name">ZAK</span>
-          <span className="nav__logo-sub">AI-ДИЗАЙНЕР</span>
+          <span className="nav__logo-name">DIGITAL ZAK</span>
+          <span className="nav__logo-sub">AI-CREATOR</span>
         </div>
       </div>
       <ul className="nav__links">

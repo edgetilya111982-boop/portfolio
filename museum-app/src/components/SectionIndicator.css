@@ -27,8 +27,9 @@
 }
 
 .section-dot--active .section-dot__pip {
-  background: var(--accent-gold);
+  background: var(--accent-blue);
   transform: scale(1.5);
+  box-shadow: 0 0 6px var(--accent-blue);
 }
 
 .section-dot__label {
@@ -44,7 +45,7 @@
 
 .section-dot--active .section-dot__label {
   opacity: 1;
-  color: var(--accent-gold);
+  color: var(--accent-blue);
 }
 
 @media (max-width: 640px) {
