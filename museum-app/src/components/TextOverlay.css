@@ -17,17 +17,18 @@
   font-size: clamp(3rem, 5vw, 5.5rem);
   font-weight: 200;
   line-height: 1.1;
-  color: var(--text-primary);
+  color: #ffffff;
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 24px rgba(0,0,0,0.9), 0 1px 6px rgba(0,0,0,0.7);
+  text-shadow: 0 2px 32px rgba(0,0,0,0.6), 0 0 80px rgba(0, 10, 30, 0.4);
 }
 
 .hero-accent {
   font-weight: 500;
-  background: linear-gradient(90deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+  background: linear-gradient(90deg, #38d9ff 0%, #c084fc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(56, 217, 255, 0.4));
 }
 
 .headline-medium {
@@ -35,18 +36,18 @@
   font-size: clamp(2rem, 3.2vw, 3rem);
   font-weight: 300;
   line-height: 1.15;
-  color: var(--text-primary);
+  color: #ffffff;
   letter-spacing: -0.01em;
-  text-shadow: 0 2px 20px rgba(0,0,0,0.9), 0 1px 4px rgba(0,0,0,0.7);
+  text-shadow: 0 2px 24px rgba(0,0,0,0.6);
 }
 
 .body-small {
   font-size: clamp(1.15rem, 2vw, 1.45rem);
   font-weight: 300;
   line-height: 1.75;
-  color: var(--text-secondary);
+  color: #dde6f0;
   max-width: 38ch;
-  text-shadow: 0 1px 8px rgba(0,0,0,0.95);
+  text-shadow: 0 1px 12px rgba(0,0,0,0.8);
 }
 
 .label-tiny {
@@ -54,8 +55,8 @@
   font-weight: 400;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--text-secondary);
-  text-shadow: 0 1px 6px rgba(0,0,0,0.95);
+  color: #b8cce0;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.7);
 }
 
 /* ─── Hero ─── */
