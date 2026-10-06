@@ -35,6 +35,9 @@ jobs:
       - name: Build
         working-directory: museum-app
         run: npm run build
+        env:
+          VITE_TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          VITE_TG_CHAT: "@zakinsk"
 
       - uses: actions/configure-pages@v4
 

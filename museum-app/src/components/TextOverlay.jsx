@@ -166,29 +166,122 @@ function WorksText({ opacity }) {
   )
 }
 
+const TG_TOKEN = import.meta.env.VITE_TG_TOKEN
+const TG_CHAT  = import.meta.env.VITE_TG_CHAT || '@zakinsk'
+
+async function sendToTelegram(name, contact, message) {
+  const text =
+    `🎨 <b>Новая заявка с сайта</b>\n\n` +
+    `👤 <b>Имя:</b> ${name}\n` +
+    `📱 <b>Контакт:</b> ${contact}\n` +
+    `💬 <b>Проект:</b> ${message}`
+  const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: TG_CHAT, text, parse_mode: 'HTML' }),
+  })
+  if (!res.ok) throw new Error('Telegram error')
+}
+
 // Section 2 — Contacts
 function ContactText({ opacity }) {
+  const [name,    setName]    = useState('')
+  const [contact, setContact] = useState('')
+  const [msg,     setMsg]     = useState('')
+  const [status,  setStatus]  = useState('idle') // idle | sending | ok | err
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!name.trim() || !contact.trim() || !msg.trim()) return
+    setStatus('sending')
+    try {
+      await sendToTelegram(name.trim(), contact.trim(), msg.trim())
+      setStatus('ok')
+      setName(''); setContact(''); setMsg('')
+    } catch {
+      setStatus('err')
+    }
+  }
+
   return (
     <div className="overlay-section overlay-contact" style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}>
       <div className="contact-inner">
-        <span className="label-tiny">Связаться</span>
-        <h2 className="headline-large contact-headline">
-          Создадим<br />
-          <span className="hero-accent">что‑то невероятное</span>
-        </h2>
-        <p className="body-small contact-sub">
-          Есть идея? Я знаю, как сделать её реальной.<br />
-          Дизайн, анимация, саунд — всё в одном месте.
-        </p>
-        <div className="contact-links">
-          <a href="https://t.me/zakinskiy" className="contact-link" target="_blank" rel="noreferrer">
-            <span className="contact-link__label label-tiny">Telegram</span>
-            <span className="contact-link__value">@zakinskiy</span>
-          </a>
-          <a href="mailto:qeepil@bk.ru" className="contact-link">
-            <span className="contact-link__label label-tiny">Email</span>
-            <span className="contact-link__value">qeepil@bk.ru</span>
-          </a>
+        <div className="contact-top">
+          <div className="contact-left">
+            <span className="label-tiny">Связаться</span>
+            <h2 className="headline-large contact-headline">
+              Создадим<br />
+              <span className="hero-accent">что‑то невероятное</span>
+            </h2>
+            <div className="contact-links">
+              <a href="https://t.me/zakinskiy" className="contact-link" target="_blank" rel="noreferrer">
+                <span className="contact-link__label label-tiny">Telegram</span>
+                <span className="contact-link__value">@zakinskiy</span>
+              </a>
+              <a href="mailto:qeepil@bk.ru" className="contact-link">
+                <span className="contact-link__label label-tiny">Email</span>
+                <span className="contact-link__value">qeepil@bk.ru</span>
+              </a>
+            </div>
+          </div>
+
+          <form className="contact-form" onSubmit={handleSubmit}>
+            <div className="contact-form__field">
+              <label className="label-tiny">Ваше имя</label>
+              <input
+                className="contact-form__input"
+                type="text"
+                placeholder="Иван"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                disabled={status === 'sending'}
+                maxLength={80}
+              />
+            </div>
+            <div className="contact-form__field">
+              <label className="label-tiny">Telegram / телефон</label>
+              <input
+                className="contact-form__input"
+                type="text"
+                placeholder="@username или +7..."
+                value={contact}
+                onChange={e => setContact(e.target.value)}
+                disabled={status === 'sending'}
+                maxLength={80}
+              />
+            </div>
+            <div className="contact-form__field">
+              <label className="label-tiny">О проекте</label>
+              <textarea
+                className="contact-form__input contact-form__textarea"
+                placeholder="Расскажите, что хотите создать..."
+                value={msg}
+                onChange={e => setMsg(e.target.value)}
+                disabled={status === 'sending'}
+                maxLength={1000}
+                rows={3}
+              />
+            </div>
+
+            {status === 'ok' && (
+              <p className="contact-form__feedback contact-form__feedback--ok">
+                ✓ Заявка отправлена — скоро свяжусь
+              </p>
+            )}
+            {status === 'err' && (
+              <p className="contact-form__feedback contact-form__feedback--err">
+                Ошибка отправки — напишите напрямую в Telegram
+              </p>
+            )}
+
+            <button
+              className="contact-form__btn"
+              type="submit"
+              disabled={status === 'sending' || !name.trim() || !contact.trim() || !msg.trim()}
+            >
+              {status === 'sending' ? 'Отправка...' : 'Отправить заявку →'}
+            </button>
+          </form>
         </div>
       </div>
     </div>
