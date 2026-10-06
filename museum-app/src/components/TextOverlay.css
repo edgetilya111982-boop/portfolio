@@ -238,14 +238,7 @@
   bottom: 5vh;
   left: 4vw;
   right: 52vw;
-  background: linear-gradient(135deg,
-    rgba(0, 3, 14, 0.80) 0%,
-    rgba(0, 3, 14, 0.55) 60%,
-    transparent 100%
-  );
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border-radius: 4px;
+  background: none;
   padding: 2rem 2.5rem 1.8rem 1.5rem;
 }
 
