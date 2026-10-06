@@ -25,7 +25,7 @@ function HeroText({ opacity }) {
     <div className="overlay-section overlay-hero" style={{ opacity }}>
       <div className="overlay-hero__headline">
         <h1 className="headline-large">
-          Я создаю образы,<br />
+          Я создаю образы<br />
           по вашим<br />
           <span className="hero-accent">Желаниям</span>
         </h1>
