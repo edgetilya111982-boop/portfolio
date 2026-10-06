@@ -174,7 +174,7 @@ function ContactText({ opacity }) {
         <span className="label-tiny">Связаться</span>
         <h2 className="headline-large contact-headline">
           Создадим<br />
-          <span className="hero-accent">что‑то невероятное.</span>
+          <span className="hero-accent">что‑то невероятное</span>
         </h2>
         <p className="body-small contact-sub">
           Есть идея? Я знаю, как сделать её реальной.<br />
