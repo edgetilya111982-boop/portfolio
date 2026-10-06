@@ -253,7 +253,7 @@ function PhotoCard({ kf, tilt }) {
   return (
     <group ref={groupRef}>
       <mesh material={mat} renderOrder={3}>
-        <planeGeometry args={[1.25, 1.25]} />
+        <planeGeometry args={[1.08, 1.08]} />
       </mesh>
     </group>
   )
