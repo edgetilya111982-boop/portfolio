@@ -26,20 +26,20 @@ function HeroText({ opacity }) {
       <div className="overlay-hero__headline">
         <h1 className="headline-large">
           Я создаю образы,<br />
-          которые ИИ<br />
-          <span className="hero-accent">ещё не видел.</span>
+          по вашим<br />
+          <span className="hero-accent">Желаниям.</span>
         </h1>
       </div>
       <div className="overlay-hero__body">
         <p className="body-small">
           Zak — AI-creator, саунд-дизайнер<br />
-          и автор визуального контента.<br />
+          и автор визуального контента<br />
           Строю будущее инструментами ИИ.
         </p>
         <div className="overlay-hero__meta">
           <span className="label-tiny">Открыт к проектам</span>
           <span className="label-tiny">·</span>
-          <span className="label-tiny">2024</span>
+          <span className="label-tiny">2026</span>
         </div>
       </div>
     </div>
