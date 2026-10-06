@@ -27,7 +27,7 @@ function HeroText({ opacity }) {
         <h1 className="headline-large">
           Я создаю образы,<br />
           по вашим<br />
-          <span className="hero-accent">Желаниям.</span>
+          <span className="hero-accent">Желаниям</span>
         </h1>
       </div>
       <div className="overlay-hero__body">
