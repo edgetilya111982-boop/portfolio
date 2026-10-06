@@ -22,7 +22,7 @@ const KEYFRAMES = [
     modelRot: [0, -0.15, 0],
     ringPos: [0.38, 0.10, -0.02],
     ringScale: 0.72,
-    ringOpacity: 0.30,
+    ringOpacity: 0.48,
     dofFocus: 0.12,
     ambientIntensity: 0.18,
     lightIntensity: 1.2,
@@ -35,7 +35,7 @@ const KEYFRAMES = [
     modelRot: [0, 0.08, 0],
     ringPos: [0.42, 0.10, -0.02],
     ringScale: 0.68,
-    ringOpacity: 0.25,
+    ringOpacity: 0.42,
     dofFocus: 0.10,
     ambientIntensity: 0.25,
     lightIntensity: 2.2,
@@ -48,7 +48,7 @@ const KEYFRAMES = [
     modelRot: [0, -0.05, 0],
     ringPos: [0.52, 0.10, -0.02],
     ringScale: 0.72,
-    ringOpacity: 0.28,
+    ringOpacity: 0.45,
     dofFocus: 0.12,
     ambientIntensity: 0.35,
     lightIntensity: 2.8,
@@ -65,7 +65,7 @@ const MOBILE_KEYFRAMES = [
     modelRot: [0, -0.15, 0],
     ringPos: [0, 0.08, -0.02],
     ringScale: 0.65,
-    ringOpacity: 0.30,
+    ringOpacity: 0.48,
     dofFocus: 0.12,
     ambientIntensity: 0.18,
     lightIntensity: 1.2,
@@ -78,7 +78,7 @@ const MOBILE_KEYFRAMES = [
     modelRot: [0, 0.08, 0],
     ringPos: [0.05, 0.08, -0.02],
     ringScale: 0.62,
-    ringOpacity: 0.25,
+    ringOpacity: 0.42,
     dofFocus: 0.10,
     ambientIntensity: 0.25,
     lightIntensity: 2.2,
@@ -91,7 +91,7 @@ const MOBILE_KEYFRAMES = [
     modelRot: [0, -0.05, 0],
     ringPos: [0.08, 0.08, -0.02],
     ringScale: 0.65,
-    ringOpacity: 0.28,
+    ringOpacity: 0.45,
     dofFocus: 0.12,
     ambientIntensity: 0.35,
     lightIntensity: 2.8,
@@ -127,7 +127,7 @@ function VideoGlowRing({ position, scale, opacity }) {
   const texture = useVideoTexture(RING_URL_WEBM, { loop: true, muted: true, start: true, playsInline: true })
   return (
     <group position={position}>
-      <mesh scale={scale * 1.9} renderOrder={2}>
+      <mesh scale={scale * 1.9} renderOrder={1}>
         <planeGeometry args={[2, 2]} />
         <meshBasicMaterial
           map={texture}
@@ -151,20 +151,20 @@ function ProceduralGlowRing({ position, scale, opacity }) {
   const s = scale * 1.9
   const add = THREE.AdditiveBlending
   return (
-    <group ref={ref} position={position} renderOrder={2}>
-      <mesh scale={s * 1.12} renderOrder={2}>
+    <group ref={ref} position={position} renderOrder={1}>
+      <mesh scale={s * 1.12} renderOrder={1}>
         <torusGeometry args={[0.68, 0.10, 8, 120]} />
         <meshBasicMaterial color="#061428" transparent opacity={opacity * 0.5} blending={add} depthWrite={false} depthTest={false} />
       </mesh>
-      <mesh scale={s} renderOrder={2}>
+      <mesh scale={s} renderOrder={1}>
         <torusGeometry args={[0.68, 0.038, 8, 120]} />
         <meshBasicMaterial color="#0d2a5a" transparent opacity={opacity * 0.75} blending={add} depthWrite={false} depthTest={false} />
       </mesh>
-      <mesh scale={s} renderOrder={2}>
+      <mesh scale={s} renderOrder={1}>
         <torusGeometry args={[0.68, 0.015, 8, 120]} />
         <meshBasicMaterial color="#1a4488" transparent opacity={opacity * 0.9} blending={add} depthWrite={false} depthTest={false} />
       </mesh>
-      <mesh scale={s} renderOrder={2}>
+      <mesh scale={s} renderOrder={1}>
         <torusGeometry args={[0.68, 0.006, 8, 120]} />
         <meshBasicMaterial color="#3366aa" transparent opacity={opacity * 0.6} blending={add} depthWrite={false} depthTest={false} />
       </mesh>
@@ -248,7 +248,7 @@ function PhotoCard({ kf, tilt }) {
 
   return (
     <group ref={groupRef}>
-      <mesh material={mat}>
+      <mesh material={mat} renderOrder={3}>
         <planeGeometry args={[0.78, 0.78]} />
       </mesh>
     </group>
