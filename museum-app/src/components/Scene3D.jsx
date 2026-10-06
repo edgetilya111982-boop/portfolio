@@ -211,16 +211,20 @@ uniform sampler2D map;
 varying vec2 vUv;
 void main() {
   vec4 tex = texture2D(map, vUv);
-  // thin circular fade — only the outermost 8% of radius dissolves
   float r = length(vUv - 0.5);
   float fade = smoothstep(0.50, 0.42, r);
-  gl_FragColor = vec4(tex.rgb, tex.a * fade);
+  // sRGB→linear conversion so tone mapping round-trips to exact original colors
+  vec3 lin = pow(max(tex.rgb, vec3(0.0)), vec3(2.2));
+  gl_FragColor = vec4(lin, tex.a * fade);
 }
 `
 
 function PhotoCard({ kf, tilt }) {
   const groupRef = useRef()
-  const texture  = useTexture(PHOTO_URL)
+  const texture  = useTexture(PHOTO_URL, (t) => {
+    // Prevent Three.js auto-decoding sRGB — we handle it manually in the shader
+    t.colorSpace = THREE.NoColorSpace
+  })
 
   const mat = useMemo(() => new THREE.ShaderMaterial({
     uniforms:    { map: { value: texture } },
@@ -289,14 +293,14 @@ function SceneContent({ scrollData, tilt, mobile }) {
 
       {mobile ? (
         <EffectComposer>
-          <Bloom intensity={0.8} luminanceThreshold={0.5} radius={0.5} />
+          <Bloom intensity={0.6} luminanceThreshold={0.92} radius={0.5} />
           <Vignette eskil={false} offset={0.2} darkness={0.65} />
         </EffectComposer>
       ) : (
         <EffectComposer>
           <DepthOfField focusDistance={kf.dofFocus} focalLength={0.008} bokehScale={0.6} />
-          <Bloom intensity={0.5} luminanceThreshold={0.6} luminanceSmoothing={0.9} radius={0.5} />
-          <Noise opacity={0.028} />
+          <Bloom intensity={0.4} luminanceThreshold={0.92} luminanceSmoothing={0.9} radius={0.5} />
+          <Noise opacity={0.022} />
           <Vignette eskil={false} offset={0.18} darkness={0.75} />
         </EffectComposer>
       )}
@@ -314,8 +318,8 @@ export default function Scene3D({ scrollData, tilt }) {
         dpr={mobile ? 1 : [1, 2]}
         gl={{
           antialias: !mobile,
-          toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.15,
+          toneMapping: THREE.LinearToneMapping,
+          toneMappingExposure: 0.95,
           powerPreference: mobile ? 'low-power' : 'high-performance',
         }}
       >
