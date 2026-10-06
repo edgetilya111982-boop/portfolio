@@ -235,7 +235,7 @@ function PhotoCard({ kf, tilt }) {
     side:        THREE.DoubleSide,
   }), [texture])
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock, camera }) => {
     if (!groupRef.current) return
     const g = groupRef.current
     g.position.lerp(
@@ -246,8 +246,13 @@ function PhotoCard({ kf, tilt }) {
       ),
       0.07
     )
-    g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y * 2.5, 0.07)
-    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x * 2.5, 0.07)
+    // Base rotation so photo always faces the camera; tilt offsets from there
+    const faceY = Math.atan2(
+      camera.position.x - g.position.x,
+      camera.position.z - g.position.z
+    )
+    g.rotation.x = lerp(g.rotation.x, tilt.y * 2.5, 0.07)
+    g.rotation.y = lerp(g.rotation.y, faceY + tilt.x * 2.5, 0.07)
   })
 
   return (
