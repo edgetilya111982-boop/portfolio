@@ -206,26 +206,24 @@ function ContactText({ opacity }) {
   return (
     <div className="overlay-section overlay-contact" style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}>
       <div className="contact-inner">
-        <div className="contact-top">
-          <div className="contact-left">
-            <span className="label-tiny">Связаться</span>
-            <h2 className="headline-large contact-headline">
-              Создадим<br />
-              <span className="hero-accent">что‑то невероятное</span>
-            </h2>
-            <div className="contact-links">
-              <a href="https://t.me/zakinskiy" className="contact-link" target="_blank" rel="noreferrer">
-                <span className="contact-link__label label-tiny">Telegram</span>
-                <span className="contact-link__value">@zakinskiy</span>
-              </a>
-              <a href="mailto:qeepil@bk.ru" className="contact-link">
-                <span className="contact-link__label label-tiny">Email</span>
-                <span className="contact-link__value">qeepil@bk.ru</span>
-              </a>
-            </div>
-          </div>
+        <h2 className="headline-large contact-headline">
+          Создадим <span className="hero-accent">что‑то невероятное</span>
+        </h2>
 
-          <form className="contact-form" onSubmit={handleSubmit}>
+        <div className="contact-links-row">
+          <a href="https://t.me/zakinskiy" className="contact-link-inline" target="_blank" rel="noreferrer">
+            <span className="label-tiny">TG</span>
+            <span className="contact-link__value">@zakinskiy</span>
+          </a>
+          <span className="contact-sep">·</span>
+          <a href="mailto:qeepil@bk.ru" className="contact-link-inline">
+            <span className="label-tiny">Email</span>
+            <span className="contact-link__value">qeepil@bk.ru</span>
+          </a>
+        </div>
+
+        <form className="contact-form" onSubmit={handleSubmit}>
+          <div className="contact-form__row">
             <div className="contact-form__field">
               <label className="label-tiny">Ваше имя</label>
               <input
@@ -250,39 +248,39 @@ function ContactText({ opacity }) {
                 maxLength={80}
               />
             </div>
-            <div className="contact-form__field">
-              <label className="label-tiny">О проекте</label>
-              <textarea
-                className="contact-form__input contact-form__textarea"
-                placeholder="Расскажите, что хотите создать..."
-                value={msg}
-                onChange={e => setMsg(e.target.value)}
-                disabled={status === 'sending'}
-                maxLength={1000}
-                rows={3}
-              />
-            </div>
+          </div>
+          <div className="contact-form__field">
+            <label className="label-tiny">О проекте</label>
+            <textarea
+              className="contact-form__input contact-form__textarea"
+              placeholder="Расскажите, что хотите создать..."
+              value={msg}
+              onChange={e => setMsg(e.target.value)}
+              disabled={status === 'sending'}
+              maxLength={1000}
+              rows={2}
+            />
+          </div>
 
-            {status === 'ok' && (
-              <p className="contact-form__feedback contact-form__feedback--ok">
-                ✓ Заявка отправлена — скоро свяжусь
-              </p>
-            )}
-            {status === 'err' && (
-              <p className="contact-form__feedback contact-form__feedback--err">
-                Ошибка отправки — напишите напрямую в Telegram
-              </p>
-            )}
+          {status === 'ok' && (
+            <p className="contact-form__feedback contact-form__feedback--ok">
+              ✓ Заявка отправлена — скоро свяжусь
+            </p>
+          )}
+          {status === 'err' && (
+            <p className="contact-form__feedback contact-form__feedback--err">
+              Ошибка отправки — напишите напрямую в Telegram
+            </p>
+          )}
 
-            <button
-              className="contact-form__btn"
-              type="submit"
-              disabled={status === 'sending' || !name.trim() || !contact.trim() || !msg.trim()}
-            >
-              {status === 'sending' ? 'Отправка...' : 'Отправить заявку →'}
-            </button>
-          </form>
-        </div>
+          <button
+            className="contact-form__btn"
+            type="submit"
+            disabled={status === 'sending' || !name.trim() || !contact.trim() || !msg.trim()}
+          >
+            {status === 'sending' ? 'Отправка...' : 'Отправить заявку →'}
+          </button>
+        </form>
       </div>
     </div>
   )

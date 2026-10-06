@@ -237,42 +237,54 @@
 .overlay-contact {
   bottom: 5vh;
   left: 4vw;
-  right: 4vw;
-  background: linear-gradient(to top,
-    rgba(0, 3, 14, 0.82) 0%,
-    rgba(0, 3, 14, 0.52) 45%,
+  right: 52vw;
+  background: linear-gradient(135deg,
+    rgba(0, 3, 14, 0.80) 0%,
+    rgba(0, 3, 14, 0.55) 60%,
     transparent 100%
   );
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   border-radius: 4px;
-  padding: 2.5rem 2rem 1.8rem;
+  padding: 2rem 2.5rem 1.8rem 1.5rem;
 }
 
 .contact-inner {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-}
-
-.contact-top {
-  display: flex;
-  gap: 4vw;
-  align-items: flex-start;
-}
-
-.contact-left {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  min-width: 240px;
-  flex-shrink: 0;
+  gap: 0.9rem;
 }
 
 .contact-headline {
-  font-size: clamp(2rem, 3.2vw, 3.6rem);
+  font-size: clamp(1.8rem, 2.8vw, 3.2rem);
+  line-height: 1.2;
 }
 
+.contact-links-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.contact-link-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 1px;
+  transition: border-color 0.2s;
+}
+
+.contact-link-inline:hover { border-color: var(--accent-blue); }
+
+.contact-sep {
+  color: rgba(184, 204, 224, 0.4);
+  font-size: 1rem;
+}
+
+/* keep old .contact-links for mobile fallback */
 .contact-links {
   display: flex;
   flex-direction: column;
@@ -284,10 +296,16 @@
 .contact-form {
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
-  flex: 1;
-  max-width: 420px;
+  gap: 0.6rem;
+  max-width: 100%;
 }
+
+.contact-form__row {
+  display: flex;
+  gap: 0.7rem;
+}
+
+.contact-form__row .contact-form__field { flex: 1; }
 
 .contact-form__field {
   display: flex;
@@ -459,12 +477,7 @@
     right: 3vw;
   }
 
-  .contact-top {
-    flex-direction: column;
-    gap: 1.2rem;
-  }
-
-  .contact-form { max-width: 100%; }
+  .contact-form__row { flex-direction: column; gap: 0.6rem; }
 
   .contact-form__btn { width: 100%; text-align: center; }
 }
