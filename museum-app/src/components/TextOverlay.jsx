@@ -7,7 +7,7 @@ const WORKS = [
     num: '01',
     title: 'Анимация',
     tools: 'Higgsfield AI',
-    desc: 'AI-анимация, где каждый кадр рождается из идеи — без рук, только воображение.',
+    desc: 'AI-анимация, где каждый кадр рождается из идеи — без рук, только воображение',
     video: `${import.meta.env.BASE_URL}work_01.mp4`,
   },
   {
@@ -34,7 +34,7 @@ function HeroText({ opacity }) {
         <p className="body-small">
           Zak — AI-creator, саунд-дизайнер<br />
           и автор визуального контента<br />
-          Строю будущее инструментами ИИ.
+          Строю будущее инструментами ИИ
         </p>
         <div className="overlay-hero__meta">
           <span className="label-tiny">Открыт к проектам</span>
