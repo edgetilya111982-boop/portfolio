@@ -87,6 +87,16 @@
   bottom: 5vh;
   left: 4vw;
   right: 4vw;
+  /* Dark cinematic pool: opaque at bottom, fades up so 3D scene breathes above */
+  background: linear-gradient(to top,
+    rgba(0, 3, 14, 0.82) 0%,
+    rgba(0, 3, 14, 0.52) 42%,
+    transparent 100%
+  );
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 4px;
+  padding-top: 2.8rem;
 }
 
 .works-header {
@@ -110,8 +120,8 @@
 
 .works-card__video-wrap {
   position: relative;
-  width: min(48vw, 560px);
-  height: min(27vw, 315px);
+  width: min(40vw, 480px);
+  height: min(22.5vw, 270px);
   flex-shrink: 0;
   cursor: pointer;
   border-radius: 1px;
@@ -154,6 +164,8 @@
   flex-direction: column;
   gap: 0.5rem;
   padding-top: 0.4rem;
+  padding-left: 1.2rem;
+  border-left: 1px solid rgba(56, 217, 255, 0.18);
 }
 
 .works-card__num { color: var(--accent-blue); }
