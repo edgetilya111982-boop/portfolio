@@ -1,12 +1,11 @@
 import React, { useRef, useMemo, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useTexture, useVideoTexture } from '@react-three/drei'
+import { useTexture } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette, Noise, DepthOfField } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import './Scene3D.css'
 
-const PHOTO_URL    = `${import.meta.env.BASE_URL}photo_nobg.png`
-const RING_URL_WEBM = `${import.meta.env.BASE_URL}ring.webm`
+const PHOTO_URL = `${import.meta.env.BASE_URL}photo_nobg.png`
 
 const isMobile = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
 
@@ -22,7 +21,7 @@ const KEYFRAMES = [
     modelRot: [0, -0.15, 0],
     ringPos: [0.38, 0.10, -0.02],
     ringScale: 0.72,
-    ringOpacity: 0.32,
+    ringOpacity: 0.82,
     dofFocus: 0.12,
     ambientIntensity: 0.18,
     lightIntensity: 1.2,
@@ -35,7 +34,7 @@ const KEYFRAMES = [
     modelRot: [0, 0.08, 0],
     ringPos: [0.42, 0.10, -0.02],
     ringScale: 0.68,
-    ringOpacity: 0.28,
+    ringOpacity: 0.75,
     dofFocus: 0.10,
     ambientIntensity: 0.25,
     lightIntensity: 2.2,
@@ -48,7 +47,7 @@ const KEYFRAMES = [
     modelRot: [0, -0.05, 0],
     ringPos: [0.52, 0.10, -0.02],
     ringScale: 0.72,
-    ringOpacity: 0.30,
+    ringOpacity: 0.80,
     dofFocus: 0.12,
     ambientIntensity: 0.35,
     lightIntensity: 2.8,
@@ -65,7 +64,7 @@ const MOBILE_KEYFRAMES = [
     modelRot: [0, -0.15, 0],
     ringPos: [0, 0.08, -0.02],
     ringScale: 0.65,
-    ringOpacity: 0.32,
+    ringOpacity: 0.82,
     dofFocus: 0.12,
     ambientIntensity: 0.18,
     lightIntensity: 1.2,
@@ -78,7 +77,7 @@ const MOBILE_KEYFRAMES = [
     modelRot: [0, 0.08, 0],
     ringPos: [0.05, 0.08, -0.02],
     ringScale: 0.62,
-    ringOpacity: 0.28,
+    ringOpacity: 0.75,
     dofFocus: 0.10,
     ambientIntensity: 0.25,
     lightIntensity: 2.2,
@@ -91,7 +90,7 @@ const MOBILE_KEYFRAMES = [
     modelRot: [0, -0.05, 0],
     ringPos: [0.08, 0.08, -0.02],
     ringScale: 0.65,
-    ringOpacity: 0.30,
+    ringOpacity: 0.80,
     dofFocus: 0.12,
     ambientIntensity: 0.35,
     lightIntensity: 2.8,
@@ -122,64 +121,78 @@ function getCurrentKF(section, progress, mobile = false) {
   return interpolateKF(kf0, kf1, progress)
 }
 
-// ── Glowing ring — video texture (desktop) ───────────────────────────────────
-function VideoGlowRing({ position, scale, opacity }) {
-  const texture = useVideoTexture(RING_URL_WEBM, { loop: true, muted: true, start: true, playsInline: true })
-  return (
-    <group position={position}>
-      <mesh scale={scale * 1.9} renderOrder={2}>
-        <planeGeometry args={[2, 2]} />
-        <meshBasicMaterial
-          map={texture}
-          transparent
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-          opacity={opacity}
-        />
-      </mesh>
-    </group>
-  )
+// ── Atmospheric aura — shader-based soft glow disc ────────────────────────────
+const AURA_VERT = `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
+`
+const AURA_FRAG = `
+uniform float opacity;
+uniform float time;
+varying vec2 vUv;
 
-// ── Glowing ring — programmatic (mobile, always works) ───────────────────────
-function ProceduralGlowRing({ position, scale, opacity }) {
-  const ref = useRef()
+void main() {
+  vec2 uv = vUv - 0.5;
+  float r = length(uv) * 2.0;
+
+  // Subtle drift on the ring radius
+  float drift = sin(time * 0.4) * 0.02;
+
+  // Soft atmospheric ring — gaussian bell centered at ~0.72
+  float ring = exp(-pow((r - 0.72 + drift) * 5.5, 2.0));
+
+  // Very faint inner sphere glow
+  float sphere = max(0.0, 1.0 - r * 1.5);
+  sphere = sphere * sphere * 0.18;
+
+  // Faint outer nebula haze
+  float outer = max(0.0, 1.0 - r * 0.9);
+  outer = outer * outer * 0.08;
+
+  float total = ring * 0.9 + sphere + outer;
+
+  // Deep indigo → cool blue — NOT neon
+  vec3 ringColor  = vec3(0.03, 0.14, 0.42);
+  vec3 innerColor = vec3(0.01, 0.05, 0.18);
+  vec3 col = mix(innerColor, ringColor, smoothstep(0.0, 1.0, ring));
+
+  gl_FragColor = vec4(col * total, total * opacity);
+}
+`
+
+function AtmosphericAura({ position, scale, opacity }) {
+  const matRef = useRef()
+  const mat = useMemo(() => new THREE.ShaderMaterial({
+    uniforms: { opacity: { value: opacity }, time: { value: 0 } },
+    vertexShader:   AURA_VERT,
+    fragmentShader: AURA_FRAG,
+    transparent: true,
+    blending:    THREE.AdditiveBlending,
+    depthWrite:  false,
+    depthTest:   false,
+    side:        THREE.DoubleSide,
+  }), [])
+
   useFrame(({ clock }) => {
-    if (ref.current) ref.current.rotation.z = clock.getElapsedTime() * 0.14
+    mat.uniforms.opacity.value = opacity
+    mat.uniforms.time.value    = clock.getElapsedTime()
   })
-  const s = scale * 1.9
-  const add = THREE.AdditiveBlending
+
+  const s = scale * 2.4
   return (
-    <group ref={ref} position={position} renderOrder={2}>
-      {/* outer soft halo */}
-      <mesh scale={s} renderOrder={2}>
-        <torusGeometry args={[0.68, 0.08, 8, 120]} />
-        <meshBasicMaterial color="#0d2a55" transparent opacity={opacity * 0.35} blending={add} depthWrite={false} depthTest={false} />
-      </mesh>
-      {/* mid glow */}
-      <mesh scale={s} renderOrder={2}>
-        <torusGeometry args={[0.68, 0.032, 8, 120]} />
-        <meshBasicMaterial color="#2255aa" transparent opacity={opacity * 0.6} blending={add} depthWrite={false} depthTest={false} />
-      </mesh>
-      {/* core ring */}
-      <mesh scale={s} renderOrder={2}>
-        <torusGeometry args={[0.68, 0.013, 8, 120]} />
-        <meshBasicMaterial color="#4488dd" transparent opacity={opacity * 0.95} blending={add} depthWrite={false} depthTest={false} />
-      </mesh>
-      {/* bright highlight */}
-      <mesh scale={s} renderOrder={2}>
-        <torusGeometry args={[0.68, 0.005, 8, 120]} />
-        <meshBasicMaterial color="#99ccff" transparent opacity={opacity * 0.75} blending={add} depthWrite={false} depthTest={false} />
+    <group position={position} renderOrder={1}>
+      <mesh scale={s} renderOrder={1} material={mat}>
+        <planeGeometry args={[2, 2]} />
       </mesh>
     </group>
   )
 }
 
-function GlowRing({ position, scale, opacity, mobile }) {
-  return mobile
-    ? <ProceduralGlowRing position={position} scale={scale} opacity={opacity} />
-    : <VideoGlowRing position={position} scale={scale} opacity={opacity} />
+function GlowRing({ position, scale, opacity }) {
+  return <AtmosphericAura position={position} scale={scale} opacity={opacity} />
 }
 
 // ── Loading spinner ───────────────────────────────────────────────────────────
@@ -285,7 +298,7 @@ function SceneContent({ scrollData, tilt, mobile }) {
       <directionalLight position={[1.5, 0.5, -1.5]} intensity={kf.lightIntensity * 0.45} color="#a0c8ff" />
       {!mobile && <directionalLight position={[0, -0.8, 1]} intensity={kf.lightIntensity * 0.2} color="#ffffff" />}
 
-      <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} mobile={mobile} />
+      <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} />
 
       <Suspense fallback={<LoadingSpinner />}>
         <PhotoCard kf={kf} tilt={tilt} />
