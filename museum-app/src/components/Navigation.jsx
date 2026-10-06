@@ -4,7 +4,6 @@ import './Navigation.css'
 const NAV_LINKS = [
   { label: 'Главная', section: 0 },
   { label: 'Работы',  section: 1 },
-  { label: 'Обо мне', section: 0 },
   { label: 'Контакты', section: 2 },
 ]
 
