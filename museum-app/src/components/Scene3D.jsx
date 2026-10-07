@@ -1,55 +1,97 @@
-import React, { useRef, useMemo, Suspense, useEffect } from 'react'
+import React, { useRef, useMemo, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useGLTF, useVideoTexture } from '@react-three/drei'
+import { useTexture, useVideoTexture } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette, Noise, DepthOfField } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import './Scene3D.css'
 
-const HEAD_URL = `${import.meta.env.BASE_URL}head.glb`
-const RING_URL = `${import.meta.env.BASE_URL}ring.webm`
-useGLTF.preload(HEAD_URL)
+const PHOTO_URL     = `${import.meta.env.BASE_URL}photo_nobg.png`
+const RING_URL_WEBM = `${import.meta.env.BASE_URL}ring.webm`
 
 const isMobile = () => window.innerWidth < 768 || /android|iphone|ipad|ipod/i.test(navigator.userAgent)
 
 function lerp(a, b, t) { return a + (b - a) * t }
 
-// Scene keyframes
+// Desktop keyframes (head on right side)
 const KEYFRAMES = [
-  // Section 0 – Hero: head in shadow, mysterious
+  // Section 0 – Hero
   {
     cam: [-0.15, 0.15, 2.3],
     camTarget: [-0.1, 0.1, 0],
     modelPos: [0.38, 0.10, 0],
-    modelRot: [0, -0.15, 0],
-    ringPos: [0.38, 0.10, -0.4],
+    modelRot: [0, 0, 0],
+    ringPos: [0.38, 0.10, -0.02],
     ringScale: 0.72,
-    ringOpacity: 0.9,
+    ringOpacity: 0.48,
     dofFocus: 0.12,
     ambientIntensity: 0.18,
     lightIntensity: 1.2,
   },
-  // Section 1 – Works: camera looks left so head at 0.42 appears on right
+  // Section 1 – Works
   {
     cam: [-0.15, 0.1, 2.5],
     camTarget: [-0.08, 0.08, 0],
     modelPos: [0.42, 0.10, 0],
-    modelRot: [0, 0.08, 0],
-    ringPos: [0.42, 0.10, -0.38],
+    modelRot: [0, 0, 0],
+    ringPos: [0.42, 0.10, -0.02],
     ringScale: 0.68,
-    ringOpacity: 0.75,
+    ringOpacity: 0.42,
     dofFocus: 0.10,
     ambientIntensity: 0.25,
     lightIntensity: 2.2,
   },
-  // Section 2 – Contact: head further right
+  // Section 2 – Contact
   {
     cam: [-0.15, 0.1, 2.4],
     camTarget: [-0.05, 0.08, 0],
     modelPos: [0.52, 0.10, 0],
-    modelRot: [0, -0.05, 0],
-    ringPos: [0.52, 0.10, -0.38],
+    modelRot: [0, 0, 0],
+    ringPos: [0.52, 0.10, -0.02],
     ringScale: 0.72,
-    ringOpacity: 0.85,
+    ringOpacity: 0.45,
+    dofFocus: 0.12,
+    ambientIntensity: 0.35,
+    lightIntensity: 2.8,
+  },
+]
+
+// Mobile keyframes (head centered, fits portrait viewport)
+const MOBILE_KEYFRAMES = [
+  // Section 0 – Hero
+  {
+    cam: [0, 0.12, 2.7],
+    camTarget: [0, 0.08, 0],
+    modelPos: [0, 0.08, 0],
+    modelRot: [0, 0, 0],
+    ringPos: [0, 0.08, -0.02],
+    ringScale: 0.65,
+    ringOpacity: 0.48,
+    dofFocus: 0.12,
+    ambientIntensity: 0.18,
+    lightIntensity: 1.2,
+  },
+  // Section 1 – Works
+  {
+    cam: [0, 0.08, 2.8],
+    camTarget: [0, 0.06, 0],
+    modelPos: [0.05, 0.08, 0],
+    modelRot: [0, 0, 0],
+    ringPos: [0.05, 0.08, -0.02],
+    ringScale: 0.62,
+    ringOpacity: 0.42,
+    dofFocus: 0.10,
+    ambientIntensity: 0.25,
+    lightIntensity: 2.2,
+  },
+  // Section 2 – Contact
+  {
+    cam: [0, 0.08, 2.7],
+    camTarget: [0, 0.06, 0],
+    modelPos: [0.08, 0.08, 0],
+    modelRot: [0, 0, 0],
+    ringPos: [0.08, 0.08, -0.02],
+    ringScale: 0.65,
+    ringOpacity: 0.45,
     dofFocus: 0.12,
     ambientIntensity: 0.35,
     lightIntensity: 2.8,
@@ -73,20 +115,19 @@ function interpolateKF(kf0, kf1, t) {
   }
 }
 
-function getCurrentKF(section, progress) {
-  const kf0 = KEYFRAMES[section]
-  const kf1 = KEYFRAMES[Math.min(section + 1, KEYFRAMES.length - 1)]
+function getCurrentKF(section, progress, mobile = false) {
+  const frames = mobile ? MOBILE_KEYFRAMES : KEYFRAMES
+  const kf0 = frames[section]
+  const kf1 = frames[Math.min(section + 1, frames.length - 1)]
   return interpolateKF(kf0, kf1, progress)
 }
 
-// ── Glowing ring (video texture, AdditiveBlending so black = transparent) ─────
-function GlowRing({ position, scale, opacity }) {
-  const texture = useVideoTexture(RING_URL, { loop: true, muted: true, start: true })
-
+// ── Glowing ring — video texture (desktop) ───────────────────────────────────
+function VideoGlowRing({ position, scale, opacity }) {
+  const texture = useVideoTexture(RING_URL_WEBM, { loop: true, muted: true, start: true, playsInline: true })
   return (
     <group position={position}>
-      {/* renderOrder=-1 → renders before head; depthTest=false → head always draws on top */}
-      <mesh scale={scale * 1.9} renderOrder={-1}>
+      <mesh scale={scale * 1.9} renderOrder={1}>
         <planeGeometry args={[2, 2]} />
         <meshBasicMaterial
           map={texture}
@@ -99,6 +140,42 @@ function GlowRing({ position, scale, opacity }) {
       </mesh>
     </group>
   )
+}
+
+// ── Glowing ring — programmatic (mobile) ─────────────────────────────────────
+function ProceduralGlowRing({ position, scale, opacity }) {
+  const ref = useRef()
+  useFrame(({ clock }) => {
+    if (ref.current) ref.current.rotation.z = clock.getElapsedTime() * 0.10
+  })
+  const s = scale * 1.9
+  const add = THREE.AdditiveBlending
+  return (
+    <group ref={ref} position={position} renderOrder={1}>
+      <mesh scale={s * 1.12} renderOrder={1}>
+        <torusGeometry args={[0.68, 0.10, 8, 120]} />
+        <meshBasicMaterial color="#061428" transparent opacity={opacity * 0.5} blending={add} depthWrite={false} depthTest={false} />
+      </mesh>
+      <mesh scale={s} renderOrder={1}>
+        <torusGeometry args={[0.68, 0.038, 8, 120]} />
+        <meshBasicMaterial color="#0d2a5a" transparent opacity={opacity * 0.75} blending={add} depthWrite={false} depthTest={false} />
+      </mesh>
+      <mesh scale={s} renderOrder={1}>
+        <torusGeometry args={[0.68, 0.015, 8, 120]} />
+        <meshBasicMaterial color="#1a4488" transparent opacity={opacity * 0.9} blending={add} depthWrite={false} depthTest={false} />
+      </mesh>
+      <mesh scale={s} renderOrder={1}>
+        <torusGeometry args={[0.68, 0.006, 8, 120]} />
+        <meshBasicMaterial color="#3366aa" transparent opacity={opacity * 0.6} blending={add} depthWrite={false} depthTest={false} />
+      </mesh>
+    </group>
+  )
+}
+
+function GlowRing({ position, scale, opacity, mobile }) {
+  return mobile
+    ? <ProceduralGlowRing position={position} scale={scale} opacity={opacity} />
+    : <VideoGlowRing      position={position} scale={scale} opacity={opacity} />
 }
 
 // ── Loading spinner ───────────────────────────────────────────────────────────
@@ -121,84 +198,70 @@ function LoadingSpinner() {
   )
 }
 
-// ── Fallback box-head (shows when GLB fails to load) ─────────────────────────
-function FallbackHead({ kf, tilt }) {
-  const groupRef = useRef()
-  const mat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#1a1512'), metalness: 0.65, roughness: 0.3,
-  }), [])
+// ── Cutout photo — transparent PNG floating in scene, tracks mouse ────────────
+const PHOTO_VERT = `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`
+const PHOTO_FRAG = `
+uniform sampler2D map;
+varying vec2 vUv;
+void main() {
+  vec4 tex = texture2D(map, vUv);
+  float r = length(vUv - 0.5);
+  float fade = smoothstep(0.50, 0.42, r);
+  // sRGB→linear conversion so tone mapping round-trips to exact original colors
+  vec3 lin = pow(max(tex.rgb, vec3(0.0)), vec3(2.2));
+  gl_FragColor = vec4(lin, tex.a * fade);
+}
+`
 
-  useFrame(() => {
+function PhotoCard({ kf, tilt }) {
+  const groupRef = useRef()
+  const texture  = useTexture(PHOTO_URL, (t) => {
+    // Prevent Three.js auto-decoding sRGB — we handle it manually in the shader
+    t.colorSpace = THREE.NoColorSpace
+  })
+
+  const mat = useMemo(() => new THREE.ShaderMaterial({
+    uniforms:    { map: { value: texture } },
+    vertexShader:   PHOTO_VERT,
+    fragmentShader: PHOTO_FRAG,
+    transparent: true,
+    depthWrite:  false,
+    side:        THREE.DoubleSide,
+  }), [texture])
+
+  useFrame(({ clock, camera }) => {
     if (!groupRef.current) return
     const g = groupRef.current
-    g.position.lerp(new THREE.Vector3(...kf.modelPos), 0.07)
-    g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y, 0.07)
-    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] + tilt.x, 0.07)
+    g.position.lerp(
+      new THREE.Vector3(
+        kf.modelPos[0],
+        kf.modelPos[1] + Math.sin(clock.getElapsedTime() * 0.85) * 0.01,
+        kf.modelPos[2]
+      ),
+      0.07
+    )
+    // Base rotation so photo always faces the camera; tilt offsets from there
+    const faceY = Math.atan2(
+      camera.position.x - g.position.x,
+      camera.position.z - g.position.z
+    )
+    g.rotation.x = lerp(g.rotation.x, tilt.y * 2.5, 0.07)
+    g.rotation.y = lerp(g.rotation.y, faceY + tilt.x * 2.5, 0.07)
   })
 
   return (
     <group ref={groupRef}>
-      <mesh material={mat} position={[0, 0.04, 0]}><boxGeometry args={[0.2, 0.22, 0.18]} /></mesh>
-      <mesh material={mat} position={[0, 0.17, 0]}><boxGeometry args={[0.18, 0.06, 0.16]} /></mesh>
-      <mesh material={mat} position={[0, -0.1, 0]}><boxGeometry args={[0.15, 0.04, 0.14]} /></mesh>
-      {[-0.052, 0.052].map((x, i) => (
-        <mesh key={i} position={[x, 0.03, 0.093]}>
-          <torusGeometry args={[0.026, 0.004, 8, 32]} />
-          <meshStandardMaterial color="#c9a000" metalness={1} roughness={0.1} />
-        </mesh>
-      ))}
-      <mesh material={mat} position={[0, -0.165, 0]}>
-        <cylinderGeometry args={[0.055, 0.065, 0.08, 8]} />
+      <mesh material={mat} renderOrder={3}>
+        <planeGeometry args={[1.08, 1.08]} />
       </mesh>
     </group>
   )
-}
-
-// ── Real GLB head model ───────────────────────────────────────────────────────
-function HeadModel({ url, kf, tilt }) {
-  const { scene } = useGLTF(url)
-  const groupRef = useRef()
-
-  useMemo(() => {
-    scene.traverse(child => {
-      if (!child.isMesh) return
-      child.castShadow = true
-      const m = child.material
-      if (!m) return
-      // GLB bakes roughnessMap/metalnessMap from Tripo → must null them out
-      // otherwise scalar roughness is multiplied by the (low) texture value
-      m.roughnessMap = null
-      m.metalnessMap = null
-      m.roughness = 0.85
-      m.metalness = 0.04
-      m.envMapIntensity = 0.1
-      m.needsUpdate = true
-    })
-  }, [scene])
-
-  useFrame(({ clock }) => {
-    if (!groupRef.current) return
-    const g = groupRef.current
-    g.position.lerp(
-      new THREE.Vector3(kf.modelPos[0], kf.modelPos[1] + Math.sin(clock.getElapsedTime() * 0.85) * 0.012, kf.modelPos[2]),
-      0.07
-    )
-    // -PI/2 rotates Tripo model to face camera (фас); tilt gives mouse tracking
-    g.rotation.x = lerp(g.rotation.x, kf.modelRot[0] + tilt.y * 0.45, 0.07)
-    g.rotation.y = lerp(g.rotation.y, kf.modelRot[1] - Math.PI / 2 - 0.25 + tilt.x * 0.45, 0.07)
-  })
-
-  return <primitive ref={groupRef} object={scene} scale={0.88} />
-}
-
-// ErrorBoundary for catching GLB load failures
-class GLBErrorBoundary extends React.Component {
-  constructor(props) { super(props); this.state = { failed: false } }
-  static getDerivedStateFromError() { return { failed: true } }
-  render() {
-    if (this.state.failed) return this.props.fallback
-    return this.props.children
-  }
 }
 
 // ── Camera controller ─────────────────────────────────────────────────────────
@@ -216,9 +279,7 @@ function CameraController({ kf }) {
 // ── Scene ─────────────────────────────────────────────────────────────────────
 function SceneContent({ scrollData, tilt, mobile }) {
   const { section, progress } = scrollData
-  const kf = getCurrentKF(section, progress)
-
-  const fallback = <FallbackHead kf={kf} tilt={tilt} />
+  const kf = getCurrentKF(section, progress, mobile)
 
   return (
     <>
@@ -229,24 +290,22 @@ function SceneContent({ scrollData, tilt, mobile }) {
       <directionalLight position={[1.5, 0.5, -1.5]} intensity={kf.lightIntensity * 0.45} color="#a0c8ff" />
       {!mobile && <directionalLight position={[0, -0.8, 1]} intensity={kf.lightIntensity * 0.2} color="#ffffff" />}
 
-      <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} />
+      <GlowRing position={kf.ringPos} scale={kf.ringScale} opacity={kf.ringOpacity} mobile={mobile} />
 
-      <GLBErrorBoundary fallback={fallback}>
-        <Suspense fallback={<LoadingSpinner />}>
-          <HeadModel url={HEAD_URL} kf={kf} tilt={tilt} />
-        </Suspense>
-      </GLBErrorBoundary>
+      <Suspense fallback={<LoadingSpinner />}>
+        <PhotoCard kf={kf} tilt={tilt} />
+      </Suspense>
 
       {mobile ? (
         <EffectComposer>
-          <Bloom intensity={0.8} luminanceThreshold={0.5} radius={0.5} />
+          <Bloom intensity={0.6} luminanceThreshold={0.92} radius={0.5} />
           <Vignette eskil={false} offset={0.2} darkness={0.65} />
         </EffectComposer>
       ) : (
         <EffectComposer>
           <DepthOfField focusDistance={kf.dofFocus} focalLength={0.008} bokehScale={0.6} />
-          <Bloom intensity={0.5} luminanceThreshold={0.6} luminanceSmoothing={0.9} radius={0.5} />
-          <Noise opacity={0.028} />
+          <Bloom intensity={0.4} luminanceThreshold={0.92} luminanceSmoothing={0.9} radius={0.5} />
+          <Noise opacity={0.022} />
           <Vignette eskil={false} offset={0.18} darkness={0.75} />
         </EffectComposer>
       )}
@@ -257,20 +316,6 @@ function SceneContent({ scrollData, tilt, mobile }) {
 export default function Scene3D({ scrollData, tilt }) {
   const mobile = isMobile()
 
-  useEffect(() => {
-    const audio = new Audio(`${import.meta.env.BASE_URL}ring.webm`)
-    audio.loop = true
-    audio.volume = 0.45
-    const start = () => audio.play().catch(() => {})
-    document.addEventListener('pointerdown', start, { once: true })
-    document.addEventListener('scroll', start, { once: true })
-    return () => {
-      audio.pause()
-      document.removeEventListener('pointerdown', start)
-      document.removeEventListener('scroll', start)
-    }
-  }, [])
-
   return (
     <div className="scene-canvas">
       <Canvas
@@ -278,8 +323,8 @@ export default function Scene3D({ scrollData, tilt }) {
         dpr={mobile ? 1 : [1, 2]}
         gl={{
           antialias: !mobile,
-          toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.15,
+          toneMapping: THREE.LinearToneMapping,
+          toneMappingExposure: 0.95,
           powerPreference: mobile ? 'low-power' : 'high-performance',
         }}
       >

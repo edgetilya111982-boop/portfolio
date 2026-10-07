@@ -1,7 +1,7 @@
 import React from 'react'
 import './SectionIndicator.css'
 
-const SECTIONS = ['01 — Intro', '02 — Works', '03 — Contact']
+const SECTIONS = ['01 — Главная', '02 — Работы', '03 — Контакт']
 
 export default function SectionIndicator({ section }) {
   return (

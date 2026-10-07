@@ -5,14 +5,19 @@
 }
 
 :root {
-  --bg-outer: #0a0e1a;
-  --bg-panel: #0d0f14;
-  --bg-panel-rgb: 13, 15, 20;
+  --bg-outer: #06091a;
+  --bg-panel: #090c1e;
+  --bg-panel-rgb: 9, 12, 30;
   --text-primary: #ffffff;
-  --text-secondary: #c8c4be;
-  --accent-gold: #c9a96e;
-  --accent-ring: #4a7fa5;
-  --ring-glow: rgba(74, 127, 165, 0.6);
+  --text-secondary: #ccd8ea;
+  /* Digital Zak brand palette */
+  --accent-blue: #00c4ff;
+  --accent-cyan: #00e5ff;
+  --accent-purple: #7a2fff;
+  --accent-pink: #ff4da0;
+  --accent-gold: #00c4ff;   /* remap gold → brand blue for legacy references */
+  --accent-ring: #2563ff;
+  --ring-glow: rgba(0, 196, 255, 0.5);
   --grid-line: rgba(255, 255, 255, 0.04);
   --font-serif: 'Montserrat', system-ui, sans-serif;
   --font-sans: 'Space Grotesk', system-ui, sans-serif;
