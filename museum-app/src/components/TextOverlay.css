@@ -492,10 +492,21 @@
   .works-card__desc { max-width: 100%; }
 
   .overlay-contact {
-    bottom: 3vh;
-    left: 3vw;
-    right: 3vw;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.8rem 1.4rem 1.6rem;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(4, 6, 20, 0.72) 12%,
+      rgba(4, 6, 20, 0.92) 100%
+    );
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
+
+  .contact-headline { font-size: 1.7rem; line-height: 1.15; }
 
   .contact-form__row { flex-direction: column; gap: 0.6rem; }
 

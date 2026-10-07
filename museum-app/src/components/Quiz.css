@@ -503,8 +503,25 @@
 /* ─── Mobile ─── */
 @media (max-width: 640px) {
   .quiz__header { padding: 1rem 1.2rem; gap: 0.8rem; }
-  .quiz__body   { padding: 2rem 1.2rem 1.5rem; }
-  .quiz__footer { padding: 1rem 1.2rem; }
+  .quiz__body   { padding: 1.5rem 1.2rem 1.5rem; }
+
+  /* On mobile footer returns to normal flow — no floating over content */
+  .quiz__footer {
+    position: static;
+    padding: 0.9rem 1.2rem;
+    background: rgba(4, 6, 20, 0.95);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .quiz__next {
+    font-size: 0.85rem;
+    padding: 0.6rem 1.2rem;
+    flex: 1;
+  }
+
+  .quiz__skip {
+    font-size: 0.82rem;
+  }
 
   .quiz-step__q { font-size: 1.6rem; }
 
