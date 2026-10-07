@@ -11,12 +11,20 @@
 
 /* ─── Header ─── */
 .quiz__header {
+  position: relative;
+  z-index: 10;
   display: flex;
   align-items: center;
   gap: 1.2rem;
   padding: 1.2rem 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: none;
   flex-shrink: 0;
+  background: linear-gradient(
+    to top,
+    transparent 0%,
+    rgba(6, 9, 26, 0.55) 40%,
+    rgba(6, 9, 26, 0.92) 100%
+  );
 }
 
 .quiz__back {
@@ -63,7 +71,7 @@
   flex: 1;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 3rem 2rem 2rem;
+  padding: 2rem 2rem 2rem;
   display: flex;
   justify-content: center;
 }
@@ -350,13 +358,28 @@
 
 /* ─── Footer ─── */
 .quiz__footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 1rem;
-  padding: 1.2rem 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  flex-shrink: 0;
+  padding: 2.5rem 2rem 1.4rem;
+  border-top: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(6, 9, 26, 0.55) 35%,
+    rgba(6, 9, 26, 0.92) 100%
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+.quiz__footer > * {
+  pointer-events: auto;
 }
 
 .quiz__skip {
