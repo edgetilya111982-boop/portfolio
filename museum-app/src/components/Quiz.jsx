@@ -377,7 +377,7 @@ export default function Quiz({ onClose, onOrder }) {
   const pct = step >= 5 ? 100 : Math.round((step / TOTAL_INPUT_STEPS) * 100)
 
   return (
-    <div className="quiz" role="dialog" aria-modal="true" aria-label="Квиз-бриф">
+    <div className="quiz" role="dialog" aria-modal="true" aria-label="Квиз-бриф" onWheel={e => e.stopPropagation()}>
       {/* Header */}
       <header className="quiz__header">
         <button className="quiz__back" onClick={back} aria-label="Назад">
