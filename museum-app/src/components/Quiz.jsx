@@ -35,6 +35,18 @@ const CHANNELS = ['Instagram', 'YouTube', 'TikTok', 'Offline / ТВ', 'Друг�
 // Steps: 0=type, 1=goal, 2=timing, 3=styles(B), 4=details(C), 5=result
 const TOTAL_INPUT_STEPS = 4
 
+async function sendFilesToTelegram(files) {
+  for (const file of files) {
+    const form = new FormData()
+    form.append('chat_id', TG_CHAT)
+    form.append('document', file, file.name)
+    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendDocument`, {
+      method: 'POST',
+      body: form,
+    })
+  }
+}
+
 async function sendBriefToTelegram(answers) {
   const lines = [
     '📋 <b>Новый бриф с сайта</b>',
@@ -48,6 +60,7 @@ async function sendBriefToTelegram(answers) {
     answers.budget   ? `💰 <b>Бюджет:</b> ${answers.budget}` : null,
     answers.channels.length > 0 ? `📺 <b>Каналы:</b> ${answers.channels.join(', ')}` : null,
     answers.comment  ? `💬 <b>Комментарий:</b> ${answers.comment}` : null,
+    answers.files?.length > 0 ? `📎 <b>Файлов:</b> ${answers.files.length}` : null,
   ].filter(Boolean).join('\n')
 
   const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
@@ -56,6 +69,9 @@ async function sendBriefToTelegram(answers) {
     body: JSON.stringify({ chat_id: TG_CHAT, text: lines, parse_mode: 'HTML' }),
   })
   if (!res.ok) throw new Error('Telegram error')
+  if (answers.files?.length > 0) {
+    await sendFilesToTelegram(answers.files)
+  }
 }
 
 // ── Card: single select ──────────────────────────────────────────────────────
@@ -237,12 +253,48 @@ function StepDetails({ answers, onChange, onToggleChannel }) {
           <label className="label-tiny">Дополнительно</label>
           <textarea
             className="quiz-input quiz-input--textarea"
-            placeholder="Референсы, особые пожелания, детали проекта..."
+            placeholder="Особые пожелания, детали проекта..."
             value={answers.comment}
             onChange={e => onChange('comment', e.target.value)}
             maxLength={800}
             rows={3}
           />
+        </div>
+
+        <div className="quiz-details__field">
+          <label className="label-tiny" htmlFor="quiz-file-upload">Референсы</label>
+          <label className="quiz-upload" htmlFor="quiz-file-upload">
+            <span className="quiz-upload__icon">↑</span>
+            <span className="quiz-upload__text">
+              {answers.files.length > 0
+                ? `${answers.files.length} файл${answers.files.length > 1 ? (answers.files.length < 5 ? 'а' : 'ов') : ''} выбрано`
+                : 'Загрузить изображения или видео'}
+            </span>
+            <span className="quiz-upload__hint">PNG, JPG, MP4 · до 20 МБ каждый</span>
+          </label>
+          <input
+            id="quiz-file-upload"
+            type="file"
+            multiple
+            accept="image/*,video/*"
+            style={{ display: 'none' }}
+            onChange={e => onChange('files', Array.from(e.target.files || []))}
+          />
+          {answers.files.length > 0 && (
+            <ul className="quiz-upload__list">
+              {answers.files.map((f, i) => (
+                <li key={i} className="quiz-upload__item">
+                  <span>{f.name}</span>
+                  <button
+                    type="button"
+                    className="quiz-upload__remove"
+                    aria-label={`Удалить ${f.name}`}
+                    onClick={() => onChange('files', answers.files.filter((_, j) => j !== i))}
+                  >×</button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>
@@ -273,6 +325,7 @@ export default function Quiz({ onClose, onOrder }) {
     type: '', goal: '', timing: '',
     styles: [], audience: '', mood: '',
     budget: '', channels: [], comment: '',
+    files: [],
     _hp: '', // honeypot
   })
   const [sent, setSent] = useState(false)
