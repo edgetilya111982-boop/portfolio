@@ -19,7 +19,7 @@
   line-height: 1.1;
   color: var(--text-primary);
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 24px rgba(0,0,0,0.9), 0 1px 6px rgba(0,0,0,0.7);
+  text-shadow: 0 2px 32px rgba(0,0,0,0.6), 0 0 80px rgba(0, 10, 30, 0.4);
 }
 
 .hero-accent {
@@ -38,7 +38,7 @@
   line-height: 1.15;
   color: var(--text-primary);
   letter-spacing: -0.01em;
-  text-shadow: 0 2px 20px rgba(0,0,0,0.9), 0 1px 4px rgba(0,0,0,0.7);
+  text-shadow: 0 2px 24px rgba(0,0,0,0.6);
 }
 
 .body-small {
@@ -47,7 +47,7 @@
   line-height: 1.75;
   color: #dde6f0;
   max-width: 38ch;
-  text-shadow: 0 1px 8px rgba(0,0,0,0.95);
+  text-shadow: 0 1px 12px rgba(0,0,0,0.8);
 }
 
 .label-tiny {
@@ -56,7 +56,7 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: #b8cce0;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.95);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.7);
 }
 
 /* ─── Hero ─── */
