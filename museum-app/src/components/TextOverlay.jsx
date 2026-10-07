@@ -7,14 +7,14 @@ const WORKS = [
     num: '01',
     title: 'Анимация',
     tools: 'Higgsfield AI',
-    desc: 'AI-анимация, где каждый кадр рождается из идеи — без рук, только воображение',
+    desc: 'AI-анимация, где каждый кадр рождается из идеи — без рук, только воображение.',
     video: `${import.meta.env.BASE_URL}work_01.mp4`,
   },
   {
     num: '02',
     title: 'Рекламный ролик',
     tools: 'Higgsfield AI',
-    desc: 'Кинематографичный ролик, созданный целиком инструментами генеративного ИИ',
+    desc: 'Кинематографичный ролик, созданный целиком инструментами генеративного ИИ.',
     video: `${import.meta.env.BASE_URL}work_02.mp4`,
   },
 ]
@@ -25,16 +25,16 @@ function HeroText({ opacity }) {
     <div className="overlay-section overlay-hero" style={{ opacity }}>
       <div className="overlay-hero__headline">
         <h1 className="headline-large">
-          Я создаю образы<br />
-          по вашим<br />
-          <span className="hero-accent">Желаниям</span>
+          Я создаю образы,<br />
+          которые ИИ<br />
+          <span className="hero-accent">ещё не видел.</span>
         </h1>
       </div>
       <div className="overlay-hero__body">
         <p className="body-small">
-          Zak — AI-creator, саунд-дизайнер<br />
-          и автор визуального контента<br />
-          Строю будущее инструментами ИИ
+          Zak — AI-дизайнер, саунд-дизайнер<br />
+          и автор визуального контента.<br />
+          Строю будущее инструментами ИИ.
         </p>
         <div className="overlay-hero__meta">
           <span className="label-tiny">Открыт к проектам</span>
@@ -54,12 +54,10 @@ function WorksText({ opacity }) {
   const videoRef = useRef(null)
   const modalVideoRef = useRef(null)
 
-  // Start loading video only when section becomes visible
   useEffect(() => {
     if (opacity > 0.1 && !loaded) setLoaded(true)
   }, [opacity, loaded])
 
-  // Play/pause preview video (always muted, pause when modal open)
   useEffect(() => {
     const v = videoRef.current
     if (!v) return
@@ -68,7 +66,6 @@ function WorksText({ opacity }) {
     else v.pause()
   }, [opacity, modal])
 
-  // Play modal video with sound when modal opens
   useEffect(() => {
     if (!modal) return
     const mv = modalVideoRef.current
@@ -91,8 +88,6 @@ function WorksText({ opacity }) {
     setModal(false)
   }
 
-  const handleVideoClick = () => setModal(true)
-
   return (
     <>
       {modal && createPortal(
@@ -104,11 +99,7 @@ function WorksText({ opacity }) {
             playsInline
             onClick={e => e.stopPropagation()}
           />
-          <button
-            className="video-modal__close"
-            onClick={closeModal}
-            aria-label="Закрыть"
-          >
+          <button className="video-modal__close" onClick={closeModal} aria-label="Закрыть">
             ✕&nbsp;&nbsp;Закрыть
           </button>
         </div>,
@@ -125,7 +116,7 @@ function WorksText({ opacity }) {
         </div>
 
         <div className="works-card">
-          <div className="works-card__video-wrap" onClick={handleVideoClick}>
+          <div className="works-card__video-wrap" onClick={() => setModal(true)}>
             <video
               ref={videoRef}
               className="works-card__video"
@@ -184,11 +175,11 @@ async function sendToTelegram(name, contact, message) {
 }
 
 // Section 2 — Contacts
-function ContactText({ opacity }) {
+function ContactText({ opacity, onOpenQuiz }) {
   const [name,    setName]    = useState('')
   const [contact, setContact] = useState('')
   const [msg,     setMsg]     = useState('')
-  const [status,  setStatus]  = useState('idle') // idle | sending | ok | err
+  const [status,  setStatus]  = useState('idle')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -281,12 +272,22 @@ function ContactText({ opacity }) {
             {status === 'sending' ? 'Отправка...' : 'Отправить заявку →'}
           </button>
         </form>
+
+        <div className="contact-quiz-alt">
+          <span className="contact-sep">или</span>
+          <button className="contact-quiz-btn" type="button" onClick={onOpenQuiz}>
+            Заполнить бриф →
+          </button>
+          <span className="label-tiny" style={{ color: 'rgba(184,204,224,0.5)' }}>
+            поможет точнее сформулировать задачу
+          </span>
+        </div>
       </div>
     </div>
   )
 }
 
-export default function TextOverlay({ scrollData }) {
+export default function TextOverlay({ scrollData, onOpenQuiz }) {
   const { raw } = scrollData
   const heroOp    = Math.max(0, 1 - Math.abs(raw - 0) * 2.5)
   const worksOp   = Math.max(0, 1 - Math.abs(raw - 1) * 2.5)
@@ -296,7 +297,7 @@ export default function TextOverlay({ scrollData }) {
     <div className="text-overlay">
       <HeroText opacity={heroOp} />
       <WorksText opacity={worksOp} />
-      <ContactText opacity={contactOp} />
+      <ContactText opacity={contactOp} onOpenQuiz={onOpenQuiz} />
     </div>
   )
 }
