@@ -461,11 +461,25 @@
 
 /* ─── Mobile ─── */
 @media (max-width: 640px) {
-  .headline-large  { font-size: 2.4rem; }
+  .headline-large {
+    font-size: 2.4rem;
+    text-shadow:
+      0 2px 24px rgba(0,0,0,1),
+      0 0 60px rgba(0,0,20,0.9),
+      0 1px 4px rgba(0,0,0,1);
+  }
   .headline-medium { font-size: 1.7rem; }
-  .body-small      { font-size: 1.1rem; max-width: 100%; }
-  .label-tiny      { font-size: 0.88rem; letter-spacing: 0.15em; }
-  .contact-headline { font-size: 2rem; }
+  .body-small {
+    font-size: 1.1rem;
+    max-width: 100%;
+    text-shadow: 0 1px 16px rgba(0,0,0,1), 0 2px 24px rgba(0,0,0,0.95);
+  }
+  .label-tiny {
+    font-size: 0.88rem;
+    letter-spacing: 0.15em;
+    text-shadow: 0 1px 10px rgba(0,0,0,1), 0 2px 18px rgba(0,0,0,0.9);
+  }
+  .contact-headline { font-size: 1.7rem; line-height: 1.15; }
 
   .overlay-hero {
     bottom: 8vh;
@@ -510,5 +524,21 @@
 
   .contact-form__row { flex-direction: column; gap: 0.6rem; }
 
-  .contact-form__btn { width: 100%; text-align: center; }
+  .contact-form__btn {
+    width: 100%;
+    text-align: center;
+    border-color: rgba(56, 217, 255, 0.75);
+    color: #5ce8ff;
+    box-shadow: 0 0 18px rgba(56, 217, 255, 0.18);
+  }
+
+  .contact-quiz-btn {
+    color: #5ce8ff;
+    border-bottom-color: rgba(56, 217, 255, 0.65);
+    text-shadow: 0 0 12px rgba(56, 217, 255, 0.45);
+  }
+
+  .contact-link-inline .contact-link__value {
+    color: #e0f0ff;
+  }
 }
