@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import './TextOverlay.css'
 
 const WORKS = [
@@ -38,7 +39,7 @@ function HeroText({ opacity }) {
         <div className="overlay-hero__meta">
           <span className="label-tiny">Открыт к проектам</span>
           <span className="label-tiny">·</span>
-          <span className="label-tiny">2024</span>
+          <span className="label-tiny">2026</span>
         </div>
       </div>
     </div>
@@ -49,118 +50,244 @@ function HeroText({ opacity }) {
 function WorksText({ opacity }) {
   const [current, setCurrent] = useState(0)
   const [loaded, setLoaded] = useState(false)
+  const [modal, setModal] = useState(false)
   const videoRef = useRef(null)
+  const modalVideoRef = useRef(null)
 
-  // Start loading video only when section becomes visible
   useEffect(() => {
     if (opacity > 0.1 && !loaded) setLoaded(true)
   }, [opacity, loaded])
 
-  // Play/pause based on visibility
   useEffect(() => {
     const v = videoRef.current
     if (!v) return
-    if (opacity > 0.3) { v.play().catch(() => {}) }
+    v.muted = true
+    if (!modal && opacity > 0.3) { v.play().catch(() => {}) }
     else v.pause()
-  }, [opacity])
+  }, [opacity, modal])
+
+  useEffect(() => {
+    if (!modal) return
+    const mv = modalVideoRef.current
+    if (!mv) return
+    mv.muted = false
+    mv.volume = 1
+    mv.currentTime = 0
+    mv.play().catch(() => {})
+  }, [modal])
 
   const prev = () => setCurrent(i => (i - 1 + WORKS.length) % WORKS.length)
   const next = () => setCurrent(i => (i + 1) % WORKS.length)
   const w = WORKS[current]
 
+  const closeModal = () => {
+    if (modalVideoRef.current) {
+      modalVideoRef.current.pause()
+      modalVideoRef.current.muted = true
+    }
+    setModal(false)
+  }
+
   return (
-    <div
-      className="overlay-section overlay-works"
-      style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}
-    >
-      <div className="works-header">
-        <span className="label-tiny">Избранные работы</span>
-        <span className="label-tiny works-counter">{current + 1} / {WORKS.length}</span>
-      </div>
-
-      <div className="works-card">
-        <div
-          className="works-card__video-wrap"
-          onClick={() => {
-            const v = videoRef.current
-            if (!v) return
-            v.muted = false
-            v.volume = 1
-            v.play().catch(() => {})
-            if (v.requestFullscreen) v.requestFullscreen()
-            else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen()
-            else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen()
-          }}
-        >
+    <>
+      {modal && createPortal(
+        <div className="video-modal" onClick={closeModal}>
           <video
-            ref={videoRef}
-            className="works-card__video"
-            src={loaded ? w.video : undefined}
-            autoPlay
-            muted
-            loop
+            ref={modalVideoRef}
+            className="video-modal__video"
+            src={w.video}
             playsInline
-            preload="metadata"
-            key={w.video}
+            onClick={e => e.stopPropagation()}
           />
-          <div className="works-card__fullscreen-hint">⛶</div>
-        </div>
-        <div className="works-card__info">
-          <span className="works-card__num label-tiny">{w.num}</span>
-          <h2 className="works-card__title headline-medium">{w.title}</h2>
-          <span className="works-card__tools label-tiny">{w.tools}</span>
-          <p className="works-card__desc body-small">{w.desc}</p>
-        </div>
-      </div>
+          <button className="video-modal__close" onClick={closeModal} aria-label="Закрыть">
+            ✕&nbsp;&nbsp;Закрыть
+          </button>
+        </div>,
+        document.body
+      )}
 
-      <div className="works-nav">
-        <button className="works-nav__btn" onClick={prev} aria-label="Назад">←</button>
-        <div className="works-nav__dots">
-          {WORKS.map((_, i) => (
-            <button
-              key={i}
-              className={`works-nav__dot ${i === current ? 'works-nav__dot--active' : ''}`}
-              onClick={() => setCurrent(i)}
-              aria-label={`Работа ${i + 1}`}
-            />
-          ))}
+      <div
+        className="overlay-section overlay-works"
+        style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}
+      >
+        <div className="works-header">
+          <span className="label-tiny">Избранные работы</span>
+          <span className="label-tiny works-counter">{current + 1} / {WORKS.length}</span>
         </div>
-        <button className="works-nav__btn" onClick={next} aria-label="Вперёд">→</button>
+
+        <div className="works-card">
+          <div className="works-card__video-wrap" onClick={() => setModal(true)}>
+            <video
+              ref={videoRef}
+              className="works-card__video"
+              src={loaded ? w.video : undefined}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              key={w.video}
+            />
+            <div className="works-card__fullscreen-hint">⛶</div>
+          </div>
+          <div className="works-card__info">
+            <span className="works-card__num label-tiny">{w.num}</span>
+            <h2 className="works-card__title headline-medium">{w.title}</h2>
+            <span className="works-card__tools label-tiny">{w.tools}</span>
+            <p className="works-card__desc body-small">{w.desc}</p>
+          </div>
+        </div>
+
+        <div className="works-nav">
+          <button className="works-nav__btn" onClick={prev} aria-label="Назад">←</button>
+          <div className="works-nav__dots">
+            {WORKS.map((_, i) => (
+              <button
+                key={i}
+                className={`works-nav__dot ${i === current ? 'works-nav__dot--active' : ''}`}
+                onClick={() => setCurrent(i)}
+                aria-label={`Работа ${i + 1}`}
+              />
+            ))}
+          </div>
+          <button className="works-nav__btn" onClick={next} aria-label="Вперёд">→</button>
+        </div>
       </div>
-    </div>
+    </>
   )
+}
+
+const TG_TOKEN = import.meta.env.VITE_TG_TOKEN
+const TG_CHAT  = import.meta.env.VITE_TG_CHAT || '@zakinsk'
+
+async function sendToTelegram(name, contact, message) {
+  const text =
+    `🎨 <b>Новая заявка с сайта</b>\n\n` +
+    `👤 <b>Имя:</b> ${name}\n` +
+    `📱 <b>Контакт:</b> ${contact}\n` +
+    `💬 <b>Проект:</b> ${message}`
+  const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: TG_CHAT, text, parse_mode: 'HTML' }),
+  })
+  if (!res.ok) throw new Error('Telegram error')
 }
 
 // Section 2 — Contacts
-function ContactText({ opacity }) {
+function ContactText({ opacity, onOpenQuiz }) {
+  const [name,    setName]    = useState('')
+  const [contact, setContact] = useState('')
+  const [msg,     setMsg]     = useState('')
+  const [status,  setStatus]  = useState('idle')
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!name.trim() || !contact.trim() || !msg.trim()) return
+    setStatus('sending')
+    try {
+      await sendToTelegram(name.trim(), contact.trim(), msg.trim())
+      setStatus('ok')
+      setName(''); setContact(''); setMsg('')
+    } catch {
+      setStatus('err')
+    }
+  }
+
   return (
     <div className="overlay-section overlay-contact" style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}>
       <div className="contact-inner">
-        <span className="label-tiny">Связаться</span>
         <h2 className="headline-large contact-headline">
-          Создадим<br />
-          <span className="hero-accent">что‑то невероятное.</span>
+          Создадим <span className="hero-accent">что‑то невероятное</span>
         </h2>
-        <p className="body-small contact-sub">
-          Есть идея? Я знаю, как сделать её реальной.<br />
-          Дизайн, анимация, саунд — всё в одном месте.
-        </p>
-        <div className="contact-links">
-          <a href="https://t.me/zakinskiy" className="contact-link" target="_blank" rel="noreferrer">
-            <span className="contact-link__label label-tiny">Telegram</span>
+
+        <div className="contact-links-row">
+          <a href="https://t.me/zakinskiy" className="contact-link-inline" target="_blank" rel="noreferrer">
+            <span className="label-tiny">TG</span>
             <span className="contact-link__value">@zakinskiy</span>
           </a>
-          <a href="mailto:qeepil@bk.ru" className="contact-link">
-            <span className="contact-link__label label-tiny">Email</span>
+          <span className="contact-sep">·</span>
+          <a href="mailto:qeepil@bk.ru" className="contact-link-inline">
+            <span className="label-tiny">Email</span>
             <span className="contact-link__value">qeepil@bk.ru</span>
           </a>
+        </div>
+
+        <form className="contact-form" onSubmit={handleSubmit}>
+          <div className="contact-form__row">
+            <div className="contact-form__field">
+              <label className="label-tiny">Ваше имя</label>
+              <input
+                className="contact-form__input"
+                type="text"
+                placeholder="Иван"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                disabled={status === 'sending'}
+                maxLength={80}
+              />
+            </div>
+            <div className="contact-form__field">
+              <label className="label-tiny">Telegram / телефон</label>
+              <input
+                className="contact-form__input"
+                type="text"
+                placeholder="@username или +7..."
+                value={contact}
+                onChange={e => setContact(e.target.value)}
+                disabled={status === 'sending'}
+                maxLength={80}
+              />
+            </div>
+          </div>
+          <div className="contact-form__field">
+            <label className="label-tiny">О проекте</label>
+            <textarea
+              className="contact-form__input contact-form__textarea"
+              placeholder="Расскажите, что хотите создать..."
+              value={msg}
+              onChange={e => setMsg(e.target.value)}
+              disabled={status === 'sending'}
+              maxLength={1000}
+              rows={2}
+            />
+          </div>
+
+          {status === 'ok' && (
+            <p className="contact-form__feedback contact-form__feedback--ok">
+              ✓ Заявка отправлена — скоро свяжусь
+            </p>
+          )}
+          {status === 'err' && (
+            <p className="contact-form__feedback contact-form__feedback--err">
+              Ошибка отправки — напишите напрямую в Telegram
+            </p>
+          )}
+
+          <button
+            className="contact-form__btn"
+            type="submit"
+            disabled={status === 'sending' || !name.trim() || !contact.trim() || !msg.trim()}
+          >
+            {status === 'sending' ? 'Отправка...' : 'Отправить заявку →'}
+          </button>
+        </form>
+
+        <div className="contact-quiz-alt">
+          <span className="contact-sep">или</span>
+          <button className="contact-quiz-btn" type="button" onClick={onOpenQuiz}>
+            Заполнить бриф →
+          </button>
+          <span className="label-tiny" style={{ color: 'rgba(184,204,224,0.5)' }}>
+            поможет точнее сформулировать задачу
+          </span>
         </div>
       </div>
     </div>
   )
 }
 
-export default function TextOverlay({ scrollData }) {
+export default function TextOverlay({ scrollData, onOpenQuiz }) {
   const { raw } = scrollData
   const heroOp    = Math.max(0, 1 - Math.abs(raw - 0) * 2.5)
   const worksOp   = Math.max(0, 1 - Math.abs(raw - 1) * 2.5)
@@ -170,7 +297,7 @@ export default function TextOverlay({ scrollData }) {
     <div className="text-overlay">
       <HeroText opacity={heroOp} />
       <WorksText opacity={worksOp} />
-      <ContactText opacity={contactOp} />
+      <ContactText opacity={contactOp} onOpenQuiz={onOpenQuiz} />
     </div>
   )
 }

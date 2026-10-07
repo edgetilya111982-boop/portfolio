@@ -12,7 +12,7 @@ function goto(index) {
   window.dispatchEvent(new CustomEvent('goto-section', { detail: { index } }))
 }
 
-export default function Navigation() {
+export default function Navigation({ onOpenQuiz }) {
   return (
     <nav className="nav">
       <div className="nav__logo" onClick={() => goto(0)} style={{ cursor: 'pointer' }}>
@@ -36,7 +36,7 @@ export default function Navigation() {
         ))}
       </ul>
       <div className="nav__cta">
-        <button className="nav__btn" onClick={() => goto(2)}>Создадим вместе →</button>
+        <button className="nav__btn" onClick={onOpenQuiz}>Создадим вместе →</button>
       </div>
     </nav>
   )
