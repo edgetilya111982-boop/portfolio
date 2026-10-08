@@ -270,9 +270,9 @@
   -webkit-backdrop-filter: blur(18px);
   border-radius: 14px;
   border: none;
-  /* soft ambient glow only — no strong color */
+  /* ambient glow matching frame teal color */
   box-shadow:
-    0 0 22px -8px rgba(90, 160, 255, 0.30),
+    0 0 28px -6px rgba(40, 200, 220, 0.35),
     0 6px 28px -8px rgba(0, 0, 0, 0.55);
   cursor: pointer;
   overflow: hidden;
@@ -286,27 +286,14 @@
   animation: liquid-breathe 7s ease-in-out infinite;
 }
 
-/* iridescent border via gradient-mask trick */
+/* liquid glass frame PNG overlay */
 .cat-card::before {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1.5px;
-  background: linear-gradient(130deg,
-    rgba(255, 255, 255, 0.90) 0%,
-    rgba(160, 220, 255, 0.72) 18%,
-    rgba(110, 140, 255, 0.52) 36%,
-    rgba(180,  90, 255, 0.42) 52%,
-    rgba(80,  200, 255, 0.58) 68%,
-    rgba(200, 235, 255, 0.68) 84%,
-    rgba(255, 255, 255, 0.86) 100%
-  );
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: destination-out;
-  mask-composite: exclude;
+  inset: -1px;
+  background-image: url('/portfolio/frame.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   pointer-events: none;
   z-index: 5;
   transition: opacity 0.4s;
