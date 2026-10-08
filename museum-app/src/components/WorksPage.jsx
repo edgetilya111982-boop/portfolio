@@ -77,7 +77,7 @@ const BG_SHADE = 'linear-gradient(90deg, rgba(4,8,22,0.55) 0%, rgba(4,8,22,0.1) 
 
 function pageBackground(category) {
   if (category === 'art') return `url(${BASE}works_bg_art.webp)`
-  if (category === 'music') return 'radial-gradient(120% 90% at 55% 40%, #0e1d45 0%, #060b20 55%, #03050f 100%)'
+  if (category === 'music') return `url(${BASE}works_bg_music.webp)`
   return `${BG_SHADE}, url(${BASE}works_bg.webp)`
 }
 
@@ -143,6 +143,8 @@ export default function WorksPage({ category, onClose }) {
         <DiscCascadeCarousel
           items={MUSIC_TRACKS}
           height="100%"
+          stageX="28%"
+          ahead={1.6}
           background="transparent"
           color="#dfe9ff"
           serif="var(--font-serif)"
