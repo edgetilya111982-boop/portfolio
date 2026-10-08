@@ -52,6 +52,13 @@ function useSphereSize() {
   return size
 }
 
+const BG_SHADE = 'linear-gradient(90deg, rgba(4,8,22,0.55) 0%, rgba(4,8,22,0.1) 60%)'
+
+function pageBackground(category) {
+  if (category === 'art') return `url(${BASE}works_bg_art.webp)`
+  return `${BG_SHADE}, url(${BASE}works_bg.webp)`
+}
+
 const CAT_META = {
   animation: { label: 'Анимация видео', accent: '#38d9ff' },
   art:       { label: 'Арт визуал',     accent: '#c084fc' },
@@ -132,7 +139,7 @@ export default function WorksPage({ category, onClose }) {
     <div
       className="works-page"
       style={{
-        backgroundImage: `linear-gradient(90deg, rgba(4,8,22,0.55) 0%, rgba(4,8,22,0.1) 60%), url(${BASE}works_bg.webp)`,
+        backgroundImage: pageBackground(category),
       }}
       onWheel={e => e.stopPropagation()}
     >
