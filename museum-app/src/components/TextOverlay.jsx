@@ -4,26 +4,48 @@ import './TextOverlay.css'
 const CATEGORIES = [
   {
     id: 'animation',
-    num: '01',
-    label: 'Анимация\nвидео',
+    label: 'Анимация видео',
     sub: 'AI motion & video',
     accent: '#38d9ff',
+    preview: 'video',
+    previewSrc: `${import.meta.env.BASE_URL}work_01.mp4`,
   },
   {
     id: 'art',
-    num: '02',
-    label: 'Арт\nвизуал',
+    label: 'Арт визуал',
     sub: 'Generative art',
     accent: '#c084fc',
+    preview: 'art',
   },
   {
     id: 'music',
-    num: '03',
     label: 'Музыка',
     sub: 'AI sound design',
     accent: '#4da6ff',
+    preview: 'music',
   },
 ]
+
+function CatPreview({ cat }) {
+  if (cat.preview === 'video') {
+    return (
+      <div className="cat-preview cat-preview--video">
+        <video src={cat.previewSrc} muted autoPlay loop playsInline preload="metadata" />
+      </div>
+    )
+  }
+  if (cat.preview === 'art') {
+    return <div className="cat-preview cat-preview--art" />
+  }
+  if (cat.preview === 'music') {
+    return (
+      <div className="cat-preview cat-preview--music">
+        {[1, 2, 3, 4, 5].map(i => <span key={i} className="eq-bar" />)}
+      </div>
+    )
+  }
+  return null
+}
 
 // Section 0 — Hero
 function HeroText({ opacity }) {
@@ -68,12 +90,11 @@ function CategoryCards({ opacity, onOpenCategory }) {
             onClick={() => onOpenCategory(cat.id)}
           >
             <div className="cat-card__glow" />
-            <span className="cat-card__num label-tiny">{cat.num}</span>
-            <div className="cat-card__bottom">
+            <div className="cat-card__body">
               <h2 className="cat-card__name">{cat.label}</h2>
               <span className="cat-card__sub label-tiny">{cat.sub}</span>
             </div>
-            <span className="cat-card__arrow">→</span>
+            <CatPreview cat={cat} />
             <div className="cat-card__stripe" />
           </button>
         ))}
