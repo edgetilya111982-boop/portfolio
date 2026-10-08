@@ -1,5 +1,5 @@
 .neon {
-  --neon-cycle: 6.4s;
+  --neon-cycle: 11s;
   position: absolute;
   z-index: 3;
   pointer-events: none;
@@ -68,79 +68,80 @@
 }
 
 /*
- * Cycle: a faint electrical hum, one stuttering burst around 38%, one lone blink near 79%.
- * Between them the tube stays lit, wobbling by a few percent.
+ * 11s cycle of a tired tube: a faint hum all the time, one group of three quick blinks
+ * around 30%, one pair of blinks around 79%. Never more than three flashes in a second.
+ * --d1..--d3 are how far the light drops in a blink (lower = darker).
  */
+.neon {
+  --d1: 0.08;
+  --d2: 0.3;
+  --d3: 0.15;
+}
+
 @keyframes neon-flicker {
   0%     { opacity: 1; }
-  6%     { opacity: 0.96; }
-  12%    { opacity: 1; }
-  18%    { opacity: 0.97; }
-  24%    { opacity: 1; }
-  30%    { opacity: 0.96; }
-  36%    { opacity: 1; }
-  37.4%  { opacity: 0.1; }
-  37.9%  { opacity: 1; }
-  38.5%  { opacity: 0.25; }
-  39%    { opacity: 0.9; }
-  39.4%  { opacity: 0.05; }
-  40.2%  { opacity: 1; }
-  40.6%  { opacity: 0.6; }
-  41.2%  { opacity: 1; }
-  48%    { opacity: 0.97; }
-  56%    { opacity: 1; }
-  64%    { opacity: 0.96; }
-  72%    { opacity: 1; }
-  79%    { opacity: 1; }
-  79.3%  { opacity: 0.2; }
-  79.8%  { opacity: 1; }
-  86%    { opacity: 0.97; }
-  93%    { opacity: 1; }
+  8%     { opacity: 0.95; }
+  16%    { opacity: 1; }
+  24%    { opacity: 0.96; }
+  29.8%  { opacity: 1; }
+  30%    { opacity: var(--d1); }
+  30.9%  { opacity: 1; }
+  32.7%  { opacity: var(--d2); }
+  33.6%  { opacity: 0.95; }
+  35.4%  { opacity: var(--d3); }
+  36.5%  { opacity: 1; }
+  44%    { opacity: 0.95; }
+  52%    { opacity: 1; }
+  60%    { opacity: 0.96; }
+  68%    { opacity: 1; }
+  76%    { opacity: 0.95; }
+  78.8%  { opacity: 1; }
+  79%    { opacity: var(--d2); }
+  80.2%  { opacity: 1; }
+  82%    { opacity: var(--d1); }
+  83.2%  { opacity: 1; }
+  90%    { opacity: 0.96; }
   100%   { opacity: 1; }
 }
 
-/* the wall keeps a little light even while the tube is out */
+/* the wall keeps some light while the tube is out */
 @keyframes neon-halo {
   0%     { opacity: 1; }
-  6%     { opacity: 0.974; }
-  12%    { opacity: 1; }
-  18%    { opacity: 0.98; }
-  24%    { opacity: 1; }
-  30%    { opacity: 0.974; }
-  36%    { opacity: 1; }
-  37.4%  { opacity: 0.415; }
-  37.9%  { opacity: 1; }
-  38.5%  { opacity: 0.51; }
-  39%    { opacity: 0.935; }
-  39.4%  { opacity: 0.38; }
-  40.2%  { opacity: 1; }
-  40.6%  { opacity: 0.74; }
-  41.2%  { opacity: 1; }
-  48%    { opacity: 0.98; }
-  56%    { opacity: 1; }
-  64%    { opacity: 0.974; }
-  72%    { opacity: 1; }
-  79%    { opacity: 1; }
-  79.3%  { opacity: 0.48; }
-  79.8%  { opacity: 1; }
-  86%    { opacity: 0.98; }
-  93%    { opacity: 1; }
+  8%     { opacity: 0.97; }
+  16%    { opacity: 1; }
+  24%    { opacity: 0.975; }
+  29.8%  { opacity: 1; }
+  30%    { opacity: calc(0.35 + 0.65 * var(--d1)); }
+  30.9%  { opacity: 1; }
+  32.7%  { opacity: calc(0.35 + 0.65 * var(--d2)); }
+  33.6%  { opacity: 0.97; }
+  35.4%  { opacity: calc(0.35 + 0.65 * var(--d3)); }
+  36.5%  { opacity: 1; }
+  44%    { opacity: 0.97; }
+  52%    { opacity: 1; }
+  60%    { opacity: 0.975; }
+  68%    { opacity: 1; }
+  76%    { opacity: 0.97; }
+  78.8%  { opacity: 1; }
+  79%    { opacity: calc(0.35 + 0.65 * var(--d2)); }
+  80.2%  { opacity: 1; }
+  82%    { opacity: calc(0.35 + 0.65 * var(--d1)); }
+  83.2%  { opacity: 1; }
+  90%    { opacity: 0.975; }
   100%   { opacity: 1; }
 }
 
-/* the sheen crosses once, well after the burst, then waits */
+/* the sheen crosses once, well after the blinks, then waits */
 @keyframes neon-glint {
-  0%, 52%  { -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+  0%, 52%   { -webkit-mask-position: 100% 0; mask-position: 100% 0; }
   72%, 100% { -webkit-mask-position: 0% 0; mask-position: 0% 0; }
 }
 
-/* reduced motion: no flashing at all, just a slow, shallow breath of the glow */
-@keyframes neon-breathe {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.86; }
-}
-
+/* reduced motion: same rhythm, but the blinks are shallow */
 @media (prefers-reduced-motion: reduce) {
-  .neon__on, .neon__halo { animation: neon-breathe 5s ease-in-out infinite; }
-  .neon .neon__glint { display: none; }
+  .neon {
+    --d1: 0.5;
+    --d2: 0.65;
+    --d3: 0.55;
+  }
 }
