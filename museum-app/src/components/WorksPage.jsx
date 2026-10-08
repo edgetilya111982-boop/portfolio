@@ -123,7 +123,7 @@ export default function WorksPage({ category, onClose }) {
           accent={meta.accent}
           onOpen={(w) => setOpenVideo(w.video)}
         />
-        <p className="works-reel__hint">Потяните, чтобы вращать · клик по центральной карточке — смотреть</p>
+        <p className="works-reel__hint">Колесо мыши или перетаскивание — вращать · клик по центральной карточке — смотреть</p>
       </div>
     )
   }
