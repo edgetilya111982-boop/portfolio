@@ -82,6 +82,35 @@ function pageBackground(category) {
   return `${BG_SHADE}, url(${BASE}works_bg.webp)`
 }
 
+function useViewport() {
+  const read = () => ({ w: window.innerWidth, h: window.innerHeight })
+  const [vp, setVp] = useState(read)
+  useEffect(() => {
+    const onResize = () => setVp(read())
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  return vp
+}
+
+// Hang the sign on the wall right above the monitor in works_bg_music.webp (2000x1105,
+// background-size: cover, centred). Coordinates below are in that image's pixels.
+const MUSIC_BG = { w: 2000, h: 1105 }
+const NEON = { centerX: 1225, monitorTop: 255, width: 380, ratio: 0.385, letterBottom: 0.93, gap: 10 }
+
+function neonPlacement(vp) {
+  const s = Math.max(vp.w / MUSIC_BG.w, vp.h / MUSIC_BG.h)
+  const ox = (vp.w - MUSIC_BG.w * s) / 2
+  const oy = (vp.h - MUSIC_BG.h * s) / 2
+  const width = NEON.width * s
+  const height = width * NEON.ratio
+  return {
+    width,
+    left: ox + NEON.centerX * s - width / 2,
+    top: oy + (NEON.monitorTop - NEON.gap) * s - height * NEON.letterBottom,
+  }
+}
+
 const CAT_META = {
   animation: { label: 'Анимация видео', accent: '#38d9ff' },
   art:       { label: 'Арт визуал',     accent: '#c084fc' },
@@ -122,6 +151,7 @@ export default function WorksPage({ category, onClose }) {
   const meta = CAT_META[category] || CAT_META.animation
   const works = WORKS_DATA[category] || []
   const sphereSize = useSphereSize()
+  const viewport = useViewport()
   const [openVideo, setOpenVideo] = useState(null)
 
   let content
@@ -166,7 +196,6 @@ export default function WorksPage({ category, onClose }) {
           hint=""
           ariaLabel="Музыка"
         />
-        <NeonSign className="works-music__neon" src={`${BASE}neon_music.webp`} />
       </div>
     )
   } else if (works.length === 0) {
@@ -203,6 +232,8 @@ export default function WorksPage({ category, onClose }) {
       </div>
 
       <div className="works-page__body">{content}</div>
+
+      {category === 'music' && <NeonSign src={`${BASE}neon_music.webp`} style={neonPlacement(viewport)} />}
 
       {openVideo && <VideoModal src={openVideo} onClose={() => setOpenVideo(null)} />}
     </div>
