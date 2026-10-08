@@ -253,6 +253,31 @@ const CSS =
   '-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}' +
   '.dcc-panel::-webkit-scrollbar{display:none}' +
   '.dcc-root[data-panel-left] .dcc-panel{right:auto;left:calc(var(--dcc-x,50%) + var(--dcc-s) * .78)}' +
+  '.dcc-root[data-sleeve][data-panel-left] .dcc-panel{left:calc(var(--dcc-x,50%) + var(--dcc-s) * 1.02)}' +
+  '.dcc-root[data-sleeve] .dcc-slide{border-radius:4px}' +
+  '.dcc-sleeve{position:absolute;inset:0;overflow:hidden;border-radius:3px;background:#0a0b10;' +
+  'box-shadow:0 26px 48px -16px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.08),inset -10px 0 14px -12px rgba(0,0,0,.55)}' +
+  '.dcc-sleeve>img{display:block;width:100%;height:100%;object-fit:cover}' +
+  '.dcc-sleeve::after{content:"";position:absolute;inset:0;pointer-events:none;' +
+  'background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,0) 38%,rgba(255,255,255,0) 70%,rgba(255,255,255,.06))}' +
+  '.dcc-slide:focus-visible .dcc-sleeve{outline:3px solid var(--color-primary,#fff);outline-offset:3px}' +
+  '.dcc-vinyl{position:absolute;left:4%;top:4%;width:92%;height:92%;border-radius:50%;--vx:12%;' +
+  'transform:translateX(var(--vx));transition:transform .85s cubic-bezier(.2,.7,.2,1);' +
+  'background:#0b0b0e;box-shadow:0 14px 34px -12px rgba(0,0,0,.85),inset 0 0 0 1px rgba(255,255,255,.07)}' +
+  '.dcc-slide[data-active] .dcc-vinyl{--vx:28%}' +
+  '.dcc-slide .dcc-vinyl[data-playing]{--vx:52%}' +
+  '.dcc-vinyl__spin{position:absolute;inset:0;border-radius:50%;' +
+  'background:repeating-radial-gradient(circle closest-side at 50% 50%,#08080a 0 1.6px,#15151a 2.2px 3.2px);' +
+  'animation:dcc-vspin 2.8s linear infinite;animation-play-state:paused}' +
+  '.dcc-vinyl[data-playing] .dcc-vinyl__spin{animation-play-state:running}' +
+  '@keyframes dcc-vspin{to{transform:rotate(1turn)}}' +
+  '.dcc-vinyl::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;' +
+  'background:conic-gradient(from 25deg,rgba(255,255,255,0),rgba(255,255,255,.2) 10%,rgba(255,255,255,0) 26%,' +
+  'rgba(255,255,255,0) 50%,rgba(255,255,255,.16) 60%,rgba(255,255,255,0) 76%)}' +
+  '.dcc-vinyl__label{position:absolute;inset:32%;overflow:hidden;border-radius:50%;box-shadow:0 0 0 2px rgba(0,0,0,.55)}' +
+  '.dcc-vinyl__label>img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 45%;transform:scale(1.7)}' +
+  '.dcc-vinyl__label::after{content:"";position:absolute;left:50%;top:50%;width:9%;height:9%;transform:translate(-50%,-50%);' +
+  'border-radius:50%;background:#05060a;box-shadow:0 0 0 1px rgba(255,255,255,.28)}' +
   '.dcc-panel .dcc-head{position:static;width:auto;pointer-events:auto}' +
   '.dcc-panel .dcc-title{margin:0 0 4px;font-size:clamp(17px,1.5cqw,22px)}' +
   '.dcc-panel .dcc-dl{display:flex;flex-wrap:wrap;gap:0 8px}' +
@@ -500,6 +525,10 @@ export default function DiscCascadeCarousel({
   panelSide = 'right',
   /** Custom panel content: (item, index) => node. Replaces the default title, credits and track list. */
   renderPanel,
+  /** Draw each item as a flat cover (item.src) with a record sliding out from behind it. */
+  sleeve = false,
+  /** Index of the item whose record is spinning right now (or null). */
+  playingIndex = null,
   spacing = 1.02,
   rise = 0.24,
   depth = 0.42,
@@ -883,6 +912,7 @@ export default function DiscCascadeCarousel({
       data-spin={spin > 0 ? '' : undefined}
       data-column={vertical ? '' : undefined}
       data-panel-left={panel && panelSide === 'left' ? '' : undefined}
+      data-sleeve={sleeve ? '' : undefined}
       onKeyDown={onKeyDown}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -985,6 +1015,21 @@ export default function DiscCascadeCarousel({
                 '--dcc-glint': t.glint,
               }}
             >
+              {sleeve ? (
+                <span className="dcc-tilt">
+                  <span className="dcc-shade" />
+                  <span className="dcc-vinyl" data-playing={playingIndex === i ? '' : undefined}>
+                    <span className="dcc-vinyl__spin">
+                      <span className="dcc-vinyl__label">
+                        <img src={item.src} alt="" draggable={false} />
+                      </span>
+                    </span>
+                  </span>
+                  <span className="dcc-sleeve">
+                    <img src={item.src} alt={item.alt ?? item.title} draggable={false} decoding="async" />
+                  </span>
+                </span>
+              ) : (
               <span className="dcc-tilt">
                 <span className="dcc-shade" />
                 <span className="dcc-edge" />
@@ -1014,6 +1059,7 @@ export default function DiscCascadeCarousel({
                   <span className="dcc-sheen" />
                 </span>
               </span>
+              )}
             </button>
           )
         })}
