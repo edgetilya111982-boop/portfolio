@@ -95,7 +95,6 @@ function CategoryCards({ opacity, onOpenCategory }) {
               <span className="cat-card__sub label-tiny">{cat.sub}</span>
             </div>
             <CatPreview cat={cat} />
-            <div className="cat-card__stripe" />
           </button>
         ))}
       </div>
