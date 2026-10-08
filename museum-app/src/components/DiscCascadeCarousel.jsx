@@ -84,7 +84,7 @@ function poseOf(dx, d, c) {
     roll: d * c.roll,
     zIndex: 100 + Math.round(d * 10),
     opacity: d < -2.5 ? Math.max(0, 1 - (-d - 2.5) / 1.2) : 1,
-    hidden: dx < -4 || dx > 2.8,
+    hidden: dx < -4 || dx > c.ahead,
   }
 }
 // #endregion
@@ -156,7 +156,7 @@ const CSS =
   '.dcc-root[data-dragging],.dcc-root[data-dragging] .dcc-slide{cursor:grabbing}' +
   '.dcc-frame{position:absolute;inset:calc(var(--dcc-pad) * .45);pointer-events:none;z-index:1;' +
   'border:1px solid color-mix(in oklab,currentColor 14%,transparent)}' +
-  '.dcc-stage{position:absolute;left:50%;top:52%;width:var(--dcc-s);aspect-ratio:1/1;' +
+  '.dcc-stage{position:absolute;left:var(--dcc-x,50%);top:52%;width:var(--dcc-s);aspect-ratio:1/1;' +
   'transform:translate(-50%,-50%);perspective:calc(var(--dcc-s) * 3.2)}' +
   '.dcc-slide{position:absolute;inset:0;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;' +
   'border-radius:50%;cursor:pointer;will-change:transform;transform-style:preserve-3d;' +
@@ -464,6 +464,9 @@ export default function DiscCascadeCarousel({
   items,
   height = '100svh',
   discSize = 'clamp(170px, min(50vmin, 38vw), 420px)',
+  stageX = '50%',
+  /** How many discs ahead of the chosen one stay visible (steps along the line). */
+  ahead = 2.8,
   spacing = 1.02,
   rise = 0.24,
   depth = 0.42,
@@ -520,8 +523,8 @@ export default function DiscCascadeCarousel({
     drag: null,
     clickBlock: false, wheel: 0, wheelAt: 0, stepAt: 0,
   }).current
-  const cfg = React.useRef({ n, loop, spacing, rise, depth, yaw, fan, tilt, roll, bounce, duration })
-  cfg.current = { n, loop, spacing, rise, depth, yaw, fan, tilt, roll, bounce, duration }
+  const cfg = React.useRef({ n, loop, spacing, rise, depth, yaw, fan, tilt, roll, bounce, duration, ahead })
+  cfg.current = { n, loop, spacing, rise, depth, yaw, fan, tilt, roll, bounce, duration, ahead }
   const cb = React.useRef({ onIndexChange, active })
   cb.current = { onIndexChange, active }
 
@@ -612,7 +615,7 @@ export default function DiscCascadeCarousel({
     if (n && !loop && E.target > n - 1) setTarget(n - 1)
     paint()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [n, loop, spacing, rise, depth, yaw, fan, tilt, roll])
+  }, [n, loop, spacing, rise, depth, yaw, fan, tilt, roll, ahead])
 
   // reduced motion
   React.useEffect(() => {
@@ -807,6 +810,7 @@ export default function DiscCascadeCarousel({
         color,
         fontFamily: sans,
         '--dcc-s': discSize,
+        '--dcc-x': stageX,
         '--dcc-sheen': '' + sheen,
         '--dcc-spin': spin + 's',
       }}
