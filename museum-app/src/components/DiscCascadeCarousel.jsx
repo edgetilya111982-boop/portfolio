@@ -244,24 +244,31 @@ const CSS =
   '.dcc-hint{position:absolute;left:var(--dcc-pad);bottom:var(--dcc-pad);z-index:4;font-size:9px;letter-spacing:.18em;' +
   'text-transform:uppercase;opacity:.45;pointer-events:none;line-height:34px}' +
   '.dcc-root[data-column]{touch-action:none}' +
-  '.dcc-panel{position:absolute;right:var(--dcc-pad);top:50%;transform:translateY(-50%);z-index:5;' +
-  'width:clamp(250px,26cqw,380px);max-height:calc(100% - var(--dcc-pad) * 3.4);overflow:auto;scrollbar-width:none;' +
-  'padding:clamp(16px,1.8cqw,26px);border-radius:16px;' +
-  'background:color-mix(in oklab,var(--dcc-panel-bg,#050a1e) 58%,transparent);' +
-  'border:1px solid color-mix(in oklab,currentColor 14%,transparent);' +
-  '-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 24px 60px -24px rgba(0,0,0,.7)}' +
+  '.dcc-panel{position:absolute;right:var(--dcc-pad);top:calc(var(--dcc-pad) * .9);z-index:5;' +
+  'width:clamp(230px,18cqw,330px);max-height:calc(100% - var(--dcc-pad) * 3.4);overflow:auto;scrollbar-width:none;' +
+  'padding:clamp(12px,1.1cqw,16px) clamp(12px,1.2cqw,18px);border-radius:12px;' +
+  'background:linear-gradient(180deg,color-mix(in oklab,var(--dcc-panel-bg,#030720) 46%,transparent),' +
+  'color-mix(in oklab,var(--dcc-panel-bg,#030720) 22%,transparent));' +
+  'border:1px solid color-mix(in oklab,currentColor 8%,transparent);' +
+  '-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}' +
   '.dcc-panel::-webkit-scrollbar{display:none}' +
   '.dcc-panel .dcc-head{position:static;width:auto;pointer-events:auto}' +
-  '.dcc-tracks{list-style:none;margin:16px 0 0;padding:0;border-top:1px solid color-mix(in oklab,currentColor 30%,transparent)}' +
-  '.dcc-track{display:flex;align-items:baseline;gap:10px;width:100%;margin:0;padding:9px 4px;border:0;' +
-  'border-bottom:1px solid color-mix(in oklab,currentColor 9%,transparent);background:none;color:inherit;font:inherit;' +
-  'font-size:12.5px;text-align:left;cursor:pointer;opacity:.5;transition:opacity .2s,padding .25s}' +
+  '.dcc-panel .dcc-title{margin:0 0 4px;font-size:clamp(17px,1.5cqw,22px)}' +
+  '.dcc-panel .dcc-dl{display:flex;flex-wrap:wrap;gap:0 8px}' +
+  '.dcc-panel .dcc-row{border-top:0;padding:0;gap:0}' +
+  '.dcc-panel .dcc-row dt{display:none}' +
+  '.dcc-panel .dcc-row dd{text-align:left;font-size:clamp(10.5px,.6cqw,12px);opacity:.7}' +
+  '.dcc-panel .dcc-row+.dcc-row::before{content:"·";margin-right:8px;opacity:.5}' +
+  '.dcc-tracks{list-style:none;margin:10px 0 0;padding:0;border-top:1px solid color-mix(in oklab,currentColor 14%,transparent)}' +
+  '.dcc-track{display:flex;align-items:baseline;gap:9px;width:100%;margin:0;padding:7px 2px;border:0;' +
+  'border-bottom:1px solid color-mix(in oklab,currentColor 6%,transparent);background:none;color:inherit;font:inherit;' +
+  'font-size:clamp(12px,.72cqw,14px);text-align:left;cursor:pointer;opacity:.55;transition:opacity .2s,padding .25s}' +
   '.dcc-track:hover{opacity:.85}' +
-  '.dcc-track[aria-current]{opacity:1;padding-left:10px;box-shadow:inset 2px 0 0 currentColor}' +
+  '.dcc-track[aria-current]{opacity:1;padding-left:8px;box-shadow:inset 2px 0 0 currentColor}' +
   '.dcc-track[aria-current] .dcc-optt{font-weight:600}' +
   '.dcc-track:focus-visible{outline:2px solid currentColor;outline-offset:-2px}' +
   '.dcc-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}' +
-  '@container (max-width:720px){.dcc-panel{top:auto;bottom:calc(var(--dcc-pad) * 3.4);transform:none;width:auto;left:var(--dcc-pad);max-height:34%}.dcc-link{display:none}.dcc-rev+.dcc-rev{display:none}.dcc-hint{display:none}' +
+  '@container (max-width:720px){.dcc-panel{top:auto;bottom:calc(var(--dcc-pad) * 3.4);width:auto;left:var(--dcc-pad);max-height:34%}.dcc-link{display:none}.dcc-rev+.dcc-rev{display:none}.dcc-hint{display:none}' +
   '.dcc-head{width:clamp(150px,44cqw,230px);top:calc(var(--dcc-pad) * 3.2)}.dcc-row:nth-child(n+3){display:none}}' +
   '@container (max-width:420px){.dcc-revs{bottom:calc(var(--dcc-pad) * 4.4)}}' +
   '@media (prefers-reduced-motion:reduce){.dcc-root .dcc-idle{animation:none}.dcc-in,.dcc-list{animation:none}' +
