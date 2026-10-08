@@ -1,4 +1,5 @@
 .neon {
+  --neon-cycle: 6.4s;
   position: absolute;
   z-index: 3;
   pointer-events: none;
@@ -11,39 +12,129 @@
   height: auto;
 }
 
+.neon__off,
+.neon__shadow,
+.neon__on,
+.neon__glint {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.neon__off { position: relative; }
+
+/* light spilled on the wall */
+.neon__halo {
+  position: absolute;
+  inset: -55% -30%;
+  background:
+    radial-gradient(ellipse 52% 46% at 50% 50%, rgba(70, 190, 255, 0.34), transparent 70%),
+    radial-gradient(ellipse 70% 62% at 50% 55%, rgba(30, 100, 255, 0.2), transparent 75%);
+  mix-blend-mode: screen;
+  animation: neon-halo var(--neon-cycle) linear infinite;
+}
+
+/* the tubes' shadow on the wall */
+.neon__shadow {
+  filter: brightness(0) blur(5px);
+  opacity: 0.6;
+  transform: translate(1.4%, 7%);
+}
+
 .neon__off {
   filter: brightness(0.2) saturate(0.5) contrast(1.15);
 }
 
 .neon__on {
-  position: absolute;
-  inset: 0;
   filter:
-    drop-shadow(0 0 5px rgba(140, 235, 255, 0.95))
-    drop-shadow(0 0 20px rgba(40, 175, 255, 0.8))
-    drop-shadow(0 0 56px rgba(30, 110, 255, 0.55));
-  animation: neon-flicker 8s linear infinite;
+    drop-shadow(0 0 4px rgba(150, 240, 255, 0.95))
+    drop-shadow(0 0 16px rgba(40, 175, 255, 0.85))
+    drop-shadow(0 0 46px rgba(30, 110, 255, 0.6));
+  animation: neon-flicker var(--neon-cycle) linear infinite;
 }
 
-/* mostly lit, with two short bursts of stutter and one slight dip, like a tired tube */
+/* a white sheen that travels along the lit tubes */
+.neon__glint {
+  filter: brightness(2.6) saturate(0.15);
+  -webkit-mask-image: linear-gradient(105deg, transparent 0 38%, #000 50%, transparent 62% 100%);
+  mask-image: linear-gradient(105deg, transparent 0 38%, #000 50%, transparent 62% 100%);
+  -webkit-mask-size: 240% 100%;
+  mask-size: 240% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  mix-blend-mode: screen;
+  animation:
+    neon-glint var(--neon-cycle) ease-in-out infinite,
+    neon-flicker var(--neon-cycle) linear infinite;
+}
+
+/*
+ * Cycle: a faint electrical hum, one stuttering burst around 38%, one lone blink near 79%.
+ * Between them the tube stays lit, wobbling by a few percent.
+ */
 @keyframes neon-flicker {
-  0%, 15.9%   { opacity: 1; }
-  16%         { opacity: 0.12; }
-  16.4%       { opacity: 1; }
-  17%         { opacity: 0.2; }
-  17.5%       { opacity: 1; }
-  18%         { opacity: 0.05; }
-  19.2%       { opacity: 1; }
-  19.6%, 58%  { opacity: 1; }
-  58.2%       { opacity: 0.3; }
-  58.8%       { opacity: 1; }
-  59.1%       { opacity: 0.08; }
-  60.2%       { opacity: 1; }
-  60.6%, 83%  { opacity: 1; }
-  84%         { opacity: 0.82; }
-  85%, 100%   { opacity: 1; }
+  0%     { opacity: 1; }
+  6%     { opacity: 0.96; }
+  12%    { opacity: 1; }
+  18%    { opacity: 0.97; }
+  24%    { opacity: 1; }
+  30%    { opacity: 0.96; }
+  36%    { opacity: 1; }
+  37.4%  { opacity: 0.1; }
+  37.9%  { opacity: 1; }
+  38.5%  { opacity: 0.25; }
+  39%    { opacity: 0.9; }
+  39.4%  { opacity: 0.05; }
+  40.2%  { opacity: 1; }
+  40.6%  { opacity: 0.6; }
+  41.2%  { opacity: 1; }
+  48%    { opacity: 0.97; }
+  56%    { opacity: 1; }
+  64%    { opacity: 0.96; }
+  72%    { opacity: 1; }
+  79%    { opacity: 1; }
+  79.3%  { opacity: 0.2; }
+  79.8%  { opacity: 1; }
+  86%    { opacity: 0.97; }
+  93%    { opacity: 1; }
+  100%   { opacity: 1; }
+}
+
+/* the wall keeps a little light even while the tube is out */
+@keyframes neon-halo {
+  0%     { opacity: 1; }
+  6%     { opacity: 0.974; }
+  12%    { opacity: 1; }
+  18%    { opacity: 0.98; }
+  24%    { opacity: 1; }
+  30%    { opacity: 0.974; }
+  36%    { opacity: 1; }
+  37.4%  { opacity: 0.415; }
+  37.9%  { opacity: 1; }
+  38.5%  { opacity: 0.51; }
+  39%    { opacity: 0.935; }
+  39.4%  { opacity: 0.38; }
+  40.2%  { opacity: 1; }
+  40.6%  { opacity: 0.74; }
+  41.2%  { opacity: 1; }
+  48%    { opacity: 0.98; }
+  56%    { opacity: 1; }
+  64%    { opacity: 0.974; }
+  72%    { opacity: 1; }
+  79%    { opacity: 1; }
+  79.3%  { opacity: 0.48; }
+  79.8%  { opacity: 1; }
+  86%    { opacity: 0.98; }
+  93%    { opacity: 1; }
+  100%   { opacity: 1; }
+}
+
+/* the sheen crosses once, well after the burst, then waits */
+@keyframes neon-glint {
+  0%, 52%  { -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+  72%, 100% { -webkit-mask-position: 0% 0; mask-position: 0% 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .neon__on { animation: none; }
+  .neon__on, .neon__halo { animation: none; }
+  .neon__glint { display: none; }
 }
