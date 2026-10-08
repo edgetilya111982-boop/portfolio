@@ -134,7 +134,13 @@
   72%, 100% { -webkit-mask-position: 0% 0; mask-position: 0% 0; }
 }
 
+/* reduced motion: no flashing at all, just a slow, shallow breath of the glow */
+@keyframes neon-breathe {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.86; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .neon__on, .neon__halo { animation: none; }
-  .neon__glint { display: none; }
+  .neon__on, .neon__halo { animation: neon-breathe 5s ease-in-out infinite; }
+  .neon .neon__glint { display: none; }
 }

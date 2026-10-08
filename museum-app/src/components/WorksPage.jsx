@@ -233,7 +233,7 @@ export default function WorksPage({ category, onClose }) {
 
       <div className="works-page__body">{content}</div>
 
-      {category === 'music' && <NeonSign src={`${BASE}neon_music.webp`} style={neonPlacement(viewport)} />}
+      {category === 'music' && <NeonSign src={`${BASE}neon_music_v2.webp`} style={neonPlacement(viewport)} />}
 
       {openVideo && <VideoModal src={openVideo} onClose={() => setOpenVideo(null)} />}
     </div>
