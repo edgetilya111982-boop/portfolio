@@ -234,19 +234,21 @@
 
 /* ─── Category cards (Section 1) ─── */
 .overlay-categories {
-  top: 15vh;
-  bottom: 8vh;
-  left: 5vw;
-  right: 5vw;
-  display: flex;
-  align-items: center;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 3vw;
+  right: auto;
+  bottom: auto;
+  width: clamp(220px, 26vw, 340px);
+  display: block;
   background: none;
 }
 
 .categories-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  align-items: flex-start;
   width: 100%;
 }
 
@@ -255,19 +257,25 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 1.8rem;
+  padding: 1.2rem 1.4rem;
   background: rgba(6, 9, 26, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 4px;
   cursor: pointer;
   overflow: hidden;
-  min-height: clamp(200px, 33vh, 360px);
+  min-height: clamp(100px, 13vh, 150px);
+  width: 100%;
   text-align: left;
   transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
               border-color 0.3s,
               box-shadow 0.3s;
   animation: cat-pulse 4s ease-in-out infinite;
 }
+
+/* asymmetric horizontal offsets */
+.categories-grid .cat-card:nth-child(1) { margin-left: 0; }
+.categories-grid .cat-card:nth-child(2) { margin-left: 2.2rem; }
+.categories-grid .cat-card:nth-child(3) { margin-left: 0.8rem; }
 
 .cat-card:nth-child(2) { animation-delay: 1.3s; }
 .cat-card:nth-child(3) { animation-delay: 2.6s; }
@@ -278,7 +286,7 @@
 }
 
 .cat-card:hover {
-  transform: translateY(-8px);
+  transform: translateX(8px);
   border-color: var(--cat-accent);
   box-shadow:
     0 0 0 1px var(--cat-accent),
@@ -318,7 +326,7 @@
 
 .cat-card__name {
   font-family: var(--font-serif);
-  font-size: clamp(1.8rem, 2.3vw, 2.8rem);
+  font-size: clamp(1.2rem, 1.6vw, 1.8rem);
   font-weight: 200;
   line-height: 1.1;
   color: #fff;
@@ -631,15 +639,23 @@
     bottom: 3vh;
     left: 3vw;
     right: 3vw;
+    width: auto;
+    transform: none;
   }
 
   .categories-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: 0.7rem;
+    align-items: stretch;
   }
 
+  /* reset asymmetric offsets on mobile */
+  .categories-grid .cat-card:nth-child(1),
+  .categories-grid .cat-card:nth-child(2),
+  .categories-grid .cat-card:nth-child(3) { margin-left: 0; }
+
   .cat-card {
-    min-height: 100px;
+    min-height: 80px;
     flex-direction: row;
     align-items: center;
     padding: 1rem 1.4rem 1rem 3.5rem;
