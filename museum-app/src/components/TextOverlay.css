@@ -284,7 +284,7 @@
     0 0 60px -20px var(--cat-accent),
     0 20px 40px -12px rgba(0, 0, 0, 0.80);
   cursor: pointer;
-  overflow: hidden;
+  overflow: visible;
   width: clamp(240px, 24vw, 320px);
   min-height: clamp(72px, 9vh, 108px);
   box-sizing: border-box;
