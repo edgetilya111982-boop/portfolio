@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import './WorksPage.css'
 
@@ -29,21 +29,23 @@ const CAT_META = {
   music:     { label: 'Музыка',         accent: '#4da6ff' },
 }
 
-function WorkCard({ work, accent }) {
+function WorkCard({ work, accent, active, onSelect }) {
   const videoRef = useRef(null)
   const modalRef = useRef(null)
   const [modal, setModal] = useState(false)
 
-  const handleEnter = () => {
-    if (videoRef.current) videoRef.current.play().catch(() => {})
-  }
-  const handleLeave = () => {
-    if (videoRef.current) {
-      videoRef.current.pause()
-      videoRef.current.currentTime = 0
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    if (active) {
+      v.play().catch(() => {})
+    } else {
+      v.pause()
+      v.currentTime = 0
     }
-  }
-  const openModal = () => setModal(true)
+  }, [active])
+
+  const openModal = () => (active ? setModal(true) : onSelect())
   const closeModal = () => {
     if (modalRef.current) { modalRef.current.pause(); modalRef.current.muted = true }
     setModal(false)
@@ -68,10 +70,8 @@ function WorkCard({ work, accent }) {
       )}
 
       <div
-        className="wp-card"
+        className={`wp-card${active ? ' wp-card--active' : ''}`}
         style={{ '--accent': accent }}
-        onMouseEnter={handleEnter}
-        onMouseLeave={handleLeave}
         onClick={openModal}
       >
         <video
@@ -79,6 +79,7 @@ function WorkCard({ work, accent }) {
           className="wp-card__video"
           src={work.video}
           muted
+          loop
           playsInline
           preload="metadata"
         />
@@ -98,9 +99,45 @@ function WorkCard({ work, accent }) {
 export default function WorksPage({ category, onClose }) {
   const meta = CAT_META[category] || CAT_META.animation
   const works = WORKS_DATA[category] || []
+  const trackRef = useRef(null)
+  const [active, setActive] = useState(0)
+
+  const goTo = useCallback((i) => {
+    const track = trackRef.current
+    const el = track && track.children[i]
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [])
+
+  const handleScroll = () => {
+    const track = trackRef.current
+    if (!track) return
+    const mid = track.scrollTop + track.clientHeight / 2
+    let best = 0
+    let bestDist = Infinity
+    Array.from(track.children).forEach((el, i) => {
+      const d = Math.abs(el.offsetTop + el.offsetHeight / 2 - mid)
+      if (d < bestDist) { bestDist = d; best = i }
+    })
+    setActive(best)
+  }
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); goTo(Math.min(active + 1, works.length - 1)) }
+      if (e.key === 'ArrowUp')   { e.preventDefault(); goTo(Math.max(active - 1, 0)) }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [active, works.length, goTo])
 
   return (
-    <div className="works-page" onWheel={e => e.stopPropagation()}>
+    <div
+      className="works-page"
+      style={{
+        backgroundImage: `linear-gradient(90deg, rgba(4,8,22,0.55) 0%, rgba(4,8,22,0.1) 60%), url(${import.meta.env.BASE_URL}works_bg.webp)`,
+      }}
+      onWheel={e => e.stopPropagation()}
+    >
       <div className="works-page__header">
         <button className="works-page__back" onClick={onClose}>← Назад</button>
         <h1 className="works-page__title" style={{ color: meta.accent }}>{meta.label}</h1>
@@ -113,10 +150,43 @@ export default function WorksPage({ category, onClose }) {
             <p className="works-page__empty-text">Работы скоро появятся</p>
           </div>
         ) : (
-          <div className="works-page__grid">
-            {works.map(w => (
-              <WorkCard key={w.id} work={w} accent={meta.accent} />
-            ))}
+          <div className="works-carousel">
+            <div className="works-carousel__track" ref={trackRef} onScroll={handleScroll}>
+              {works.map((w, i) => (
+                <WorkCard
+                  key={w.id}
+                  work={w}
+                  accent={meta.accent}
+                  active={i === active}
+                  onSelect={() => goTo(i)}
+                />
+              ))}
+            </div>
+            <div className="works-carousel__nav">
+              <button
+                className="works-carousel__arrow"
+                onClick={() => goTo(Math.max(active - 1, 0))}
+                disabled={active === 0}
+                aria-label="Предыдущая работа"
+              >↑</button>
+              <div className="works-carousel__dots">
+                {works.map((w, i) => (
+                  <button
+                    key={w.id}
+                    className={`works-carousel__dot${i === active ? ' is-active' : ''}`}
+                    style={{ '--accent': meta.accent }}
+                    onClick={() => goTo(i)}
+                    aria-label={`Работа ${i + 1}`}
+                  />
+                ))}
+              </div>
+              <button
+                className="works-carousel__arrow"
+                onClick={() => goTo(Math.min(active + 1, works.length - 1))}
+                disabled={active === works.length - 1}
+                aria-label="Следующая работа"
+              >↓</button>
+            </div>
           </div>
         )}
       </div>
