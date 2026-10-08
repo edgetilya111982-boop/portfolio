@@ -20,7 +20,8 @@
   background: #000;
   cursor: pointer;
   box-shadow: 0 18px 44px -14px rgba(0, 0, 0, 0.8);
-  transition: border-color 0.4s, box-shadow 0.4s;
+  transition: border-color 0.4s;
+  will-change: transform, opacity;
 }
 
 .halo-card--front {
