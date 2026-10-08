@@ -145,6 +145,7 @@ export default function WorksPage({ category, onClose }) {
           height="100%"
           layout="column"
           panel
+          panelSide="left"
           stageX="20%"
           discSize="clamp(150px, min(34vh, 24vw), 330px)"
           spacing={0.1}
