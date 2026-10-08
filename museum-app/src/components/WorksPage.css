@@ -1,0 +1,228 @@
+/* ─── Works Page — full-screen category view ─── */
+.works-page {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--bg-outer, #06091a);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ─── Header ─── */
+.works-page__header {
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+  padding: 1.2rem 2rem;
+  background: linear-gradient(
+    to top,
+    transparent 0%,
+    rgba(6, 9, 26, 0.92) 100%
+  );
+  flex-shrink: 0;
+}
+
+.works-page__back {
+  background: none;
+  border: none;
+  color: var(--text-secondary, #ccd8ea);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 0.3rem 0;
+  white-space: nowrap;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+.works-page__back:hover { color: #fff; }
+.works-page__back:focus-visible {
+  outline: 2px solid var(--accent-blue, #00c4ff);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.works-page__title {
+  font-family: var(--font-serif, sans-serif);
+  font-size: clamp(1.4rem, 2.4vw, 2.2rem);
+  font-weight: 200;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* ─── Scrollable body ─── */
+.works-page__body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2rem;
+}
+
+/* ─── Video grid ─── */
+.works-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.4rem;
+}
+
+/* ─── Video card ─── */
+.wp-card {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+
+.wp-card:hover {
+  border-color: var(--accent);
+  transform: scale(1.02);
+  box-shadow: 0 0 0 1px var(--accent), 0 0 32px -8px var(--accent);
+}
+
+.wp-card__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #000;
+}
+
+.wp-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.1) 55%,
+    transparent 100%
+  );
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 1.2rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.wp-card:hover .wp-card__overlay { opacity: 1; }
+
+.wp-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.wp-card__title {
+  font-family: var(--font-serif, sans-serif);
+  font-size: 1.15rem;
+  font-weight: 300;
+  color: #fff;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.wp-card__tools {
+  font-size: 0.75rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.wp-card__play {
+  font-size: 2.2rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.wp-card__stripe {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+
+.wp-card:hover .wp-card__stripe { opacity: 1; }
+
+/* ─── Empty state ─── */
+.works-page__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 55vh;
+  gap: 1rem;
+}
+
+.works-page__empty-icon {
+  font-size: 3rem;
+  color: rgba(184, 204, 224, 0.2);
+}
+
+.works-page__empty-text {
+  font-family: var(--font-serif, sans-serif);
+  font-size: 1.2rem;
+  font-weight: 200;
+  letter-spacing: 0.05em;
+  color: rgba(184, 204, 224, 0.35);
+  margin: 0;
+}
+
+/* ─── Video modal ─── */
+.wp-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.wp-modal__video {
+  width: 100%;
+  max-height: 75dvh;
+  object-fit: contain;
+  display: block;
+  background: #000;
+  cursor: default;
+}
+
+.wp-modal__close {
+  position: fixed;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  padding: 1rem 2.5rem;
+  background: #fff;
+  border: none;
+  border-radius: 50px;
+  color: #000;
+  font-size: 1.1rem;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  pointer-events: all;
+  white-space: nowrap;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 640px) {
+  .works-page__header { padding: 1rem 1.2rem; gap: 1rem; }
+  .works-page__body   { padding: 1.2rem; }
+  .works-page__grid   { grid-template-columns: 1fr; gap: 1rem; }
+  .wp-card__overlay   { opacity: 1; }
+}

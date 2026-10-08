@@ -1,21 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { createPortal } from 'react-dom'
+import React, { useState } from 'react'
 import './TextOverlay.css'
 
-const WORKS = [
+const CATEGORIES = [
   {
+    id: 'animation',
     num: '01',
-    title: 'Анимация',
-    tools: 'Higgsfield AI',
-    desc: 'AI-анимация, где каждый кадр рождается из идеи — без рук, только воображение.',
-    video: `${import.meta.env.BASE_URL}work_01.mp4`,
+    label: 'Анимация\nвидео',
+    sub: 'AI motion & video',
+    accent: '#38d9ff',
   },
   {
+    id: 'art',
     num: '02',
-    title: 'Рекламный ролик',
-    tools: 'Higgsfield AI',
-    desc: 'Кинематографичный ролик, созданный целиком инструментами генеративного ИИ.',
-    video: `${import.meta.env.BASE_URL}work_02.mp4`,
+    label: 'Арт\nвизуал',
+    sub: 'Generative art',
+    accent: '#c084fc',
+  },
+  {
+    id: 'music',
+    num: '03',
+    label: 'Музыка',
+    sub: 'AI sound design',
+    accent: '#f59e0b',
   },
 ]
 
@@ -46,116 +52,36 @@ function HeroText({ opacity }) {
   )
 }
 
-// Section 1 — Works carousel
-function WorksText({ opacity }) {
-  const [current, setCurrent] = useState(0)
-  const [loaded, setLoaded] = useState(false)
-  const [modal, setModal] = useState(false)
-  const videoRef = useRef(null)
-  const modalVideoRef = useRef(null)
-
-  useEffect(() => {
-    if (opacity > 0.1 && !loaded) setLoaded(true)
-  }, [opacity, loaded])
-
-  useEffect(() => {
-    const v = videoRef.current
-    if (!v) return
-    v.muted = true
-    if (!modal && opacity > 0.3) { v.play().catch(() => {}) }
-    else v.pause()
-  }, [opacity, modal])
-
-  useEffect(() => {
-    if (!modal) return
-    const mv = modalVideoRef.current
-    if (!mv) return
-    mv.muted = false
-    mv.volume = 1
-    mv.currentTime = 0
-    mv.play().catch(() => {})
-  }, [modal])
-
-  const prev = () => setCurrent(i => (i - 1 + WORKS.length) % WORKS.length)
-  const next = () => setCurrent(i => (i + 1) % WORKS.length)
-  const w = WORKS[current]
-
-  const closeModal = () => {
-    if (modalVideoRef.current) {
-      modalVideoRef.current.pause()
-      modalVideoRef.current.muted = true
-    }
-    setModal(false)
-  }
-
+// Section 1 — Category cards
+function CategoryCards({ opacity, onOpenCategory }) {
   return (
-    <>
-      {modal && createPortal(
-        <div className="video-modal" onClick={closeModal}>
-          <video
-            ref={modalVideoRef}
-            className="video-modal__video"
-            src={w.video}
-            playsInline
-            onClick={e => e.stopPropagation()}
-          />
-          <button className="video-modal__close" onClick={closeModal} aria-label="Закрыть">
-            ✕&nbsp;&nbsp;Закрыть
+    <div
+      className="overlay-section overlay-categories"
+      style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}
+    >
+      <div className="categories-grid">
+        {CATEGORIES.map(cat => (
+          <button
+            key={cat.id}
+            className="cat-card"
+            style={{ '--cat-accent': cat.accent }}
+            onClick={() => onOpenCategory(cat.id)}
+          >
+            <div className="cat-card__glow" />
+            <span className="cat-card__num label-tiny">{cat.num}</span>
+            <div className="cat-card__bottom">
+              <h2 className="cat-card__name">{cat.label}</h2>
+              <span className="cat-card__sub label-tiny">{cat.sub}</span>
+            </div>
+            <span className="cat-card__arrow">→</span>
+            <div className="cat-card__stripe" />
           </button>
-        </div>,
-        document.body
-      )}
-
-      <div
-        className="overlay-section overlay-works"
-        style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}
-      >
-        <div className="works-header">
-          <span className="label-tiny">Избранные работы</span>
-          <span className="label-tiny works-counter">{current + 1} / {WORKS.length}</span>
-        </div>
-
-        <div className="works-card">
-          <div className="works-card__video-wrap" onClick={() => setModal(true)}>
-            <video
-              ref={videoRef}
-              className="works-card__video"
-              src={loaded ? w.video : undefined}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              key={w.video}
-            />
-            <div className="works-card__fullscreen-hint">⛶</div>
-          </div>
-          <div className="works-card__info">
-            <span className="works-card__num label-tiny">{w.num}</span>
-            <h2 className="works-card__title headline-medium">{w.title}</h2>
-            <span className="works-card__tools label-tiny">{w.tools}</span>
-            <p className="works-card__desc body-small">{w.desc}</p>
-          </div>
-        </div>
-
-        <div className="works-nav">
-          <button className="works-nav__btn" onClick={prev} aria-label="Назад">←</button>
-          <div className="works-nav__dots">
-            {WORKS.map((_, i) => (
-              <button
-                key={i}
-                className={`works-nav__dot ${i === current ? 'works-nav__dot--active' : ''}`}
-                onClick={() => setCurrent(i)}
-                aria-label={`Работа ${i + 1}`}
-              />
-            ))}
-          </div>
-          <button className="works-nav__btn" onClick={next} aria-label="Вперёд">→</button>
-        </div>
+        ))}
       </div>
-    </>
+    </div>
   )
 }
+
 
 const TG_TOKEN = import.meta.env.VITE_TG_TOKEN
 const TG_CHAT  = import.meta.env.VITE_TG_CHAT || '@zakinsk'
@@ -287,7 +213,7 @@ function ContactText({ opacity, onOpenQuiz }) {
   )
 }
 
-export default function TextOverlay({ scrollData, onOpenQuiz }) {
+export default function TextOverlay({ scrollData, onOpenQuiz, onOpenCategory }) {
   const { raw } = scrollData
   const heroOp    = Math.max(0, 1 - Math.abs(raw - 0) * 2.5)
   const worksOp   = Math.max(0, 1 - Math.abs(raw - 1) * 2.5)
@@ -296,7 +222,7 @@ export default function TextOverlay({ scrollData, onOpenQuiz }) {
   return (
     <div className="text-overlay">
       <HeroText opacity={heroOp} />
-      <WorksText opacity={worksOp} />
+      <CategoryCards opacity={worksOp} onOpenCategory={onOpenCategory} />
       <ContactText opacity={contactOp} onOpenQuiz={onOpenQuiz} />
     </div>
   )
