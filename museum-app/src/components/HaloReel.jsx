@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import {
-  animate,
   motion,
   useMotionValue,
   useMotionValueEvent,
@@ -13,15 +12,17 @@ const TAU = Math.PI * 2
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
 const mod = (n, m) => ((n % m) + m) % m
 
-// overdamped springs: no wobble, just a long soft landing
-const SPRING = { type: 'spring', stiffness: 85, damping: 22, mass: 0.9 }
-const SPRING_SNAP = { type: 'spring', stiffness: 110, damping: 24, mass: 0.9 }
+// wheel pixels that advance the reel by one card (one mouse notch is ~100px)
+const WHEEL_PX = 80
 
 /*
  * Cards ride a circle whose centre sits near the left edge; only the right half
  * (cos θ > 0) is shown, which gives a clean semicircle with the front card at its apex.
  *   x = R·cos θ   y = R·sin θ   θ = i·step + rotation
- * One `rotation` motion value drives every card, so spinning never re-renders React.
+ *
+ * All motion goes through one critically damped follower: callers only move `target`,
+ * and `rotation` glides after it with smooth acceleration and no overshoot. Because the
+ * velocity is carried across target changes, rapid wheel notches blend into one motion.
  */
 export default function HaloReel({
   items,
@@ -33,11 +34,10 @@ export default function HaloReel({
   fan = 0.22,
   autoPlay = true,
   holdDuration = 3200,
-  stepDuration = 1000,
+  smoothTime = 0.34,
   pauseOnHover = true,
   spread = 1.1,
   maxCards = 64,
-  wheelSensitivity = 0.0035,
   accent = '#38d9ff',
   onOpen,
 }) {
@@ -50,10 +50,12 @@ export default function HaloReel({
   const hoverRef = useRef(false)
   const movedRef = useRef(0)
   const dragRef = useRef({ left: 0, top: 0, angle: 0 })
-  const wheelRef = useRef({ start: 0, target: 0, last: -1e9, timer: 0, controls: null })
+  const lastInputRef = useRef(-1e9)
+  const motionRef = useRef({ target: 0, vel: 0, raf: 0, last: 0 })
 
   const [size, setSize] = useState({ w: 0, h: 0 })
   const [front, setFront] = useState(0)
+  const [settled, setSettled] = useState(true)
 
   useEffect(() => {
     const node = stageRef.current
@@ -95,79 +97,106 @@ export default function HaloReel({
     setFront((prev) => (prev === next ? prev : next))
   })
 
+  /* ── the follower: critically damped smoothing toward `target` ── */
+  const tick = useCallback(
+    (now) => {
+      const m = motionRef.current
+      const dt = Math.min((now - m.last) / 1000, 0.05)
+      m.last = now
+
+      const omega = 2 / smoothTime
+      const x = omega * dt
+      const decay = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x)
+      const change = rotation.get() - m.target
+      const temp = (m.vel + omega * change) * dt
+      m.vel = (m.vel - omega * temp) * decay
+      const next = m.target + (change + temp) * decay
+
+      if (Math.abs(m.target - next) < 1e-4 && Math.abs(m.vel) < 1e-3) {
+        rotation.set(m.target)
+        m.vel = 0
+        m.raf = 0
+        setSettled(true)
+        return
+      }
+      rotation.set(next)
+      m.raf = requestAnimationFrame(tick)
+    },
+    [rotation, smoothTime]
+  )
+
+  const setTarget = useCallback(
+    (target) => {
+      const m = motionRef.current
+      m.target = target
+      if (reduceMotion) {
+        rotation.set(target)
+        return
+      }
+      setSettled(false)
+      if (!m.raf) {
+        m.last = performance.now()
+        m.raf = requestAnimationFrame(tick)
+      }
+    },
+    [reduceMotion, rotation, tick]
+  )
+
+  const halt = () => {
+    const m = motionRef.current
+    cancelAnimationFrame(m.raf)
+    m.raf = 0
+    m.vel = 0
+  }
+
+  useEffect(() => () => cancelAnimationFrame(motionRef.current.raf), [])
+
   const quiet = () =>
     !draggingRef.current &&
-    performance.now() - wheelRef.current.last > 2500 &&
+    performance.now() - lastInputRef.current > 2500 &&
     !(pauseOnHover && hoverRef.current)
 
   /* ── autoplay ── */
   useEffect(() => {
     if (!autoPlay || reduceMotion || !count || !step) return
-    let timer = 0
-    let controls
-    const tick = () => {
-      timer = window.setTimeout(() => {
-        if (!quiet()) {
-          tick()
-          return
-        }
-        controls = animate(rotation, rotation.get() - step, {
-          duration: stepDuration / 1000,
-          ease: [0.45, 0, 0.2, 1],
-          onComplete: tick,
-        })
-      }, holdDuration)
-    }
-    tick()
-    return () => {
-      window.clearTimeout(timer)
-      controls?.stop()
-    }
-  }, [autoPlay, count, holdDuration, pauseOnHover, reduceMotion, rotation, step, stepDuration])
+    const id = window.setInterval(() => {
+      if (!quiet()) return
+      const m = motionRef.current
+      setTarget(Math.round(m.target / step) * step - step)
+    }, holdDuration)
+    return () => window.clearInterval(id)
+  }, [autoPlay, count, holdDuration, pauseOnHover, reduceMotion, step, setTarget])
 
-  /* ── mouse wheel: soft spring toward a moving target, then settle on a card ── */
+  /* ── mouse wheel: each ~80px moves one card; the follower blends rapid notches ── */
   useEffect(() => {
     const node = stageRef.current
     if (!node || !step) return
-    const w = wheelRef.current
+    const w = { acc: 0, last: 0 }
 
     const onWheel = (e) => {
       e.preventDefault()
       e.stopPropagation()
       const now = performance.now()
-      if (now - w.last > 350) {
-        w.start = rotation.get()
-        w.target = w.start
-      }
+      lastInputRef.current = now
+      if (now - w.last > 250) w.acc = 0
       w.last = now
 
       const delta = e.deltaMode === 1 ? e.deltaY * 32 : e.deltaY
-      w.target -= clamp(delta, -240, 240) * step * wheelSensitivity
+      w.acc += clamp(delta, -300, 300)
+      const cards = Math.trunc(w.acc / WHEEL_PX)
+      if (!cards) return
+      w.acc -= cards * WHEEL_PX
 
-      w.controls?.stop()
-      if (reduceMotion) rotation.set(w.target)
-      else w.controls = animate(rotation, w.target, SPRING)
-
-      window.clearTimeout(w.timer)
-      w.timer = window.setTimeout(() => {
-        // a nudge always moves at least to the neighbouring card
-        const n = w.target / step
-        const dir = Math.sign(w.target - w.start)
-        const snapped = (dir < 0 ? Math.floor(n + 0.1) : dir > 0 ? Math.ceil(n - 0.1) : Math.round(n)) * step
-        w.target = snapped
-        w.controls?.stop()
-        if (reduceMotion) rotation.set(snapped)
-        else w.controls = animate(rotation, snapped, SPRING_SNAP)
-      }, 150)
+      const m = motionRef.current
+      const base = Math.round(m.target / step) * step
+      // never run more than a few cards ahead of what is on screen
+      const next = clamp(base - cards * step, rotation.get() - 4 * step, rotation.get() + 4 * step)
+      setTarget(Math.round(next / step) * step)
     }
 
     node.addEventListener('wheel', onWheel, { passive: false })
-    return () => {
-      node.removeEventListener('wheel', onWheel)
-      window.clearTimeout(w.timer)
-      w.controls?.stop()
-    }
-  }, [rotation, step, reduceMotion, wheelSensitivity])
+    return () => node.removeEventListener('wheel', onWheel)
+  }, [rotation, step, setTarget])
 
   /* ── drag ── */
   const pointerAngle = (e) => {
@@ -185,8 +214,9 @@ export default function HaloReel({
     dragRef.current.angle = pointerAngle(e)
     draggingRef.current = true
     movedRef.current = 0
-    wheelRef.current.controls?.stop()
-    rotation.stop()
+    lastInputRef.current = performance.now()
+    halt()
+    motionRef.current.target = rotation.get()
   }
 
   const onPointerMove = (e) => {
@@ -198,34 +228,33 @@ export default function HaloReel({
     const wasClick = movedRef.current < 6
     movedRef.current += Math.abs(delta) * 200
     // capture only once it is a real drag, otherwise clicks never reach the cards
-    if (wasClick && movedRef.current >= 6) e.currentTarget.setPointerCapture?.(e.pointerId)
+    if (wasClick && movedRef.current >= 6) {
+      e.currentTarget.setPointerCapture?.(e.pointerId)
+      setSettled(false)
+    }
 
-    rotation.set(rotation.get() + delta)
+    const next = rotation.get() + delta
+    rotation.set(next)
+    motionRef.current.target = next
   }
 
   const endDrag = (e) => {
     if (!draggingRef.current) return
     draggingRef.current = false
+    lastInputRef.current = performance.now()
     if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
       e.currentTarget.releasePointerCapture(e.pointerId)
     }
     if (movedRef.current < 6) return
-    const snapped = Math.round(rotation.get() / step) * step
-    if (reduceMotion) rotation.set(snapped)
-    else animate(rotation, snapped, SPRING_SNAP)
-  }
-
-  const spinTo = (target) => {
-    wheelRef.current.controls?.stop()
-    if (reduceMotion) rotation.set(target)
-    else animate(rotation, target, SPRING_SNAP)
+    setTarget(Math.round(rotation.get() / step) * step)
   }
 
   const onKeyDown = (e) => {
     const direction = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]
     if (!direction) return
     e.preventDefault()
-    spinTo(Math.round(rotation.get() / step) * step - direction * step)
+    lastInputRef.current = performance.now()
+    setTarget(Math.round(motionRef.current.target / step) * step - direction * step)
   }
 
   const onCardClick = (slot) => {
@@ -235,9 +264,10 @@ export default function HaloReel({
       return
     }
     // bring the clicked card to the front along the shortest way round
+    lastInputRef.current = performance.now()
     const base = -slot * step
     const turns = Math.round((rotation.get() - base) / TAU)
-    spinTo(base + turns * TAU)
+    setTarget(base + turns * TAU)
   }
 
   if (!count) return null
@@ -263,6 +293,7 @@ export default function HaloReel({
           item={items[i % count]}
           index={i}
           isFront={i === front}
+          playVideo={i === front && settled}
           decorative={i >= count}
           step={step}
           rotation={rotation}
@@ -281,7 +312,7 @@ export default function HaloReel({
 }
 
 function ReelCard({
-  item, index, isFront, decorative, step, rotation, radius,
+  item, index, isFront, playVideo, decorative, step, rotation, radius,
   centerXRatio, minScale, fan, width, height, onHoverChange, onClick,
 }) {
   const angle = useTransform(rotation, (r) => index * step + r)
@@ -314,7 +345,7 @@ function ReelCard({
       }}
     >
       <img className="halo-card__img" src={item.poster} alt={decorative ? '' : item.title} draggable={false} />
-      {isFront && item.video && (
+      {playVideo && item.video && (
         <video className="halo-card__video" src={item.video} autoPlay muted loop playsInline />
       )}
       <div className="halo-card__info">
