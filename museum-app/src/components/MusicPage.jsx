@@ -31,14 +31,15 @@ export default function MusicPage() {
         renderPanel={(item, i) => (
           <MusicPanel albums={MUSIC_ALBUMS} albumIndex={i} player={player} />
         )}
-        stageX="15%"
-        discSize="clamp(170px, min(38vh, 22vw), 380px)"
+        stageX="14%"
+        discSize="clamp(170px, min(34vh, 20vw), 360px)"
         spacing={0.04}
         rise={-1.12}
         depth={0.1}
-        yaw={8}
-        fan={-3}
+        yaw={0}
+        fan={0}
         tilt={0}
+        pitch={0}
         roll={0}
         ahead={2.2}
         background="transparent"

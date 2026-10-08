@@ -245,7 +245,7 @@ const CSS =
   'text-transform:uppercase;opacity:.45;pointer-events:none;line-height:34px}' +
   '.dcc-root[data-column]{touch-action:none}' +
   '.dcc-panel{position:absolute;right:var(--dcc-pad);top:calc(var(--dcc-pad) * .9);z-index:5;' +
-  'width:clamp(230px,18cqw,330px);max-height:calc(100% - var(--dcc-pad) * 3.4);overflow:auto;scrollbar-width:none;' +
+  'width:clamp(230px,16cqw,300px);max-height:calc(100% - var(--dcc-pad) * 3.4);overflow:auto;scrollbar-width:none;' +
   'padding:clamp(12px,1.1cqw,16px) clamp(12px,1.2cqw,18px);border-radius:12px;' +
   'background:linear-gradient(180deg,color-mix(in oklab,var(--dcc-panel-bg,#030720) 46%,transparent),' +
   'color-mix(in oklab,var(--dcc-panel-bg,#030720) 22%,transparent));' +
@@ -253,7 +253,7 @@ const CSS =
   '-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}' +
   '.dcc-panel::-webkit-scrollbar{display:none}' +
   '.dcc-root[data-panel-left] .dcc-panel{right:auto;left:calc(var(--dcc-x,50%) + var(--dcc-s) * .78)}' +
-  '.dcc-root[data-sleeve][data-panel-left] .dcc-panel{left:calc(var(--dcc-x,50%) + var(--dcc-s) * 1.02)}' +
+  '.dcc-root[data-sleeve][data-panel-left] .dcc-panel{left:calc(var(--dcc-x,50%) + var(--dcc-s) * 1.12)}' +
   '.dcc-root[data-sleeve] .dcc-slide{border-radius:4px}' +
   '.dcc-sleeve{position:absolute;inset:0;overflow:hidden;border-radius:3px;background:#0a0b10;' +
   'box-shadow:0 26px 48px -16px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.08),inset -10px 0 14px -12px rgba(0,0,0,.55)}' +
@@ -265,7 +265,7 @@ const CSS =
   'transform:translateX(var(--vx));transition:transform .85s cubic-bezier(.2,.7,.2,1);' +
   'background:#0b0b0e;box-shadow:0 14px 34px -12px rgba(0,0,0,.85),inset 0 0 0 1px rgba(255,255,255,.07)}' +
   '.dcc-slide[data-active] .dcc-vinyl{--vx:28%}' +
-  '.dcc-slide .dcc-vinyl[data-playing]{--vx:52%}' +
+  '.dcc-slide .dcc-vinyl[data-playing]{--vx:62%}' +
   '.dcc-vinyl__spin{position:absolute;inset:0;border-radius:50%;' +
   'background:repeating-radial-gradient(circle closest-side at 50% 50%,#08080a 0 1.6px,#15151a 2.2px 3.2px);' +
   'animation:dcc-vspin 2.8s linear infinite;animation-play-state:paused}' +
@@ -535,6 +535,8 @@ export default function DiscCascadeCarousel({
   yaw = 22,
   fan = -10,
   tilt = -6,
+  /** Backward lean of every disc, degrees (0 keeps a flat sleeve square to the viewer). */
+  pitch = 8,
   roll = 110,
   spin = 24,
   sheen = 0.6,
@@ -586,8 +588,8 @@ export default function DiscCascadeCarousel({
     drag: null,
     clickBlock: false, wheel: 0, wheelAt: 0, stepAt: 0,
   }).current
-  const cfg = React.useRef({ n, loop, spacing, rise, depth, yaw, fan, tilt, roll, bounce, duration, ahead })
-  cfg.current = { n, loop, spacing, rise, depth, yaw, fan, tilt, roll, bounce, duration, ahead }
+  const cfg = React.useRef({ n, loop, spacing, rise, depth, yaw, fan, tilt, pitch, roll, bounce, duration, ahead })
+  cfg.current = { n, loop, spacing, rise, depth, yaw, fan, tilt, pitch, roll, bounce, duration, ahead }
   const cb = React.useRef({ onIndexChange, active })
   cb.current = { onIndexChange, active }
 
@@ -597,7 +599,7 @@ export default function DiscCascadeCarousel({
     return {
       transform:
         'translate3d(calc(' + p.x.toFixed(4) + ' * var(--dcc-s)), calc(' + p.y.toFixed(4) + ' * var(--dcc-s)), calc(' +
-        p.z.toFixed(4) + ' * var(--dcc-s))) rotateZ(' + c.tilt + 'deg) rotateY(' + p.yaw.toFixed(3) + 'deg) rotateX(8deg)',
+        p.z.toFixed(4) + ' * var(--dcc-s))) rotateZ(' + c.tilt + 'deg) rotateY(' + p.yaw.toFixed(3) + 'deg) rotateX(' + c.pitch + 'deg)',
       roll: p.roll.toFixed(2) + 'deg',
       glint: (p.yaw * 3 + p.x * 40).toFixed(1) + 'deg',
       zIndex: p.zIndex,
@@ -679,7 +681,7 @@ export default function DiscCascadeCarousel({
     if (n && !loop && E.target > n - 1) setTarget(n - 1)
     paint()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [n, loop, spacing, rise, depth, yaw, fan, tilt, roll, ahead])
+  }, [n, loop, spacing, rise, depth, yaw, fan, tilt, pitch, roll, ahead])
 
   // reduced motion
   React.useEffect(() => {
