@@ -13,25 +13,31 @@ const TAU = Math.PI * 2
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
 const mod = (n, m) => ((n % m) + m) % m
 
+// overdamped springs: no wobble, just a long soft landing
+const SPRING = { type: 'spring', stiffness: 85, damping: 22, mass: 0.9 }
+const SPRING_SNAP = { type: 'spring', stiffness: 110, damping: 24, mass: 0.9 }
+
 /*
- * Cards ride an ellipse. Card i sits at θ = i·step + rotation:
- *   x = rx·cos θ   y = ry·sin θ   scale = min + (1−min)·(cos θ + 1)/2
+ * Cards ride a circle whose centre sits near the left edge; only the right half
+ * (cos θ > 0) is shown, which gives a clean semicircle with the front card at its apex.
+ *   x = R·cos θ   y = R·sin θ   θ = i·step + rotation
  * One `rotation` motion value drives every card, so spinning never re-renders React.
  */
 export default function HaloReel({
   items,
   cardWidth = 300,
   cardHeight = 169,
-  minScale = 0.45,
-  radiusXRatio = 0.4,
-  centerXRatio = 0,
-  radiusYRatio = 0.34,
+  minScale = 0.4,
+  radiusRatio = 0.4,
+  centerXRatio = 0.16,
+  fan = 0.22,
   autoPlay = true,
-  holdDuration = 3000,
-  stepDuration = 800,
+  holdDuration = 3200,
+  stepDuration = 1000,
   pauseOnHover = true,
-  spread = 1.7,
+  spread = 1.1,
   maxCards = 64,
+  wheelSensitivity = 0.0035,
   accent = '#38d9ff',
   onOpen,
 }) {
@@ -44,6 +50,7 @@ export default function HaloReel({
   const hoverRef = useRef(false)
   const movedRef = useRef(0)
   const dragRef = useRef({ left: 0, top: 0, angle: 0 })
+  const wheelRef = useRef({ start: 0, target: 0, last: -1e9, timer: 0, controls: null })
 
   const [size, setSize] = useState({ w: 0, h: 0 })
   const [front, setFront] = useState(0)
@@ -58,21 +65,23 @@ export default function HaloReel({
     return () => observer.disconnect()
   }, [])
 
-  const radiusX = size.w * radiusXRatio
-  const radiusY = size.h * radiusYRatio
+  const radius = size.h * radiusRatio
 
-  const slots = clamp(
-    Math.ceil(
-      TAU * Math.max(radiusX / (cardWidth * spread), radiusY / (cardHeight * spread))
-    ),
+  // even number of slots keeps the repeated items alternating cleanly all the way round
+  let slots = clamp(
+    Math.ceil((TAU * radius) / (cardHeight * spread)),
     count,
     Math.max(count, maxCards)
   )
+  if (slots % 2 && slots < maxCards) slots += 1
   const step = slots ? TAU / slots : 0
 
   const fit = size.w
     ? clamp(
-        Math.min(size.w / (radiusX + cardWidth), size.h / (2 * radiusY + cardHeight)),
+        Math.min(
+          size.h / (2 * radius + cardHeight),
+          size.w / (size.w * centerXRatio + radius + cardWidth)
+        ),
         0.45,
         1
       )
@@ -80,26 +89,31 @@ export default function HaloReel({
   const cardW = cardWidth * fit
   const cardH = cardHeight * fit
 
-  // which slot currently faces the viewer
   useMotionValueEvent(rotation, 'change', (r) => {
     if (!step) return
     const next = mod(Math.round(-r / step), slots)
     setFront((prev) => (prev === next ? prev : next))
   })
 
+  const quiet = () =>
+    !draggingRef.current &&
+    performance.now() - wheelRef.current.last > 2500 &&
+    !(pauseOnHover && hoverRef.current)
+
+  /* ── autoplay ── */
   useEffect(() => {
     if (!autoPlay || reduceMotion || !count || !step) return
     let timer = 0
     let controls
     const tick = () => {
       timer = window.setTimeout(() => {
-        if (draggingRef.current || (pauseOnHover && hoverRef.current)) {
+        if (!quiet()) {
           tick()
           return
         }
         controls = animate(rotation, rotation.get() - step, {
           duration: stepDuration / 1000,
-          ease: [0.4, 0, 0.2, 1],
+          ease: [0.45, 0, 0.2, 1],
           onComplete: tick,
         })
       }, holdDuration)
@@ -111,12 +125,56 @@ export default function HaloReel({
     }
   }, [autoPlay, count, holdDuration, pauseOnHover, reduceMotion, rotation, step, stepDuration])
 
+  /* ── mouse wheel: soft spring toward a moving target, then settle on a card ── */
+  useEffect(() => {
+    const node = stageRef.current
+    if (!node || !step) return
+    const w = wheelRef.current
+
+    const onWheel = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      const now = performance.now()
+      if (now - w.last > 350) {
+        w.start = rotation.get()
+        w.target = w.start
+      }
+      w.last = now
+
+      const delta = e.deltaMode === 1 ? e.deltaY * 32 : e.deltaY
+      w.target -= clamp(delta, -240, 240) * step * wheelSensitivity
+
+      w.controls?.stop()
+      if (reduceMotion) rotation.set(w.target)
+      else w.controls = animate(rotation, w.target, SPRING)
+
+      window.clearTimeout(w.timer)
+      w.timer = window.setTimeout(() => {
+        // a nudge always moves at least to the neighbouring card
+        const n = w.target / step
+        const dir = Math.sign(w.target - w.start)
+        const snapped = (dir < 0 ? Math.floor(n + 0.1) : dir > 0 ? Math.ceil(n - 0.1) : Math.round(n)) * step
+        w.target = snapped
+        w.controls?.stop()
+        if (reduceMotion) rotation.set(snapped)
+        else w.controls = animate(rotation, snapped, SPRING_SNAP)
+      }, 150)
+    }
+
+    node.addEventListener('wheel', onWheel, { passive: false })
+    return () => {
+      node.removeEventListener('wheel', onWheel)
+      window.clearTimeout(w.timer)
+      w.controls?.stop()
+    }
+  }, [rotation, step, reduceMotion, wheelSensitivity])
+
   /* ── drag ── */
   const pointerAngle = (e) => {
     const { left, top } = dragRef.current
     return Math.atan2(
-      (e.clientY - top - size.h / 2) / (radiusY || 1),
-      (e.clientX - left - size.w * centerXRatio) / (radiusX || 1)
+      e.clientY - top - size.h / 2,
+      e.clientX - left - size.w * centerXRatio
     )
   }
 
@@ -127,6 +185,7 @@ export default function HaloReel({
     dragRef.current.angle = pointerAngle(e)
     draggingRef.current = true
     movedRef.current = 0
+    wheelRef.current.controls?.stop()
     rotation.stop()
   }
 
@@ -152,40 +211,33 @@ export default function HaloReel({
     }
     if (movedRef.current < 6) return
     const snapped = Math.round(rotation.get() / step) * step
-    if (reduceMotion) {
-      rotation.set(snapped)
-      return
-    }
-    animate(rotation, snapped, { duration: 0.5, ease: [0.16, 1, 0.3, 1] })
+    if (reduceMotion) rotation.set(snapped)
+    else animate(rotation, snapped, SPRING_SNAP)
   }
 
-  const spinBy = (direction) => {
-    const target = Math.round(rotation.get() / step) * step - direction * step
+  const spinTo = (target) => {
+    wheelRef.current.controls?.stop()
     if (reduceMotion) rotation.set(target)
-    else animate(rotation, target, { duration: stepDuration / 1000, ease: [0.4, 0, 0.2, 1] })
-  }
-
-  // bring a given slot to the front along the shortest way round
-  const spinTo = (slot) => {
-    const current = rotation.get()
-    const base = -slot * step
-    const turns = Math.round((current - base) / TAU)
-    const target = base + turns * TAU
-    if (reduceMotion) rotation.set(target)
-    else animate(rotation, target, { duration: stepDuration / 1000, ease: [0.4, 0, 0.2, 1] })
+    else animate(rotation, target, SPRING_SNAP)
   }
 
   const onKeyDown = (e) => {
-    const direction = { ArrowRight: 1, ArrowLeft: -1 }[e.key]
+    const direction = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]
     if (!direction) return
     e.preventDefault()
-    spinBy(direction)
+    spinTo(Math.round(rotation.get() / step) * step - direction * step)
   }
 
   const onCardClick = (slot) => {
     if (movedRef.current >= 6) return
-    if (slot === front) onOpen?.(items[slot % count])
-    else spinTo(slot)
+    if (slot === front) {
+      onOpen?.(items[slot % count])
+      return
+    }
+    // bring the clicked card to the front along the shortest way round
+    const base = -slot * step
+    const turns = Math.round((rotation.get() - base) / TAU)
+    spinTo(base + turns * TAU)
   }
 
   if (!count) return null
@@ -214,10 +266,10 @@ export default function HaloReel({
           decorative={i >= count}
           step={step}
           rotation={rotation}
-          radiusX={radiusX}
-          radiusY={radiusY}
+          radius={radius}
           centerXRatio={centerXRatio}
           minScale={minScale}
+          fan={fan}
           width={cardW}
           height={cardH}
           onHoverChange={(h) => { hoverRef.current = h }}
@@ -229,17 +281,22 @@ export default function HaloReel({
 }
 
 function ReelCard({
-  item, index, isFront, decorative, step, rotation, radiusX, radiusY,
-  centerXRatio, minScale, width, height, onHoverChange, onClick,
+  item, index, isFront, decorative, step, rotation, radius,
+  centerXRatio, minScale, fan, width, height, onHoverChange, onClick,
 }) {
-  const cos = useTransform(rotation, (r) => Math.cos(index * step + r))
-  const sin = useTransform(rotation, (r) => Math.sin(index * step + r))
+  const angle = useTransform(rotation, (r) => index * step + r)
+  const cos = useTransform(angle, Math.cos)
+  const sin = useTransform(angle, Math.sin)
 
-  const x = useTransform(cos, (c) => c * radiusX)
-  const y = useTransform(sin, (s) => s * radiusY)
-  const scale = useTransform(cos, (c) => minScale + (1 - minScale) * ((c + 1) / 2))
-  const zIndex = useTransform(scale, (s) => Math.round(s * 1000))
-  const opacity = useTransform(cos, (c) => 0.35 + 0.65 * ((c + 1) / 2))
+  const x = useTransform(cos, (c) => c * radius)
+  const y = useTransform(sin, (s) => s * radius)
+  const scale = useTransform(cos, (c) => minScale + (1 - minScale) * Math.pow(Math.max(c, 0), 1.3))
+  const zIndex = useTransform(cos, (c) => Math.round((c + 1) * 500))
+  // the back half of the circle fades out, leaving a clean semicircle
+  const opacity = useTransform(cos, (c) => clamp((c + 0.05) * 2.6, 0, 1))
+  const pointerEvents = useTransform(cos, (c) => (c < 0.12 ? 'none' : 'auto'))
+  // cards fan out slightly along the arc
+  const rotate = useTransform(angle, (a) => Math.atan2(Math.sin(a), Math.cos(a)) * (180 / Math.PI) * fan)
 
   return (
     <motion.div
@@ -249,7 +306,7 @@ function ReelCard({
       onPointerLeave={() => onHoverChange(false)}
       onClick={onClick}
       style={{
-        x, y, scale, zIndex, opacity, width, height,
+        x, y, scale, rotate, zIndex, opacity, pointerEvents, width, height,
         left: `${centerXRatio * 100}%`,
         top: '50%',
         marginLeft: -width / 2,
