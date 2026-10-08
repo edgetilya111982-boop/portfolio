@@ -252,6 +252,7 @@ const CSS =
   'border:1px solid color-mix(in oklab,currentColor 8%,transparent);' +
   '-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}' +
   '.dcc-panel::-webkit-scrollbar{display:none}' +
+  '.dcc-root[data-panel-left] .dcc-panel{right:auto;left:calc(var(--dcc-x,50%) + var(--dcc-s) * .78)}' +
   '.dcc-panel .dcc-head{position:static;width:auto;pointer-events:auto}' +
   '.dcc-panel .dcc-title{margin:0 0 4px;font-size:clamp(17px,1.5cqw,22px)}' +
   '.dcc-panel .dcc-dl{display:flex;flex-wrap:wrap;gap:0 8px}' +
@@ -268,7 +269,7 @@ const CSS =
   '.dcc-track[aria-current] .dcc-optt{font-weight:600}' +
   '.dcc-track:focus-visible{outline:2px solid currentColor;outline-offset:-2px}' +
   '.dcc-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}' +
-  '@container (max-width:720px){.dcc-panel{top:auto;bottom:calc(var(--dcc-pad) * 3.4);width:auto;left:var(--dcc-pad);max-height:34%}.dcc-link{display:none}.dcc-rev+.dcc-rev{display:none}.dcc-hint{display:none}' +
+  '@container (max-width:720px){.dcc-root[data-panel-left] .dcc-panel{left:var(--dcc-pad)}.dcc-panel{top:auto;bottom:calc(var(--dcc-pad) * 3.4);width:auto;left:var(--dcc-pad);max-height:34%}.dcc-link{display:none}.dcc-rev+.dcc-rev{display:none}.dcc-hint{display:none}' +
   '.dcc-head{width:clamp(150px,44cqw,230px);top:calc(var(--dcc-pad) * 3.2)}.dcc-row:nth-child(n+3){display:none}}' +
   '@container (max-width:420px){.dcc-revs{bottom:calc(var(--dcc-pad) * 4.4)}}' +
   '@media (prefers-reduced-motion:reduce){.dcc-root .dcc-idle{animation:none}.dcc-in,.dcc-list{animation:none}' +
@@ -495,6 +496,8 @@ export default function DiscCascadeCarousel({
   layout = 'line',
   /** Put the title, credits and an always-open track list in a glass side panel. */
   panel = false,
+  /** Which side the panel sits on: 'right' (default) or 'left', right next to the discs. */
+  panelSide = 'right',
   spacing = 1.02,
   rise = 0.24,
   depth = 0.42,
@@ -876,6 +879,7 @@ export default function DiscCascadeCarousel({
       data-dragging={dragging ? '' : undefined}
       data-spin={spin > 0 ? '' : undefined}
       data-column={vertical ? '' : undefined}
+      data-panel-left={panel && panelSide === 'left' ? '' : undefined}
       onKeyDown={onKeyDown}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
