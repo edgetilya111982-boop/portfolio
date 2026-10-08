@@ -78,6 +78,11 @@
   color: rgba(184, 204, 224, 0.5);
 }
 
+/* ─── Music discs ─── */
+.works-music {
+  height: 100%;
+}
+
 /* ─── Halo reel ─── */
 .works-reel {
   position: relative;
