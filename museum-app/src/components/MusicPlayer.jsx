@@ -17,6 +17,17 @@ function tracksWord(n) {
   return 'треков'
 }
 
+const VOLUME_KEY = 'zak.music.volume'
+
+function readVolume() {
+  try {
+    const v = parseFloat(localStorage.getItem(VOLUME_KEY))
+    return Number.isFinite(v) ? Math.min(Math.max(v, 0), 1) : 0.8
+  } catch {
+    return 0.8
+  }
+}
+
 // One audio element for the whole page. `now` is the track that is loaded, whichever album is on screen.
 export function useMusicPlayer(albums) {
   const audioRef = useRef(null)
@@ -25,6 +36,8 @@ export function useMusicPlayer(albums) {
   const [playing, setPlaying] = useState(false)
   const [time, setTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [volume, setVolumeState] = useState(readVolume)
+  const [muted, setMuted] = useState(false)
 
   const setNow = (v) => {
     nowRef.current = v
@@ -106,12 +119,38 @@ export function useMusicPlayer(albums) {
     if (t >= 0 && t < albums[n.a].tracks.length) load(n.a, t)
   }
 
+  // keep the element in step with the state (also covers the first load)
+  useEffect(() => {
+    const el = audioRef.current
+    if (!el) return
+    el.volume = volume
+    el.muted = muted
+  }, [volume, muted, now])
+
+  const setVolume = (v) => {
+    const next = Math.min(Math.max(v, 0), 1)
+    setVolumeState(next)
+    setMuted(next === 0)
+    try {
+      localStorage.setItem(VOLUME_KEY, String(next))
+    } catch {
+      /* private mode: the level just is not remembered */
+    }
+  }
+
+  const toggleMute = () => {
+    if (muted || volume === 0) {
+      setMuted(false)
+      if (volume === 0) setVolume(0.6)
+    } else setMuted(true)
+  }
+
   const seek = (sec) => {
     if (audioRef.current) audioRef.current.currentTime = sec
     setTime(sec)
   }
 
-  return { now, playing, time, duration, play, toggle, step, seek }
+  return { now, playing, time, duration, volume, muted, play, toggle, step, seek, setVolume, toggleMute }
 }
 
 const Icon = {
@@ -119,6 +158,9 @@ const Icon = {
   next: <path d="M18 5v14M6 6l9 6-9 6z" />,
   play: <path d="M8 5l11 7-11 7z" />,
   pause: <path d="M8 5v14M16 5v14" />,
+  speaker: <path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />,
+  speakerLow: <path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7" />,
+  speakerOff: <path d="M11 5 6 9H2v6h4l5 4zM23 9l-6 6M17 9l6 6" />,
 }
 
 function Glyph({ name, fill }) {
@@ -131,7 +173,7 @@ function Glyph({ name, fill }) {
 
 export function MusicPanel({ albums, albumIndex, player }) {
   const album = albums[albumIndex]
-  const { now, playing, time, duration } = player
+  const { now, playing, time, duration, volume, muted } = player
   if (!album) return null
 
   const total = album.tracks.reduce((s, t) => s + (t.duration || 0), 0)
@@ -181,8 +223,9 @@ export function MusicPanel({ albums, albumIndex, player }) {
         })}
       </ol>
 
-      {nowTrack ? (
-        <div className="mp__bar">
+      <div className="mp__bar">
+        {nowTrack ? (
+          <>
           <div className="mp__now">
             {nowAlbum.title} · {nowTrack.title}
           </div>
@@ -212,8 +255,32 @@ export function MusicPanel({ albums, albumIndex, player }) {
               <Glyph name="next" />
             </button>
           </div>
+          </>
+        ) : null}
+
+        <div className="mp__vol">
+          <button
+            type="button"
+            className="mp__btn mp__btn--small"
+            aria-label={muted || volume === 0 ? 'Включить звук' : 'Выключить звук'}
+            onClick={player.toggleMute}
+          >
+            <Glyph name={muted || volume === 0 ? 'speakerOff' : volume < 0.45 ? 'speakerLow' : 'speaker'} />
+          </button>
+          <input
+            className="mp__range"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={muted ? 0 : volume}
+            style={{ '--p': (muted ? 0 : volume) * 100 + '%' }}
+            aria-label="Громкость"
+            onChange={(e) => player.setVolume(Number(e.target.value))}
+          />
+          <span className="mp__volnum">{Math.round((muted ? 0 : volume) * 100)}</span>
         </div>
-      ) : null}
+      </div>
     </div>
   )
 }

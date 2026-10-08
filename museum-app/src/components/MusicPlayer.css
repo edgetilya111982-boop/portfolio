@@ -167,3 +167,19 @@
 @media (prefers-reduced-motion: reduce) {
   .mp__eq i { animation: none; height: 8px; }
 }
+
+.mp__vol {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.mp__vol .mp__range { max-width: 120px; }
+.mp__btn--small { width: 26px; height: 26px; flex-shrink: 0; }
+.mp__volnum {
+  min-width: 2.2em;
+  font-size: 10px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
