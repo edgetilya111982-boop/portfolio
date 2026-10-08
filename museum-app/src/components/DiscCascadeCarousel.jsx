@@ -243,8 +243,25 @@ const CSS =
   '.dcc-count b{font-weight:600}' +
   '.dcc-hint{position:absolute;left:var(--dcc-pad);bottom:var(--dcc-pad);z-index:4;font-size:9px;letter-spacing:.18em;' +
   'text-transform:uppercase;opacity:.45;pointer-events:none;line-height:34px}' +
+  '.dcc-root[data-column]{touch-action:none}' +
+  '.dcc-panel{position:absolute;right:var(--dcc-pad);top:50%;transform:translateY(-50%);z-index:5;' +
+  'width:clamp(250px,26cqw,380px);max-height:calc(100% - var(--dcc-pad) * 3.4);overflow:auto;scrollbar-width:none;' +
+  'padding:clamp(16px,1.8cqw,26px);border-radius:16px;' +
+  'background:color-mix(in oklab,var(--dcc-panel-bg,#050a1e) 58%,transparent);' +
+  'border:1px solid color-mix(in oklab,currentColor 14%,transparent);' +
+  '-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 24px 60px -24px rgba(0,0,0,.7)}' +
+  '.dcc-panel::-webkit-scrollbar{display:none}' +
+  '.dcc-panel .dcc-head{position:static;width:auto;pointer-events:auto}' +
+  '.dcc-tracks{list-style:none;margin:16px 0 0;padding:0;border-top:1px solid color-mix(in oklab,currentColor 30%,transparent)}' +
+  '.dcc-track{display:flex;align-items:baseline;gap:10px;width:100%;margin:0;padding:9px 4px;border:0;' +
+  'border-bottom:1px solid color-mix(in oklab,currentColor 9%,transparent);background:none;color:inherit;font:inherit;' +
+  'font-size:12.5px;text-align:left;cursor:pointer;opacity:.5;transition:opacity .2s,padding .25s}' +
+  '.dcc-track:hover{opacity:.85}' +
+  '.dcc-track[aria-current]{opacity:1;padding-left:10px;box-shadow:inset 2px 0 0 currentColor}' +
+  '.dcc-track[aria-current] .dcc-optt{font-weight:600}' +
+  '.dcc-track:focus-visible{outline:2px solid currentColor;outline-offset:-2px}' +
   '.dcc-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}' +
-  '@container (max-width:720px){.dcc-link{display:none}.dcc-rev+.dcc-rev{display:none}.dcc-hint{display:none}' +
+  '@container (max-width:720px){.dcc-panel{top:auto;bottom:calc(var(--dcc-pad) * 3.4);transform:none;width:auto;left:var(--dcc-pad);max-height:34%}.dcc-link{display:none}.dcc-rev+.dcc-rev{display:none}.dcc-hint{display:none}' +
   '.dcc-head{width:clamp(150px,44cqw,230px);top:calc(var(--dcc-pad) * 3.2)}.dcc-row:nth-child(n+3){display:none}}' +
   '@container (max-width:420px){.dcc-revs{bottom:calc(var(--dcc-pad) * 4.4)}}' +
   '@media (prefers-reduced-motion:reduce){.dcc-root .dcc-idle{animation:none}.dcc-in,.dcc-list{animation:none}' +
@@ -467,6 +484,10 @@ export default function DiscCascadeCarousel({
   stageX = '50%',
   /** How many discs ahead of the chosen one stay visible (steps along the line). */
   ahead = 2.8,
+  /** 'line' climbs sideways; 'column' stacks the discs vertically (drag and wheel follow the column). */
+  layout = 'line',
+  /** Put the title, credits and an always-open track list in a glass side panel. */
+  panel = false,
   spacing = 1.02,
   rise = 0.24,
   depth = 0.42,
@@ -502,6 +523,7 @@ export default function DiscCascadeCarousel({
   className = '',
 }) {
   const n = items.length
+  const vertical = layout === 'column'
   const start = Math.min(Math.max(Math.round(index ?? defaultIndex), 0), Math.max(n - 1, 0))
   const [active, setActive] = React.useState(start)
   const [dragging, setDragging] = React.useState(false)
@@ -600,6 +622,7 @@ export default function DiscCascadeCarousel({
     kick()
   }
 
+  const unit = () => (vertical ? Math.abs(cfg.current.rise) : cfg.current.spacing)
   const goTo = (i) => setTarget(targetFor(i, E.target, cfg.current.n, cfg.current.loop))
   const step = (by) => setTarget(Math.round(E.target) + by)
 
@@ -707,7 +730,8 @@ export default function DiscCascadeCarousel({
   const onPointerDown = (e) => {
     if (e.button !== 0 || !n) return
     if (e.target.closest('[data-dcc-ui]')) return
-    E.drag = { id: e.pointerId, x0: e.clientX, pos0: E.a, moved: false, samples: [{ t: e.timeStamp, x: e.clientX }] }
+    const pt = vertical ? e.clientY : e.clientX
+    E.drag = { id: e.pointerId, x0: pt, pos0: E.a, moved: false, samples: [{ t: e.timeStamp, x: pt }] }
   }
   const onPointerMove = (e) => {
     // The glint and the chosen disc's lean follow a mouse, never a finger.
@@ -723,11 +747,12 @@ export default function DiscCascadeCarousel({
     }
     const d = E.drag
     if (!d || d.id !== e.pointerId) return
-    const dx = e.clientX - d.x0
+    const pt = vertical ? e.clientY : e.clientX
+    const dx = pt - d.x0
     if (!d.moved) {
       if (Math.abs(dx) < 6) return
       d.moved = true
-      d.x0 = e.clientX
+      d.x0 = pt
       d.pos0 = E.a
       E.va = 0
       rootRef.current?.setPointerCapture(e.pointerId)
@@ -735,9 +760,9 @@ export default function DiscCascadeCarousel({
       setStopped(true)
     }
     const c = cfg.current
-    const raw = d.pos0 - (e.clientX - d.x0) / (E.size * c.spacing)
+    const raw = d.pos0 - (pt - d.x0) / (E.size * unit())
     E.a = c.loop ? raw : rubber(raw, c.n)
-    d.samples.push({ t: e.timeStamp, x: e.clientX })
+    d.samples.push({ t: e.timeStamp, x: pt })
     if (d.samples.length > 6) d.samples.shift()
     const i = indexAt(E.a, c.n, c.loop)
     if (i !== cb.current.active) {
@@ -760,7 +785,7 @@ export default function DiscCascadeCarousel({
     const last = d.samples[d.samples.length - 1]
     const ms = Math.max(last.t - first.t, 1)
     // px per ms → slides per second, against the drag direction
-    const v = e.type === 'pointercancel' ? 0 : (-(last.x - first.x) / ms / (E.size * cfg.current.spacing)) * 1000
+    const v = e.type === 'pointercancel' ? 0 : (-(last.x - first.x) / ms / (E.size * unit())) * 1000
     E.va = v
     setTarget(releaseTarget(E.a, v, cfg.current.n, cfg.current.loop))
   }
@@ -800,6 +825,29 @@ export default function DiscCascadeCarousel({
   const quotes = (current?.reviews ?? []).slice(0, 2)
   const year = current?.credits?.find((c) => /year|год/i.test(c.label))
 
+  const headBlock =
+    details && current ? (
+      <div className="dcc-head" key={'h' + active} aria-hidden="true">
+        <h2 className="dcc-title dcc-in" style={{ fontFamily: serif }}>
+          {current.title}
+        </h2>
+        {current.credits?.length ? (
+          <dl className="dcc-dl">
+            {current.credits.map((c, k) => (
+              <div className="dcc-row dcc-in" key={k} style={{ '--i': k + 1 }}>
+                <dt>{c.label}</dt>
+                <dd>
+                  {lines(c.value).map((v, j) => (
+                    <span key={j}>{v}</span>
+                  ))}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
+      </div>
+    ) : null
+
   return (
     <div
       ref={rootRef}
@@ -820,6 +868,7 @@ export default function DiscCascadeCarousel({
       tabIndex={0}
       data-dragging={dragging ? '' : undefined}
       data-spin={spin > 0 ? '' : undefined}
+      data-column={vertical ? '' : undefined}
       onKeyDown={onKeyDown}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -890,27 +939,7 @@ export default function DiscCascadeCarousel({
         </nav>
       ) : null}
 
-      {details && current ? (
-        <div className="dcc-head" key={'h' + active} aria-hidden="true">
-          <h2 className="dcc-title dcc-in" style={{ fontFamily: serif }}>
-            {current.title}
-          </h2>
-          {current.credits?.length ? (
-            <dl className="dcc-dl">
-              {current.credits.map((c, k) => (
-                <div className="dcc-row dcc-in" key={k} style={{ '--i': k + 1 }}>
-                  <dt>{c.label}</dt>
-                  <dd>
-                    {lines(c.value).map((v, j) => (
-                      <span key={j}>{v}</span>
-                    ))}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          ) : null}
-        </div>
-      ) : null}
+      {panel ? null : headBlock}
 
       <div ref={stageRef} className="dcc-stage">
         {items.map((item, i) => {
@@ -975,6 +1004,35 @@ export default function DiscCascadeCarousel({
           )
         })}
       </div>
+
+      {panel ? (
+        <aside className="dcc-panel" data-dcc-ui="" aria-label="Композиции">
+          {headBlock}
+          <ol className="dcc-tracks">
+            {items.map((it, k) => {
+              const y = it.credits?.find((c) => /year|год/i.test(c.label))
+              const len = it.credits?.find((c) => /length|длит/i.test(c.label))
+              return (
+                <li key={k}>
+                  <button
+                    type="button"
+                    className="dcc-track"
+                    aria-current={k === active ? 'true' : undefined}
+                    onClick={() => {
+                      setStopped(true)
+                      goTo(k)
+                    }}
+                  >
+                    <span className="dcc-optn">{pad(k + 1)}</span>
+                    <span className="dcc-optt">{it.title}</span>
+                    <span className="dcc-opty">{len ? lines(len.value)[0] : y ? lines(y.value)[0] : ''}</span>
+                  </button>
+                </li>
+              )
+            })}
+          </ol>
+        </aside>
+      ) : null}
 
       {reviews && quotes.length ? (
         <div className="dcc-revs" key={'r' + active} aria-hidden="true">
