@@ -255,6 +255,8 @@ const CSS =
   '.dcc-root[data-panel-left] .dcc-panel{right:auto;left:calc(var(--dcc-x,50%) + var(--dcc-s) * .78)}' +
   '.dcc-root[data-sleeve][data-panel-left] .dcc-panel{left:calc(var(--dcc-x,50%) + var(--dcc-s) * 1.12)}' +
   '.dcc-root[data-sleeve] .dcc-slide{border-radius:4px}' +
+  '.dcc-root[data-sleeve] .dcc-slide[data-active] .dcc-tilt{transform:translateZ(var(--dcc-lift,0px)) rotateX(calc(var(--dcc-py,0) * -2.5deg)) rotateY(calc(var(--dcc-px,0) * 2.5deg))}' +
+  '.dcc-root[data-sleeve] .dcc-slide[data-active]:hover{--dcc-lift:calc(var(--dcc-s) * .02)}' +
   '.dcc-sleeve{position:absolute;inset:0;overflow:hidden;border-radius:3px;background:#0a0b10;' +
   'box-shadow:0 26px 48px -16px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.08),inset -10px 0 14px -12px rgba(0,0,0,.55)}' +
   '.dcc-sleeve>img{display:block;width:100%;height:100%;object-fit:cover}' +
