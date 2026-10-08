@@ -232,21 +232,23 @@
   box-shadow: 0 0 8px var(--accent-blue);
 }
 
-/* ─── Category cards — liquid glass style ─── */
+/* ─── Category cards — minimal floating ─── */
 .overlay-categories {
-  top: 48%;
+  top: 50%;
   transform: translateY(-50%);
   left: 2.5vw;
   right: auto;
   bottom: auto;
   display: block;
   background: none;
+  height: 68vh;
 }
 
 .categories-grid {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  justify-content: space-between;
+  height: 100%;
 }
 
 /* staircase shifting RIGHT */
@@ -254,99 +256,50 @@
 .categories-grid .cat-card:nth-child(2) { margin-left: clamp(36px, 5vw, 68px); }
 .categories-grid .cat-card:nth-child(3) { margin-left: clamp(16px, 2.2vw, 30px); }
 
-.cat-card:nth-child(2) { animation-delay: 2s; }
-.cat-card:nth-child(3) { animation-delay: 4s; }
+.cat-card:nth-child(1) { animation-delay: 0s; }
+.cat-card:nth-child(2) { animation-delay: 1.6s; }
+.cat-card:nth-child(3) { animation-delay: 3.2s; }
 
-/* ── liquid glass card ── */
+/* ── minimal transparent card ── */
 .cat-card {
   position: relative;
   display: flex;
   flex-direction: row;
   align-items: stretch;
   padding: 0;
-  /* near-transparent interior — border does the talking */
-  background: rgba(6, 14, 50, 0.10);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: rgba(8, 16, 48, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 14px;
   border: none;
-  /* ambient glow matching frame teal color */
   box-shadow:
-    0 0 28px -6px rgba(40, 200, 220, 0.35),
-    0 6px 28px -8px rgba(0, 0, 0, 0.55);
+    0 8px 32px -6px rgba(0, 0, 0, 0.50),
+    0 2px 12px -4px rgba(0, 0, 0, 0.30);
   cursor: pointer;
   overflow: hidden;
-  /* wider + taller */
   width: clamp(380px, 32vw, 500px);
   min-height: clamp(130px, 15vh, 175px);
   box-sizing: border-box;
   text-align: left;
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              box-shadow 0.4s;
-  animation: liquid-breathe 7s ease-in-out infinite;
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.5s;
+  animation: card-float 6s ease-in-out infinite;
 }
 
-/* liquid glass frame PNG overlay */
-.cat-card::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  background-image: url('/portfolio/frame.png');
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  pointer-events: none;
-  z-index: 5;
-  transition: opacity 0.4s;
-}
-
-/* inner glass sheen — top highlight band */
-.cat-card::after {
-  content: '';
-  position: absolute;
-  top: 1.5px;
-  left: 8%;
-  right: 8%;
-  height: 48%;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.36) 0%,
-    rgba(255, 255, 255, 0.12) 45%,
-    transparent 100%
-  );
-  border-radius: 0 0 50% 50%;
-  pointer-events: none;
-  z-index: 4;
-}
-
-@keyframes liquid-breathe {
-  0%, 100% { box-shadow: 0 0 22px -8px rgba(90,160,255,0.30), 0 6px 28px -8px rgba(0,0,0,0.55); }
-  50%       { box-shadow: 0 0 32px -5px rgba(110,180,255,0.42), 0 6px 28px -8px rgba(0,0,0,0.55); }
+@keyframes card-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-5px); }
 }
 
 .cat-card:hover {
-  transform: translateY(-4px) scale(1.015);
+  transform: translateY(-8px);
   box-shadow:
-    0 0 40px -4px rgba(120, 190, 255, 0.50),
-    0 10px 36px -6px rgba(0, 0, 0, 0.50);
+    0 16px 48px -6px rgba(0, 0, 0, 0.55),
+    0 4px 16px -4px rgba(0, 0, 0, 0.30);
 }
-.cat-card:hover::before { opacity: 1; }
 
-/* very subtle tint fog — almost invisible */
-.cat-card__glow {
-  position: absolute;
-  left: 0; right: 0;
-  bottom: -8%; height: 80%;
-  background:
-    radial-gradient(ellipse at 25% 100%, var(--cat-accent) 0%, transparent 50%),
-    radial-gradient(ellipse at 75% 100%, var(--cat-accent) 0%, transparent 48%);
-  opacity: 0.10;
-  mix-blend-mode: screen;
-  filter: blur(6px);
-  transition: opacity 0.4s;
-  pointer-events: none;
-  z-index: 1;
-}
-.cat-card:hover .cat-card__glow { opacity: 0.20; }
+/* no ::before, no ::after — clean */
+.cat-card__glow { display: none; }
 
 /* text body — left side */
 .cat-card__body {
