@@ -245,7 +245,7 @@ const CSS =
   'text-transform:uppercase;opacity:.45;pointer-events:none;line-height:34px}' +
   '.dcc-root[data-column]{touch-action:none}' +
   '.dcc-panel{position:absolute;right:var(--dcc-pad);top:calc(var(--dcc-pad) * .9);z-index:5;' +
-  'width:clamp(230px,18cqw,330px);max-height:calc(100% - var(--dcc-pad) * 3.4);overflow:auto;scrollbar-width:none;' +
+  'width:clamp(230px,16cqw,300px);max-height:calc(100% - var(--dcc-pad) * 3.4);overflow:auto;scrollbar-width:none;' +
   'padding:clamp(12px,1.1cqw,16px) clamp(12px,1.2cqw,18px);border-radius:12px;' +
   'background:linear-gradient(180deg,color-mix(in oklab,var(--dcc-panel-bg,#030720) 46%,transparent),' +
   'color-mix(in oklab,var(--dcc-panel-bg,#030720) 22%,transparent));' +
@@ -253,6 +253,33 @@ const CSS =
   '-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}' +
   '.dcc-panel::-webkit-scrollbar{display:none}' +
   '.dcc-root[data-panel-left] .dcc-panel{right:auto;left:calc(var(--dcc-x,50%) + var(--dcc-s) * .78)}' +
+  '.dcc-root[data-sleeve][data-panel-left] .dcc-panel{left:calc(var(--dcc-x,50%) + var(--dcc-s) * 1.12)}' +
+  '.dcc-root[data-sleeve] .dcc-slide{border-radius:4px}' +
+  '.dcc-root[data-sleeve] .dcc-slide[data-active] .dcc-tilt{transform:translateZ(var(--dcc-lift,0px)) rotateX(calc(var(--dcc-py,0) * -2.5deg)) rotateY(calc(var(--dcc-px,0) * 2.5deg))}' +
+  '.dcc-root[data-sleeve] .dcc-slide[data-active]:hover{--dcc-lift:calc(var(--dcc-s) * .02)}' +
+  '.dcc-sleeve{position:absolute;inset:0;overflow:hidden;border-radius:3px;background:#0a0b10;' +
+  'box-shadow:0 26px 48px -16px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.08),inset -10px 0 14px -12px rgba(0,0,0,.55)}' +
+  '.dcc-sleeve>img{display:block;width:100%;height:100%;object-fit:cover}' +
+  '.dcc-sleeve::after{content:"";position:absolute;inset:0;pointer-events:none;' +
+  'background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,0) 38%,rgba(255,255,255,0) 70%,rgba(255,255,255,.06))}' +
+  '.dcc-slide:focus-visible .dcc-sleeve{outline:3px solid var(--color-primary,#fff);outline-offset:3px}' +
+  '.dcc-vinyl{position:absolute;left:4%;top:4%;width:92%;height:92%;border-radius:50%;--vx:12%;' +
+  'transform:translateX(var(--vx));transition:transform .85s cubic-bezier(.2,.7,.2,1);' +
+  'background:#0b0b0e;box-shadow:0 14px 34px -12px rgba(0,0,0,.85),inset 0 0 0 1px rgba(255,255,255,.07)}' +
+  '.dcc-slide[data-active] .dcc-vinyl{--vx:28%}' +
+  '.dcc-slide .dcc-vinyl[data-playing]{--vx:62%}' +
+  '.dcc-vinyl__spin{position:absolute;inset:0;border-radius:50%;' +
+  'background:repeating-radial-gradient(circle closest-side at 50% 50%,#08080a 0 1.6px,#15151a 2.2px 3.2px);' +
+  'animation:dcc-vspin 2.8s linear infinite;animation-play-state:paused}' +
+  '.dcc-vinyl[data-playing] .dcc-vinyl__spin{animation-play-state:running}' +
+  '@keyframes dcc-vspin{to{transform:rotate(1turn)}}' +
+  '.dcc-vinyl::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;' +
+  'background:conic-gradient(from 25deg,rgba(255,255,255,0),rgba(255,255,255,.2) 10%,rgba(255,255,255,0) 26%,' +
+  'rgba(255,255,255,0) 50%,rgba(255,255,255,.16) 60%,rgba(255,255,255,0) 76%)}' +
+  '.dcc-vinyl__label{position:absolute;inset:32%;overflow:hidden;border-radius:50%;box-shadow:0 0 0 2px rgba(0,0,0,.55)}' +
+  '.dcc-vinyl__label>img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 45%;transform:scale(1.7)}' +
+  '.dcc-vinyl__label::after{content:"";position:absolute;left:50%;top:50%;width:9%;height:9%;transform:translate(-50%,-50%);' +
+  'border-radius:50%;background:#05060a;box-shadow:0 0 0 1px rgba(255,255,255,.28)}' +
   '.dcc-panel .dcc-head{position:static;width:auto;pointer-events:auto}' +
   '.dcc-panel .dcc-title{margin:0 0 4px;font-size:clamp(17px,1.5cqw,22px)}' +
   '.dcc-panel .dcc-dl{display:flex;flex-wrap:wrap;gap:0 8px}' +
@@ -500,12 +527,18 @@ export default function DiscCascadeCarousel({
   panelSide = 'right',
   /** Custom panel content: (item, index) => node. Replaces the default title, credits and track list. */
   renderPanel,
+  /** Draw each item as a flat cover (item.src) with a record sliding out from behind it. */
+  sleeve = false,
+  /** Index of the item whose record is spinning right now (or null). */
+  playingIndex = null,
   spacing = 1.02,
   rise = 0.24,
   depth = 0.42,
   yaw = 22,
   fan = -10,
   tilt = -6,
+  /** Backward lean of every disc, degrees (0 keeps a flat sleeve square to the viewer). */
+  pitch = 8,
   roll = 110,
   spin = 24,
   sheen = 0.6,
@@ -557,8 +590,8 @@ export default function DiscCascadeCarousel({
     drag: null,
     clickBlock: false, wheel: 0, wheelAt: 0, stepAt: 0,
   }).current
-  const cfg = React.useRef({ n, loop, spacing, rise, depth, yaw, fan, tilt, roll, bounce, duration, ahead })
-  cfg.current = { n, loop, spacing, rise, depth, yaw, fan, tilt, roll, bounce, duration, ahead }
+  const cfg = React.useRef({ n, loop, spacing, rise, depth, yaw, fan, tilt, pitch, roll, bounce, duration, ahead })
+  cfg.current = { n, loop, spacing, rise, depth, yaw, fan, tilt, pitch, roll, bounce, duration, ahead }
   const cb = React.useRef({ onIndexChange, active })
   cb.current = { onIndexChange, active }
 
@@ -568,7 +601,7 @@ export default function DiscCascadeCarousel({
     return {
       transform:
         'translate3d(calc(' + p.x.toFixed(4) + ' * var(--dcc-s)), calc(' + p.y.toFixed(4) + ' * var(--dcc-s)), calc(' +
-        p.z.toFixed(4) + ' * var(--dcc-s))) rotateZ(' + c.tilt + 'deg) rotateY(' + p.yaw.toFixed(3) + 'deg) rotateX(8deg)',
+        p.z.toFixed(4) + ' * var(--dcc-s))) rotateZ(' + c.tilt + 'deg) rotateY(' + p.yaw.toFixed(3) + 'deg) rotateX(' + c.pitch + 'deg)',
       roll: p.roll.toFixed(2) + 'deg',
       glint: (p.yaw * 3 + p.x * 40).toFixed(1) + 'deg',
       zIndex: p.zIndex,
@@ -650,7 +683,7 @@ export default function DiscCascadeCarousel({
     if (n && !loop && E.target > n - 1) setTarget(n - 1)
     paint()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [n, loop, spacing, rise, depth, yaw, fan, tilt, roll, ahead])
+  }, [n, loop, spacing, rise, depth, yaw, fan, tilt, pitch, roll, ahead])
 
   // reduced motion
   React.useEffect(() => {
@@ -883,6 +916,7 @@ export default function DiscCascadeCarousel({
       data-spin={spin > 0 ? '' : undefined}
       data-column={vertical ? '' : undefined}
       data-panel-left={panel && panelSide === 'left' ? '' : undefined}
+      data-sleeve={sleeve ? '' : undefined}
       onKeyDown={onKeyDown}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -985,6 +1019,21 @@ export default function DiscCascadeCarousel({
                 '--dcc-glint': t.glint,
               }}
             >
+              {sleeve ? (
+                <span className="dcc-tilt">
+                  <span className="dcc-shade" />
+                  <span className="dcc-vinyl" data-playing={playingIndex === i ? '' : undefined}>
+                    <span className="dcc-vinyl__spin">
+                      <span className="dcc-vinyl__label">
+                        <img src={item.src} alt="" draggable={false} />
+                      </span>
+                    </span>
+                  </span>
+                  <span className="dcc-sleeve">
+                    <img src={item.src} alt={item.alt ?? item.title} draggable={false} decoding="async" />
+                  </span>
+                </span>
+              ) : (
               <span className="dcc-tilt">
                 <span className="dcc-shade" />
                 <span className="dcc-edge" />
@@ -1014,6 +1063,7 @@ export default function DiscCascadeCarousel({
                   <span className="dcc-sheen" />
                 </span>
               </span>
+              )}
             </button>
           )
         })}

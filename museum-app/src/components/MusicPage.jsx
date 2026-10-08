@@ -24,16 +24,23 @@ export default function MusicPage() {
         items={items}
         height="100%"
         layout="column"
+        sleeve
+        playingIndex={player.playing && player.now ? player.now.a : null}
         panel
         panelSide="left"
         renderPanel={(item, i) => (
           <MusicPanel albums={MUSIC_ALBUMS} albumIndex={i} player={player} />
         )}
-        stageX="20%"
-        discSize="clamp(150px, min(34vh, 24vw), 330px)"
-        spacing={0.1}
-        rise={-1.08}
-        depth={0.16}
+        stageX="14%"
+        discSize="clamp(170px, min(34vh, 20vw), 360px)"
+        spacing={0.04}
+        rise={-1.12}
+        depth={0.1}
+        yaw={0}
+        fan={0}
+        tilt={0}
+        pitch={0}
+        roll={0}
         ahead={2.2}
         background="transparent"
         color="#dfe9ff"
