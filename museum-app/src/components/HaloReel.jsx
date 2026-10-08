@@ -129,17 +129,13 @@ export default function HaloReel({
     (target) => {
       const m = motionRef.current
       m.target = target
-      if (reduceMotion) {
-        rotation.set(target)
-        return
-      }
       setSettled(false)
       if (!m.raf) {
         m.last = performance.now()
         m.raf = requestAnimationFrame(tick)
       }
     },
-    [reduceMotion, rotation, tick]
+    [rotation, tick]
   )
 
   const halt = () => {
