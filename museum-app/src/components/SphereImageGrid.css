@@ -1,0 +1,100 @@
+.sphere-grid {
+  position: relative;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: grab;
+}
+.sphere-grid:active { cursor: grabbing; }
+
+.sphere-item {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+.sphere-item__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 6px 22px -6px rgba(0, 0, 0, 0.7), 0 0 18px -8px var(--accent);
+  transition: transform 0.25s ease-out, border-color 0.25s, box-shadow 0.25s;
+}
+.sphere-item:hover .sphere-item__img {
+  transform: scale(1.18);
+  border-color: var(--accent);
+  box-shadow: 0 8px 28px -6px rgba(0, 0, 0, 0.8), 0 0 28px -4px var(--accent);
+}
+
+/* ─── Modal ─── */
+.sphere-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(2, 5, 16, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: sphere-fade 0.3s ease-out;
+}
+
+.sphere-modal__card {
+  position: relative;
+  width: min(92vw, 520px);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(8, 14, 36, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.9);
+  animation: sphere-scale 0.3s ease-out;
+}
+
+.sphere-modal__img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.sphere-modal__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.sphere-modal__close:hover { background: rgba(0, 0, 0, 0.8); }
+
+.sphere-modal__info { padding: 1.1rem 1.4rem 1.4rem; }
+.sphere-modal__info h3 {
+  margin: 0 0 0.3rem;
+  font-family: var(--font-serif, sans-serif);
+  font-weight: 300;
+  font-size: 1.25rem;
+  color: #fff;
+}
+.sphere-modal__info p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(200, 215, 240, 0.7);
+}
+
+@keyframes sphere-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sphere-scale {
+  from { transform: scale(0.88); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}

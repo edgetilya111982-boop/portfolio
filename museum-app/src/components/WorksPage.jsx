@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
+import SphereImageGrid from './SphereImageGrid'
 import './WorksPage.css'
 
 const WORKS_DATA = {
@@ -21,6 +22,31 @@ const WORKS_DATA = {
   ],
   art: [],
   music: [],
+}
+
+const ART_FRAMES = ['01', '02'].flatMap(n => [1, 2, 3, 4, 5, 6].map(i => `art_${n}_${i}`))
+
+// placeholder frames cycled to fill the sphere until real artworks are added
+const ART_IMAGES = Array.from({ length: 30 }, (_, i) => {
+  const frame = ART_FRAMES[i % ART_FRAMES.length]
+  return {
+    id: `art-${i}`,
+    src: `${import.meta.env.BASE_URL}art/${frame}.webp`,
+    alt: `Арт визуал ${i + 1}`,
+    title: `Арт визуал ${i + 1}`,
+  }
+})
+
+function useSphereSize() {
+  const calc = () =>
+    Math.round(Math.max(300, Math.min(window.innerHeight - 150, window.innerWidth * 0.92, 680)))
+  const [size, setSize] = useState(calc)
+  useEffect(() => {
+    const onResize = () => setSize(calc())
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  return size
 }
 
 const CAT_META = {
@@ -101,6 +127,8 @@ export default function WorksPage({ category, onClose }) {
   const works = WORKS_DATA[category] || []
   const trackRef = useRef(null)
   const [active, setActive] = useState(0)
+  const sphereSize = useSphereSize()
+  const isSphere = category === 'art'
 
   const goTo = useCallback((i) => {
     const track = trackRef.current
@@ -144,7 +172,18 @@ export default function WorksPage({ category, onClose }) {
       </div>
 
       <div className="works-page__body">
-        {works.length === 0 ? (
+        {isSphere ? (
+          <div className="works-sphere">
+            <SphereImageGrid
+              images={ART_IMAGES}
+              containerSize={sphereSize}
+              sphereRadius={sphereSize * 0.4}
+              baseImageScale={0.24}
+              accent={meta.accent}
+            />
+            <p className="works-sphere__hint">Потяните, чтобы вращать · клик — открыть</p>
+          </div>
+        ) : works.length === 0 ? (
           <div className="works-page__empty">
             <span className="works-page__empty-icon">◈</span>
             <p className="works-page__empty-text">Работы скоро появятся</p>
