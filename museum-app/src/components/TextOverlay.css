@@ -234,12 +234,12 @@
 
 /* ─── Category cards (Section 1) ─── */
 .overlay-categories {
-  top: 50%;
+  top: 48%;
   transform: translateY(-50%);
-  left: 3vw;
+  left: 2.5vw;
   right: auto;
   bottom: auto;
-  width: clamp(220px, 26vw, 340px);
+  width: clamp(240px, 28vw, 360px);
   display: block;
   background: none;
 }
@@ -247,8 +247,7 @@
 .categories-grid {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  align-items: flex-start;
+  gap: 0.9rem;
   width: 100%;
 }
 
@@ -257,14 +256,14 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 1.2rem 1.4rem;
-  background: rgba(6, 9, 26, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 1.6rem 1.4rem 1.1rem;
+  background: rgba(6, 9, 26, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 4px;
   cursor: pointer;
   overflow: hidden;
-  min-height: clamp(100px, 13vh, 150px);
-  width: 100%;
+  min-height: clamp(115px, 14vh, 165px);
+  box-sizing: border-box;
   text-align: left;
   transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
               border-color 0.3s,
@@ -272,10 +271,10 @@
   animation: cat-pulse 4s ease-in-out infinite;
 }
 
-/* asymmetric horizontal offsets */
-.categories-grid .cat-card:nth-child(1) { margin-left: 0; }
-.categories-grid .cat-card:nth-child(2) { margin-left: 2.2rem; }
-.categories-grid .cat-card:nth-child(3) { margin-left: 0.8rem; }
+/* staircase: left edge steps in, right edge stays flush */
+.categories-grid .cat-card:nth-child(1) { margin-left: 0;      width: 100%; }
+.categories-grid .cat-card:nth-child(2) { margin-left: 1.8rem; width: calc(100% - 1.8rem); }
+.categories-grid .cat-card:nth-child(3) { margin-left: 0.8rem; width: calc(100% - 0.8rem); }
 
 .cat-card:nth-child(2) { animation-delay: 1.3s; }
 .cat-card:nth-child(3) { animation-delay: 2.6s; }
@@ -652,7 +651,7 @@
   /* reset asymmetric offsets on mobile */
   .categories-grid .cat-card:nth-child(1),
   .categories-grid .cat-card:nth-child(2),
-  .categories-grid .cat-card:nth-child(3) { margin-left: 0; }
+  .categories-grid .cat-card:nth-child(3) { margin-left: 0; width: 100%; }
 
   .cat-card {
     min-height: 80px;

@@ -26,7 +26,7 @@ const WORKS_DATA = {
 const CAT_META = {
   animation: { label: 'Анимация видео', accent: '#38d9ff' },
   art:       { label: 'Арт визуал',     accent: '#c084fc' },
-  music:     { label: 'Музыка',         accent: '#f59e0b' },
+  music:     { label: 'Музыка',         accent: '#4da6ff' },
 }
 
 function WorkCard({ work, accent }) {
