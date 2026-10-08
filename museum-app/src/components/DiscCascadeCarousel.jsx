@@ -498,6 +498,8 @@ export default function DiscCascadeCarousel({
   panel = false,
   /** Which side the panel sits on: 'right' (default) or 'left', right next to the discs. */
   panelSide = 'right',
+  /** Custom panel content: (item, index) => node. Replaces the default title, credits and track list. */
+  renderPanel,
   spacing = 1.02,
   rise = 0.24,
   depth = 0.42,
@@ -681,6 +683,7 @@ export default function DiscCascadeCarousel({
     const el = rootRef.current
     if (!el) return
     const onWheel = (e) => {
+      if (e.target.closest && e.target.closest('.dcc-panel')) return
       e.preventDefault()
       e.stopPropagation()
       const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
@@ -809,7 +812,7 @@ export default function DiscCascadeCarousel({
       setMenu(false)
       return
     }
-    if (e.target.closest('[data-dcc-menu]')) return
+    if (e.target.closest('[data-dcc-menu], .dcc-panel')) return
     let handled = true
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') step(1)
     else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') step(-1)
@@ -1018,6 +1021,10 @@ export default function DiscCascadeCarousel({
 
       {panel ? (
         <aside className="dcc-panel" data-dcc-ui="" aria-label="Композиции">
+          {renderPanel ? (
+            renderPanel(current, active)
+          ) : (
+            <>
           {headBlock}
           <ol className="dcc-tracks">
             {items.map((it, k) => {
@@ -1042,6 +1049,8 @@ export default function DiscCascadeCarousel({
               )
             })}
           </ol>
+            </>
+          )}
         </aside>
       ) : null}
 

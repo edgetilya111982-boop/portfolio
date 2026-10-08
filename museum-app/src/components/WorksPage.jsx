@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import SphereImageGrid from './SphereImageGrid'
 import HaloReel from './HaloReel'
-import DiscCascadeCarousel from './DiscCascadeCarousel'
+import MusicPage from './MusicPage'
 import NeonSign from './NeonSign'
 import './WorksPage.css'
 
@@ -53,26 +53,6 @@ function useSphereSize() {
   }, [])
   return size
 }
-
-// placeholder discs until real tracks are added; palette = [background, figure, accent]
-const MUSIC_TRACKS = [
-  ['Neon Drift',   'Ambient',    '2026', '3:42', ['#071433', '#4da6ff', '#c7e4ff']],
-  ['Glass Rain',   'Electronic', '2026', '4:05', ['#12082e', '#c084fc', '#38d9ff']],
-  ['Afterglow',    'Downtempo',  '2026', '3:18', ['#06222b', '#38d9ff', '#e6fbff']],
-  ['Signal Bloom', 'Cinematic',  '2026', '5:11', ['#1a1040', '#4da6ff', '#c084fc']],
-  ['Night Circuit','Synthwave',  '2026', '3:56', ['#0b1d3d', '#8fc5ff', '#2a6bd1']],
-  ['Velvet Static','Lo-fi',      '2026', '2:47', ['#17082a', '#e8b4ff', '#4da6ff']],
-  ['Deep Current', 'Ambient',    '2026', '4:33', ['#03141f', '#2ad4c0', '#9be9ff']],
-].map(([title, genre, year, length, palette], i) => ({
-  title,
-  palette,
-  labelStyle: i % 2 ? 'block' : 'arc',
-  credits: [
-    { label: 'Жанр', value: genre },
-    { label: 'Год', value: year },
-    { label: 'Длительность', value: length },
-  ],
-}))
 
 const BG_SHADE = 'linear-gradient(90deg, rgba(4,8,22,0.55) 0%, rgba(4,8,22,0.1) 60%)'
 
@@ -169,35 +149,7 @@ export default function WorksPage({ category, onClose }) {
       </div>
     )
   } else if (category === 'music') {
-    content = (
-      <div className="works-music">
-        <DiscCascadeCarousel
-          items={MUSIC_TRACKS}
-          height="100%"
-          layout="column"
-          panel
-          panelSide="left"
-          stageX="20%"
-          discSize="clamp(150px, min(34vh, 24vw), 330px)"
-          spacing={0.1}
-          rise={-1.08}
-          depth={0.16}
-          ahead={2.2}
-          background="transparent"
-          color="#dfe9ff"
-          serif="var(--font-serif)"
-          sans="var(--font-sans)"
-          display="var(--font-sans)"
-          indexLabel=""
-          defaultIndex={1}
-          loop
-          reviews={false}
-          frame={false}
-          hint=""
-          ariaLabel="Музыка"
-        />
-      </div>
-    )
+    content = <MusicPage />
   } else if (works.length === 0) {
     content = (
       <div className="works-page__empty">
