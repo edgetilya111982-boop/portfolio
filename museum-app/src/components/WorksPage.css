@@ -80,7 +80,15 @@
 
 /* ─── Music discs ─── */
 .works-music {
+  position: relative;
   height: 100%;
+}
+
+.works-music__neon {
+  left: 34%;
+  bottom: 17%;
+  width: clamp(220px, 17vw, 340px);
+  transform: rotate(-5deg);
 }
 
 /* ─── Halo reel ─── */

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import SphereImageGrid from './SphereImageGrid'
 import HaloReel from './HaloReel'
 import DiscCascadeCarousel from './DiscCascadeCarousel'
+import NeonSign from './NeonSign'
 import './WorksPage.css'
 
 const BASE = import.meta.env.BASE_URL
@@ -165,6 +166,7 @@ export default function WorksPage({ category, onClose }) {
           hint=""
           ariaLabel="Музыка"
         />
+        <NeonSign className="works-music__neon" src={`${BASE}neon_music.webp`} />
       </div>
     )
   } else if (works.length === 0) {
