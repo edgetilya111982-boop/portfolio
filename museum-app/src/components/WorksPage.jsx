@@ -143,14 +143,20 @@ export default function WorksPage({ category, onClose }) {
         <DiscCascadeCarousel
           items={MUSIC_TRACKS}
           height="100%"
-          stageX="28%"
-          ahead={1.6}
+          layout="column"
+          panel
+          stageX="20%"
+          discSize="clamp(150px, min(34vh, 24vw), 330px)"
+          spacing={0.1}
+          rise={-1.08}
+          depth={0.16}
+          ahead={2.2}
           background="transparent"
           color="#dfe9ff"
           serif="var(--font-serif)"
           sans="var(--font-sans)"
           display="var(--font-sans)"
-          indexLabel="Треки"
+          indexLabel=""
           defaultIndex={1}
           loop
           reviews={false}
