@@ -1,11 +1,12 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import NeonSign from './NeonSign'
 import { MusicPanel, useMusicPlayer } from './MusicPlayer'
 import { MUSIC_ALBUMS, MUSIC_GENRES, albumCover } from '../data/musicAlbums'
 import './MusicPage.css'
 
 const BASE = import.meta.env.BASE_URL
 
-// Geometry of the four shelves in music/shelf.webp, as % of the image:
+// Geometry of the four shelves in music/shelf_v2.webp, as % of the image:
 // the clickable row band and the spot where the record sits.
 const SHELVES = {
   rock:      { top: 0.3,  h: 25.9, x: 66.4, y: 18.3, color: '#ff2fa0' },
@@ -128,7 +129,12 @@ export default function MusicPage() {
       <h2 className="sr-only">Музыка по жанрам: рок, лаунж, чиллаут, кинематографичная музыка</h2>
       <div className="mshelf" data-open={open ? '' : undefined}>
         <div className="mshelf__shelf" ref={shelfRef}>
-          <img className="mshelf__img" src={`${BASE}music/shelf.webp`} alt="Стеллаж с жанрами музыки" draggable="false" />
+          <img className="mshelf__img" src={`${BASE}music/shelf_v2.webp`} alt="Стеллаж с жанрами музыки" draggable="false" />
+          <NeonSign
+            className="neon--rock"
+            src={`${BASE}music/neon_rock.webp`}
+            style={{ left: '20.2%', top: '5.9%', width: '13.4%' }}
+          />
           {MUSIC_GENRES.map((g) => {
             const s = SHELVES[g.id]
             const empty = byGenre[g.id].length === 0
