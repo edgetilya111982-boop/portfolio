@@ -76,7 +76,23 @@
   animation-delay: var(--neon-delay, 0s), var(--neon-delay, 0s);
 }
 
-/* pink tube on the genre shelf */
+/* tubes on the genre shelf: own colour, rhythm and phase for each */
+.neon--rock,
+.neon--lounge,
+.neon--chillout,
+.neon--cinematic {
+  --neon-g1: 1px;
+  --neon-g2: 5px;
+  --neon-g3: 14px;
+}
+.neon--rock .neon__halo,
+.neon--lounge .neon__halo,
+.neon--chillout .neon__halo {
+  inset: -70% -25%;
+}
+.neon--cinematic .neon__halo {
+  inset: -90% -8%;
+}
 .neon--rock {
   --neon-cycle: 9s;
   --neon-delay: -3.2s;
@@ -85,12 +101,35 @@
   --neon-c1: rgba(255, 190, 225, 0.95);
   --neon-c2: rgba(255, 50, 160, 0.8);
   --neon-c3: rgba(220, 20, 120, 0.55);
-  --neon-g1: 1px;
-  --neon-g2: 5px;
-  --neon-g3: 14px;
 }
-.neon--rock .neon__halo {
-  inset: -70% -25%;
+.neon--lounge {
+  --neon-cycle: 10.5s;
+  --neon-delay: -7.1s;
+  --neon-halo-1: rgba(255, 150, 60, 0.3);
+  --neon-halo-2: rgba(220, 90, 20, 0.16);
+  --neon-c1: rgba(255, 230, 195, 0.95);
+  --neon-c2: rgba(255, 125, 40, 0.8);
+  --neon-c3: rgba(220, 80, 20, 0.55);
+}
+.neon--chillout {
+  --neon-cycle: 12.5s;
+  --neon-delay: -1.4s;
+  --neon-halo-1: rgba(40, 230, 215, 0.28);
+  --neon-halo-2: rgba(10, 150, 170, 0.15);
+  --neon-c1: rgba(200, 255, 250, 0.95);
+  --neon-c2: rgba(20, 220, 200, 0.8);
+  --neon-c3: rgba(10, 150, 170, 0.55);
+}
+.neon--cinematic {
+  --neon-cycle: 11.5s;
+  --neon-delay: -8.3s;
+  --neon-g2: 7px;
+  --neon-g3: 20px;
+  --neon-halo-1: rgba(70, 150, 255, 0.3);
+  --neon-halo-2: rgba(20, 70, 230, 0.18);
+  --neon-c1: rgba(205, 235, 255, 0.95);
+  --neon-c2: rgba(40, 140, 255, 0.85);
+  --neon-c3: rgba(20, 70, 230, 0.6);
 }
 
 /*
