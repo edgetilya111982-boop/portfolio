@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { trackSrc } from '../data/musicAlbums'
+import { trackSrc, MUSIC_GENRES } from '../data/musicAlbums'
 import './MusicPlayer.css'
 
 const pad = (n) => String(n).padStart(2, '0')
@@ -188,7 +188,7 @@ export function MusicPanel({ albums, albumIndex, player }) {
         <h2 className="mp__title">{album.title}</h2>
         {album.subtitle ? <p className="mp__sub">{album.subtitle}</p> : null}
         <p className="mp__meta">
-          {[album.year, album.genre, `${album.tracks.length} ${tracksWord(album.tracks.length)} · ${fmt(total)}`].filter(Boolean).join(' · ')}
+          {[album.year, MUSIC_GENRES.find((g) => g.id === album.genre)?.label, `${album.tracks.length} ${tracksWord(album.tracks.length)} · ${fmt(total)}`].filter(Boolean).join(' · ')}
         </p>
       </header>
 

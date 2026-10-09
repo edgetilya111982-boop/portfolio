@@ -11,6 +11,7 @@ export const MUSIC_ALBUMS = [
     id: 'gothic-cello',
     title: 'Gothic Cello',
     subtitle: 'Autumn Requiem',
+    genre: 'cinematic',
     tracks: [
       { title: 'Трек 1', duration: 167.1 },
       { title: 'Трек 2', duration: 174.3 },
@@ -21,6 +22,7 @@ export const MUSIC_ALBUMS = [
   {
     id: 'album-2',
     title: 'Альбом 2',
+    genre: 'chillout',
     tracks: [
       { title: 'Трек 1', duration: 175.4 },
       { title: 'Трек 2', duration: 171.7 },
@@ -28,6 +30,18 @@ export const MUSIC_ALBUMS = [
       { title: 'Трек 4', duration: 153.8 },
     ],
   },
+]
+
+/*
+ * Genres shown as tiles above the discs. Labels are short for the UI;
+ * `seo` is the full phrase for aria-labels and the page heading.
+ * Assign an album to a genre with `genre: 'rock'` (an id from this list).
+ */
+export const MUSIC_GENRES = [
+  { id: 'rock', label: 'Рок', seo: 'Рок-музыка' },
+  { id: 'lounge', label: 'Лаунж', seo: 'Лаунж-музыка' },
+  { id: 'chillout', label: 'Чиллаут', seo: 'Чиллаут и расслабляющая музыка' },
+  { id: 'cinematic', label: 'Кинематографичная', seo: 'Кинематографичная музыка для фильмов и видео' },
 ]
 
 const pad = (n) => String(n).padStart(2, '0')
