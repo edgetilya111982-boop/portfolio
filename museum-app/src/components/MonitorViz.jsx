@@ -9,8 +9,37 @@ const POP = { x: 1320, y: 466, rx: 55, ry: 67 }
 const MIC = { x: 1331, y: 458, w: 64, h: 100 }
 
 const BASE = import.meta.env.BASE_URL
-// the DZ logo sits in the free left part of the screen (fractions of the screen)
-const LOGO = { cx: 0.31, cy: 0.47, h: 0.68 }
+// The crystal DZ (music/logo_crystal.webp) is a crop of a 2000x1105 render, saved at half size.
+// Its columns are stretched like equalizer bars; BASE_* is the line where they meet the plate.
+const CRYSTAL = {
+  x0: 600, // crop origin in the original render
+  y0: 230,
+  scale: 0.5, // saved size / original size
+  w: 410,
+  h: 385,
+  left: 705, // crystals span this range (the gap between D and Z has no columns)
+  right: 1310,
+  gap: [990, 1015],
+  baseD: [[705, 715], [790, 738], [850, 770], [890, 777], [940, 745], [990, 705]],
+  baseZ: [[1015, 838], [1090, 822], [1140, 808], [1190, 792], [1240, 775], [1305, 758]],
+  anchorX: 1010, // the point of the render that is put at the logo position
+  anchorY: 770,
+  cx: 0.31, // logo position on the screen, fractions
+  by: 0.74,
+  k: 0.3, // screen heights per 267 px of original render
+}
+
+function lerpLine(line, x) {
+  if (x <= line[0][0]) return line[0][1]
+  for (let i = 1; i < line.length; i++) {
+    if (x <= line[i][0]) {
+      const [x0, y0] = line[i - 1]
+      const [x1, y1] = line[i]
+      return y0 + ((x - x0) / (x1 - x0)) * (y1 - y0)
+    }
+  }
+  return line[line.length - 1][1]
+}
 
 const PTS = 30 // points along the curve
 const F_MIN = 45
@@ -83,18 +112,33 @@ export default function MonitorViz({ player }) {
     let raf = 0
 
     const logo = new Image()
-    logo.src = `${BASE}logo_dz.png`
+    logo.src = `${BASE}music/logo_crystal.webp`
     let logoReady = false
     logo.onload = () => {
       logoReady = true
     }
-    // the logo on its own canvas, so a light sheen can be clipped to its shape
-    const lh = Math.round(H * LOGO.h)
-    const lw = Math.round((lh * 426) / 465)
-    const sheen = document.createElement('canvas')
-    sheen.width = lw
-    sheen.height = lh
-    const sctx = sheen.getContext('2d')
+    // The picture is cut into thin vertical strips. Each strip is stretched up from the
+    // line where its crystals stand on the plate; what is below that line stays put.
+    const SW = 2 // strip width in saved px
+    const strips = []
+    for (let sx = 0; sx < CRYSTAL.w; sx += SW) {
+      const xo = CRYSTAL.x0 + (sx + SW / 2) / CRYSTAL.scale
+      const inCrystals = xo >= CRYSTAL.left && xo <= CRYSTAL.right && !(xo > CRYSTAL.gap[0] && xo < CRYSTAL.gap[1])
+      const baseO = inCrystals ? lerpLine(xo < CRYSTAL.gap[0] ? CRYSTAL.baseD : CRYSTAL.baseZ, xo) : 0
+      strips.push({
+        sx,
+        xo,
+        baseO,
+        baseS: inCrystals ? (baseO - CRYSTAL.y0) * CRYSTAL.scale : 0,
+        u: Math.min(Math.max((xo - CRYSTAL.left) / (CRYSTAL.right - CRYSTAL.left), 0), 1),
+        live: inCrystals,
+        lvl: 0,
+      })
+    }
+    const lc = document.createElement('canvas')
+    lc.width = W
+    lc.height = H
+    const lctx = lc.getContext('2d')
     let bass = 0
     let mid = 0
     let high = 0
@@ -238,55 +282,74 @@ export default function MonitorViz({ player }) {
         ctx.restore()
       }
 
-      // the DZ logo: breathes when it is quiet, hits on the bass, sparkles on the highs
+      // the crystal DZ: columns grow with their frequency band, the whole thing hits on the bass
       if (logoReady) {
-        const breathe = 0.5 + 0.5 * Math.sin(t * 0.0016)
-        const pulse = vis * (0.55 * bass + 0.95 * beat)
-        const scale = 1 + 0.014 * breathe * (1 - vis) + 0.075 * pulse
-        const cx = W * LOGO.cx
-        const cy = H * LOGO.cy
+        const kk = (CRYSTAL.k * H) / 267 // screen px per px of the original render
+        const cxPx = W * CRYSTAL.cx
+        const byPx = H * CRYSTAL.by
+        const pulse = vis * (0.5 * bass + 0.9 * beat)
 
-        const R = lh * (0.8 + 0.4 * pulse + 0.05 * breathe)
-        const halo = ctx.createRadialGradient(cx, cy, R * 0.08, cx, cy, R)
-        halo.addColorStop(0, `rgba(70, 150, 255, ${0.26 + 0.1 * breathe * (1 - vis) + 0.4 * pulse})`)
-        halo.addColorStop(0.55, `rgba(60, 90, 255, ${0.1 + 0.2 * pulse})`)
+        lctx.clearRect(0, 0, W, H)
+        const fpos = (u) => u * (PTS - 1)
+        for (let j = 0; j < strips.length; j++) {
+          const st = strips[j]
+          let target = 0
+          if (st.live) {
+            const fi = fpos(st.u)
+            const i0 = Math.floor(fi)
+            const i1 = Math.min(i0 + 1, PTS - 1)
+            const band = shaped[i0] * (1 - (fi - i0)) + shaped[i1] * (fi - i0)
+            const vary = 0.9 + 0.2 * Math.sin(j * 0.53) * Math.sin(j * 0.19 + 1.3)
+            const idle = 0.03 * Math.sin(t * 0.0013 + st.u * 6.5) + 0.02 * Math.sin(t * 0.0021 + st.u * 15)
+            // the highs (Z) are quieter in any music, so they get a little more gain
+            target = vis * (0.34 * band * vary * (1 + 0.6 * st.u) + 0.08 * beat) + (1 - vis) * idle
+          }
+          st.lvl += (target - st.lvl) * (target > st.lvl ? 0.45 : 0.14)
+          const f = 1 + Math.min(Math.max(st.lvl, -0.06), 0.4)
+          const dx = cxPx + (st.xo - CRYSTAL.anchorX) * kk
+          const dw = (SW / CRYSTAL.scale) * kk + 0.7
+          const baseDest = byPx + ((st.live ? st.baseO : CRYSTAL.y0) - CRYSTAL.anchorY) * kk
+          if (st.live) {
+            const hTop = (st.baseO - CRYSTAL.y0) * kk * f
+            lctx.drawImage(logo, st.sx, 0, SW, st.baseS, dx, baseDest - hTop, dw, hTop + 0.6)
+          }
+          const srcY = st.live ? st.baseS : 0
+          lctx.drawImage(logo, st.sx, srcY, SW, CRYSTAL.h - srcY, dx, baseDest, dw, ((CRYSTAL.h - srcY) / CRYSTAL.scale) * kk)
+        }
+        // soft edges: the plate fades into the dark screen
+        lctx.globalCompositeOperation = 'destination-in'
+        const mx = cxPx
+        const my = byPx - H * 0.12
+        const mg = lctx.createRadialGradient(mx, my, H * 0.2, mx, my, H * 0.78)
+        mg.addColorStop(0, 'rgba(0, 0, 0, 1)')
+        mg.addColorStop(0.62, 'rgba(0, 0, 0, 1)')
+        mg.addColorStop(1, 'rgba(0, 0, 0, 0)')
+        lctx.fillStyle = mg
+        lctx.fillRect(0, 0, W, H)
+        lctx.globalCompositeOperation = 'source-over'
+
+        // light spilled around it
+        const R = H * (0.62 + 0.3 * pulse)
+        const hy = byPx - H * 0.22
+        const halo = ctx.createRadialGradient(cxPx, hy, R * 0.08, cxPx, hy, R)
+        halo.addColorStop(0, `rgba(70, 150, 255, ${0.16 + 0.34 * pulse})`)
+        halo.addColorStop(0.55, `rgba(70, 80, 255, ${0.06 + 0.18 * pulse})`)
         halo.addColorStop(1, 'rgba(230, 80, 60, 0)')
         ctx.fillStyle = halo
         ctx.fillRect(0, 0, W, H)
 
         ctx.save()
-        ctx.translate(cx, cy)
-        ctx.scale(scale, scale)
-        ctx.shadowColor = `rgba(80, 160, 255, ${0.5 + 0.4 * Math.min(pulse, 1)})`
-        ctx.shadowBlur = (8 + 24 * pulse) * dpr
-        ctx.globalAlpha = 0.86 + 0.1 * breathe * (1 - vis) + 0.14 * Math.min(pulse, 1)
-        ctx.drawImage(logo, -lw / 2, -lh / 2, lw, lh)
+        ctx.shadowColor = `rgba(80, 160, 255, ${0.35 + 0.4 * Math.min(pulse, 1)})`
+        ctx.shadowBlur = (6 + 18 * pulse) * dpr
+        ctx.globalAlpha = 0.94
+        ctx.drawImage(lc, 0, 0)
         ctx.shadowBlur = 0
-
-        // brighter on highs and hits
-        const lift = vis * (0.4 * high + 0.55 * beat)
+        const lift = vis * (0.3 * high + 0.5 * beat)
         if (lift > 0.01) {
           ctx.globalCompositeOperation = 'lighter'
-          ctx.globalAlpha = Math.min(lift, 0.65)
-          ctx.drawImage(logo, -lw / 2, -lh / 2, lw, lh)
+          ctx.globalAlpha = Math.min(lift, 0.6)
+          ctx.drawImage(lc, 0, 0)
         }
-
-        // a sheen crossing the facets, clipped to the logo's own shape
-        const p = ((t % 5600) / 5600) * 1.7 - 0.35
-        sctx.clearRect(0, 0, lw, lh)
-        sctx.globalCompositeOperation = 'source-over'
-        sctx.drawImage(logo, 0, 0, lw, lh)
-        sctx.globalCompositeOperation = 'source-atop'
-        const px = p * lw
-        const sg = sctx.createLinearGradient(px - lw * 0.2, 0, px + lw * 0.2, lh * 0.45)
-        sg.addColorStop(0, 'rgba(255, 255, 255, 0)')
-        sg.addColorStop(0.5, 'rgba(255, 255, 255, 0.95)')
-        sg.addColorStop(1, 'rgba(255, 255, 255, 0)')
-        sctx.fillStyle = sg
-        sctx.fillRect(0, 0, lw, lh)
-        ctx.globalCompositeOperation = 'lighter'
-        ctx.globalAlpha = 0.3 + 0.5 * vis * Math.min(high + beat, 1)
-        ctx.drawImage(sheen, -lw / 2, -lh / 2)
         ctx.restore()
       }
 
