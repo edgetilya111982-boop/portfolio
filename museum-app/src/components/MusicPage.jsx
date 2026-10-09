@@ -1,89 +1,180 @@
-import React, { useMemo, useState } from 'react'
-import DiscCascadeCarousel from './DiscCascadeCarousel'
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { MusicPanel, useMusicPlayer } from './MusicPlayer'
 import { MUSIC_ALBUMS, MUSIC_GENRES, albumCover } from '../data/musicAlbums'
+import './MusicPage.css'
 
-// Each disc is an album; the side panel lists its tracks and holds the player.
+const BASE = import.meta.env.BASE_URL
+
+// Geometry of the four shelves in music/shelf.webp, as % of the image:
+// the clickable row band and the spot where the record sits.
+const SHELVES = {
+  rock:      { top: 0.3,  h: 25.9, x: 66.4, y: 18.3, color: '#ff2fa0' },
+  lounge:    { top: 26.6, h: 22.0, x: 66.4, y: 41.0, color: '#ff9a3c' },
+  chillout:  { top: 48.8, h: 22.7, x: 66.8, y: 63.6, color: '#22e0d0' },
+  cinematic: { top: 71.5, h: 28.3, x: 65.5, y: 86.8, color: '#3d7bff' },
+}
+
+const FLIGHT_MS = 1100
+
+// A shelf of genres: pick one and the record slides out with its track list.
 export default function MusicPage() {
   const player = useMusicPlayer(MUSIC_ALBUMS)
-  const [genre, setGenre] = useState('all')
-  // Indices into MUSIC_ALBUMS for the chosen genre: the player keeps global indices.
-  const shown = useMemo(
-    () => MUSIC_ALBUMS.map((_, i) => i).filter((i) => genre === 'all' || MUSIC_ALBUMS[i].genre === genre),
-    [genre]
-  )
-  const items = useMemo(
-    () =>
-      shown.map((i) => {
-        const a = MUSIC_ALBUMS[i]
-        return { title: a.title, src: albumCover(a), alt: `${a.title} — обложка альбома`, label: '', fine: '' }
-      }),
-    [shown]
-  )
-  const count = (id) => MUSIC_ALBUMS.filter((a) => a.genre === id).length
-  const playingGlobal = player.playing && player.now ? player.now.a : null
-  const playingShown = playingGlobal === null ? -1 : shown.indexOf(playingGlobal)
+  const [open, setOpen] = useState(null) // genre id
+  const [pos, setPos] = useState(0) // album position inside the genre
+  const [soon, setSoon] = useState(null)
+  const shelfRef = useRef(null)
+  const slotRef = useRef(null)
+  const animRef = useRef(null)
+  const soonTimer = useRef(0)
+
+  const byGenre = useMemo(() => {
+    const m = {}
+    MUSIC_GENRES.forEach((g) => (m[g.id] = []))
+    MUSIC_ALBUMS.forEach((a, i) => m[a.genre]?.push(i))
+    return m
+  }, [])
+
+  const list = open ? byGenre[open] : []
+  const albumIndex = list[Math.min(pos, list.length - 1)]
+  const album = albumIndex != null ? MUSIC_ALBUMS[albumIndex] : null
+  const isPlaying = !!album && player.playing && player.now?.a === albumIndex
+
+  // Record flight: from the shelf spot to its place beside the shelf.
+  useLayoutEffect(() => {
+    if (!open || !slotRef.current || !shelfRef.current) return
+    const slot = slotRef.current
+    const s = SHELVES[open]
+    const sr = shelfRef.current.getBoundingClientRect()
+    const tr = slot.getBoundingClientRect()
+    const dx = sr.left + (sr.width * s.x) / 100 - (tr.left + tr.width / 2)
+    const dy = sr.top + (sr.height * s.y) / 100 - (tr.top + tr.height / 2)
+    animRef.current?.cancel()
+    animRef.current = slot.animate(
+      [
+        { transform: `translate(${dx}px, ${dy}px) scale(0.22) rotate(-10deg)`, opacity: 0 },
+        { opacity: 1, offset: 0.16 },
+        { transform: 'translate(0, 0) scale(1) rotate(0deg)', opacity: 1 },
+      ],
+      { duration: FLIGHT_MS, easing: 'cubic-bezier(.2,.75,.2,1)', fill: 'both' }
+    )
+  }, [open])
+
+  const clearSoon = () => {
+    window.clearTimeout(soonTimer.current)
+    setSoon(null)
+  }
+
+  const choose = (id) => {
+    if (byGenre[id].length === 0) {
+      setSoon(id)
+      window.clearTimeout(soonTimer.current)
+      soonTimer.current = window.setTimeout(() => setSoon(null), 2200)
+      return
+    }
+    clearSoon()
+    if (id === open) return
+    const state = { works: 'music', shelf: id }
+    if (open) window.history.replaceState(state, '')
+    else window.history.pushState(state, '')
+    setPos(0)
+    setOpen(id)
+  }
+
+  const close = (fromHistory = false) => {
+    if (!open) return
+    if (!fromHistory && window.history.state?.shelf) {
+      window.history.back() // popstate below runs the same closing animation
+      return
+    }
+    const a = animRef.current
+    if (!a) return setOpen(null)
+    a.onfinish = () => {
+      animRef.current = null
+      setOpen(null)
+    }
+    a.playbackRate = -1.4
+    a.play()
+  }
+
+  // One stable listener: App re-renders during the same popstate event, so
+  // re-subscribing on every render would make this listener miss it.
+  const latest = useRef(null)
+  latest.current = { open, close }
+  useEffect(() => {
+    const onPop = (e) => {
+      const { open: cur, close: closeNow } = latest.current
+      const id = e.state?.shelf ?? null
+      if (id === cur) return
+      if (id) {
+        setPos(0)
+        setOpen(id)
+      } else closeNow(true)
+    }
+    const onKey = (e) => e.key === 'Escape' && latest.current.open && latest.current.close()
+    window.addEventListener('popstate', onPop)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('popstate', onPop)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [])
+
+  useEffect(() => () => window.clearTimeout(soonTimer.current), [])
+
+  const step = (d) => setPos((p) => (p + d + list.length) % list.length)
 
   return (
     <div className="works-music">
       <h2 className="sr-only">Музыка по жанрам: рок, лаунж, чиллаут, кинематографичная музыка</h2>
-      <nav className="genres" aria-label="Жанры музыки">
-        {[{ id: 'all', label: 'Все', seo: 'Вся музыка' }, ...MUSIC_GENRES].map((g) => {
-          const n = g.id === 'all' ? MUSIC_ALBUMS.length : count(g.id)
-          return (
-            <button
-              key={g.id}
-              type="button"
-              className={`genres__tile${genre === g.id ? ' is-active' : ''}`}
-              aria-pressed={genre === g.id}
-              aria-label={g.seo}
-              title={g.seo}
-              disabled={n === 0}
-              onClick={() => setGenre(g.id)}
-            >
-              <span className="genres__name">{g.label}</span>
-              <span className="genres__count">{n === 0 ? null : n}</span>
-            </button>
-          )
-        })}
-      </nav>
-      <div className="works-music__stage">
-      <DiscCascadeCarousel
-        key={genre}
-        items={items}
-        height="100%"
-        layout="column"
-        sleeve
-        playingIndex={playingShown >= 0 ? playingShown : null}
-        panel
-        panelSide="left"
-        renderPanel={(item, i) => (
-          <MusicPanel albums={MUSIC_ALBUMS} albumIndex={shown[i]} player={player} />
-        )}
-        stageX="14%"
-        discSize="clamp(170px, min(34vh, 20vw), 360px)"
-        spacing={0.04}
-        rise={-1.12}
-        depth={0.1}
-        yaw={0}
-        fan={0}
-        tilt={0}
-        pitch={0}
-        roll={0}
-        ahead={2.2}
-        background="transparent"
-        color="#dfe9ff"
-        serif="var(--font-serif)"
-        sans="var(--font-sans)"
-        display="var(--font-sans)"
-        indexLabel=""
-        defaultIndex={0}
-        loop={items.length > 2}
-        reviews={false}
-        frame={false}
-        hint=""
-        ariaLabel="Музыка — альбомы"
-      />
+      <div className="mshelf" data-open={open ? '' : undefined}>
+        <div className="mshelf__shelf" ref={shelfRef}>
+          <img className="mshelf__img" src={`${BASE}music/shelf.webp`} alt="Стеллаж с жанрами музыки" draggable="false" />
+          {MUSIC_GENRES.map((g) => {
+            const s = SHELVES[g.id]
+            const empty = byGenre[g.id].length === 0
+            return (
+              <button
+                key={g.id}
+                type="button"
+                className={`mshelf__row${open === g.id ? ' is-open' : ''}${empty ? ' is-empty' : ''}`}
+                style={{ top: `${s.top}%`, height: `${s.h}%`, '--c': s.color }}
+                aria-label={empty ? `${g.seo} — скоро` : g.seo}
+                aria-pressed={open === g.id}
+                title={g.seo}
+                onClick={() => choose(g.id)}
+              >
+                {soon === g.id ? <span className="mshelf__soon">Скоро здесь появится музыка</span> : null}
+              </button>
+            )
+          })}
+        </div>
+
+        {album ? (
+          <>
+            <div className="mshelf__slot" ref={slotRef}>
+              <div className="mshelf__vinyl" data-playing={isPlaying ? '' : undefined}>
+                <div className="mshelf__grooves" />
+                <div className="mshelf__label">
+                  <img src={albumCover(album)} alt="" />
+                </div>
+              </div>
+              <div className="mshelf__sleeve">
+                <img src={albumCover(album)} alt={`${album.title} — обложка альбома`} />
+              </div>
+              {list.length > 1 ? (
+                <div className="mshelf__nav">
+                  <button type="button" onClick={() => step(-1)} aria-label="Предыдущий альбом">‹</button>
+                  <span>{Math.min(pos, list.length - 1) + 1} / {list.length}</span>
+                  <button type="button" onClick={() => step(1)} aria-label="Следующий альбом">›</button>
+                </div>
+              ) : null}
+            </div>
+            <aside className="mshelf__panel" aria-label="Композиции">
+              <button type="button" className="mshelf__close" onClick={() => close()} aria-label="Вернуть пластинку на полку">✕</button>
+              <MusicPanel albums={MUSIC_ALBUMS} albumIndex={albumIndex} player={player} />
+            </aside>
+          </>
+        ) : null}
       </div>
     </div>
   )

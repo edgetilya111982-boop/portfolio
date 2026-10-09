@@ -78,15 +78,7 @@
   color: rgba(184, 204, 224, 0.5);
 }
 
-/* ─── Music discs ─── */
-.works-music {
-  position: relative;
-  height: 100%;
-}
-.works-music__stage {
-  position: absolute;
-  inset: 64px 0 0 0;
-}
+/* ─── Music shelf: see MusicPage.css ─── */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -96,52 +88,6 @@
   white-space: nowrap;
 }
 
-/* Genre tiles: minimal glass chips, light motion */
-.genres {
-  position: absolute;
-  top: 14px;
-  left: clamp(16px, 3vw, 48px);
-  z-index: 5;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  max-width: calc(100% - 32px);
-}
-.genres__tile {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-  padding: 9px 16px;
-  border: 0;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(190, 215, 255, 0.14), rgba(120, 160, 230, 0.06));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 6px 18px rgba(0, 10, 40, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  color: rgba(223, 233, 255, 0.78);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: transform 0.35s ease, background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
-}
-.genres__tile:hover:not(:disabled) {
-  transform: translateY(-2px);
-  color: #fff;
-}
-.genres__tile.is-active {
-  color: #fff;
-  background: linear-gradient(180deg, rgba(110, 170, 255, 0.5), rgba(60, 110, 220, 0.28));
-  box-shadow: 0 8px 24px rgba(40, 100, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-.genres__tile:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-.genres__count {
-  font-size: 11px;
-  opacity: 0.65;
-}
 
 
 /* ─── Halo reel ─── */
