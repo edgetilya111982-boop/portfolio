@@ -18,6 +18,16 @@ export const MUSIC_ALBUMS = [
       { title: 'Трек 4', duration: 179.1 },
     ],
   },
+  {
+    id: 'album-2',
+    title: 'Альбом 2',
+    tracks: [
+      { title: 'Трек 1', duration: 175.4 },
+      { title: 'Трек 2', duration: 171.7 },
+      { title: 'Трек 3', duration: 167.2 },
+      { title: 'Трек 4', duration: 153.8 },
+    ],
+  },
 ]
 
 const pad = (n) => String(n).padStart(2, '0')
