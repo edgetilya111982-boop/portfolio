@@ -100,8 +100,10 @@ export default function MonitorViz({ player }) {
           let m = 0
           for (let b = b0; b < b1 && b < data.length; b++) m = Math.max(m, data[b])
           // the top of the spectrum is always quieter: lift it a little
-          const tilt = 1 + (i / BARS) * 0.55
-          target[i] = Math.min(1, Math.pow((m / 255) * gain * tilt, 1.35))
+          const tilt = 1 + (i / BARS) * 0.3
+          // soft ceiling: loud music tops out at 85% of the bar range, never the screen edge
+          const x = Math.min(1, (m / 255) * gain * tilt)
+          target[i] = 0.85 * Math.pow(x, 1.8)
           energy += target[i]
         }
       }
@@ -109,14 +111,14 @@ export default function MonitorViz({ player }) {
         // no analyser (or the browser keeps it silent): a believable fake
         for (let i = 0; i < BARS; i++) {
           const env = 0.85 - (i / BARS) * 0.55
-          target[i] = env * (0.35 + 0.35 * Math.sin(t * 0.0042 + i * 0.7) * Math.sin(t * 0.0017 + i * 0.31) + 0.25 * Math.abs(Math.sin(t * 0.009 + i * 1.9)))
+          target[i] = 0.8 * env * (0.35 + 0.35 * Math.sin(t * 0.0042 + i * 0.7) * Math.sin(t * 0.0017 + i * 0.31) + 0.25 * Math.abs(Math.sin(t * 0.009 + i * 1.9)))
         }
       }
 
       let alive = false
       for (let i = 0; i < BARS; i++) {
         const v = target[i]
-        bars[i] += (v - bars[i]) * (v > bars[i] ? 0.6 : 0.14)
+        bars[i] += (v - bars[i]) * (v > bars[i] ? 0.4 : 0.12)
         if (bars[i] > peaks[i]) peaks[i] = bars[i]
         else peaks[i] = Math.max(0, peaks[i] - 0.006)
         if (bars[i] > 0.004 || peaks[i] > 0.004) alive = true
@@ -142,7 +144,7 @@ export default function MonitorViz({ player }) {
         const pad = W * 0.04
         const slot = (W - pad * 2) / BARS
         const bw = slot * 0.64
-        const maxH = base * 0.88
+        const maxH = base * 0.6
         const grad = ctx.createLinearGradient(0, base - maxH, 0, base)
         grad.addColorStop(0, '#b9fbff')
         grad.addColorStop(0.35, '#4cc2ff')
