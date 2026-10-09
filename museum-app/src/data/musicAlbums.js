@@ -11,6 +11,7 @@ export const MUSIC_ALBUMS = [
     id: 'gothic-cello',
     title: 'Gothic Cello',
     subtitle: 'Autumn Requiem',
+    genre: 'cinematic',
     tracks: [
       { title: 'Трек 1', duration: 167.1 },
       { title: 'Трек 2', duration: 174.3 },
@@ -21,6 +22,7 @@ export const MUSIC_ALBUMS = [
   {
     id: 'album-2',
     title: 'Альбом 2',
+    genre: 'chillout',
     tracks: [
       { title: 'Трек 1', duration: 175.4 },
       { title: 'Трек 2', duration: 171.7 },
