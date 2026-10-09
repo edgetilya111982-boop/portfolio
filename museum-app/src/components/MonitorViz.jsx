@@ -8,6 +8,10 @@ const SCREEN = { x: 1013, y: 259, w: 424, h: 267 }
 const POP = { x: 1320, y: 466, rx: 55, ry: 67 }
 const MIC = { x: 1331, y: 458, w: 64, h: 100 }
 
+const BASE = import.meta.env.BASE_URL
+// the DZ logo sits in the free left part of the screen (fractions of the screen)
+const LOGO = { cx: 0.31, cy: 0.47, h: 0.68 }
+
 const PTS = 30 // points along the curve
 const F_MIN = 45
 const F_MAX = 12000
@@ -78,6 +82,26 @@ export default function MonitorViz({ player }) {
     let vis = 0
     let raf = 0
 
+    const logo = new Image()
+    logo.src = `${BASE}logo_dz.png`
+    let logoReady = false
+    logo.onload = () => {
+      logoReady = true
+    }
+    // the logo on its own canvas, so a light sheen can be clipped to its shape
+    const lh = Math.round(H * LOGO.h)
+    const lw = Math.round((lh * 426) / 465)
+    const sheen = document.createElement('canvas')
+    sheen.width = lw
+    sheen.height = lh
+    const sctx = sheen.getContext('2d')
+    let bass = 0
+    let mid = 0
+    let high = 0
+    let bassAvg = 0.2
+    let beat = 0
+    let lastDraw = 0
+
     // mic and pop filter, in canvas pixels
     const k = (geo.s * dpr)
     const toX = (ix) => (ix - SCREEN.x) * k
@@ -111,7 +135,13 @@ export default function MonitorViz({ player }) {
       const { playing, volume, analyserRef } = live.current
       const an = analyserRef && analyserRef.current
       vis += ((playing ? 1 : 0) - vis) * 0.07
-      canvas.style.opacity = vis > 0.01 ? String(Math.min(vis, 1)) : '0'
+      canvas.style.opacity = '1'
+      // idle breathing does not need 60 fps
+      if (!playing && vis < 0.02 && t - lastDraw < 32) {
+        raf = requestAnimationFrame(frame)
+        return
+      }
+      lastDraw = t
 
       // raw level per point
       const raw = new Float32Array(PTS)
@@ -173,36 +203,30 @@ export default function MonitorViz({ player }) {
         }
       })
 
+      // band levels that drive the logo
+      const avg = (from, to) => {
+        let sum = 0
+        for (let i = from; i < to; i++) sum += shaped[i]
+        return sum / (to - from)
+      }
+      const tb = playing ? avg(0, 6) : 0
+      bass += (tb - bass) * (tb > bass ? 0.5 : 0.12)
+      mid += ((playing ? avg(8, 18) : 0) - mid) * 0.2
+      high += ((playing ? avg(20, PTS) : 0) - high) * 0.25
+      const onset = Math.max(0, tb - bassAvg * 1.2 - 0.05)
+      bassAvg += (tb - bassAvg) * 0.04
+      beat = Math.max(beat * 0.9, Math.min(onset * 2.4, 1))
+
       ctx.clearRect(0, 0, W, H)
+      ctx.fillStyle = 'rgba(2, 6, 26, 0.93)'
+      ctx.fillRect(0, 0, W, H)
+
+      // the wave stays behind the logo while music plays
       if (vis > 0.01) {
-        ctx.fillStyle = 'rgba(2, 6, 26, 0.93)'
-        ctx.fillRect(0, 0, W, H)
-        const base = H * 0.74
-        const amp = base * 0.62 // the tallest point stays well inside the screen
-
-        // faint scale lines
-        ctx.strokeStyle = 'rgba(90, 160, 255, 0.07)'
-        ctx.lineWidth = dpr
-        for (let g = 1; g <= 3; g++) {
-          const y = base - (amp * g) / 3
-          ctx.beginPath()
-          ctx.moveTo(0, y)
-          ctx.lineTo(W, y)
-          ctx.stroke()
-        }
-
-        // reflection under the baseline
+        const base = H * 0.78
+        const amp = base * 0.55
         ctx.save()
-        ctx.setTransform(1, 0, 0, -0.32, 0, base * 1.32)
-        ctx.globalAlpha = 0.22
-        const rg = ctx.createLinearGradient(0, base - amp, 0, base)
-        rg.addColorStop(0, 'rgba(120, 200, 255, 0.8)')
-        rg.addColorStop(1, 'rgba(40, 90, 255, 0)')
-        ctx.fillStyle = rg
-        trace(state[2], 1, W, base, amp)
-        ctx.fill()
-        ctx.restore()
-
+        ctx.globalAlpha = 0.7 * Math.min(vis, 1)
         LAYERS.forEach((L, li) => {
           const g = ctx.createLinearGradient(0, base - amp * L.scale, 0, base)
           g.addColorStop(0, L.top)
@@ -210,32 +234,63 @@ export default function MonitorViz({ player }) {
           ctx.fillStyle = g
           trace(state[li], L.scale, W, base, amp)
           ctx.fill()
-          if (li === LAYERS.length - 1) {
-            ctx.shadowColor = 'rgba(90, 210, 255, 0.9)'
-            ctx.shadowBlur = 10 * dpr
-            ctx.strokeStyle = 'rgba(215, 252, 255, 0.95)'
-            ctx.lineWidth = 1.6 * dpr
-            ctx.lineJoin = 'round'
-            // only the top edge, not the baseline
-            ctx.save()
-            ctx.beginPath()
-            ctx.rect(0, 0, W, base - dpr)
-            ctx.clip()
-            trace(state[li], L.scale, W, base, amp)
-            ctx.stroke()
-            ctx.restore()
-            ctx.shadowBlur = 0
-          }
         })
+        ctx.restore()
+      }
 
-        const bl = ctx.createLinearGradient(0, 0, W, 0)
-        bl.addColorStop(0, 'rgba(120, 200, 255, 0)')
-        bl.addColorStop(0.1, 'rgba(120, 200, 255, 0.5)')
-        bl.addColorStop(0.5, 'rgba(120, 200, 255, 0.5)')
-        bl.addColorStop(0.62, 'rgba(120, 200, 255, 0)')
-        ctx.fillStyle = bl
-        ctx.fillRect(0, base, W, dpr)
+      // the DZ logo: breathes when it is quiet, hits on the bass, sparkles on the highs
+      if (logoReady) {
+        const breathe = 0.5 + 0.5 * Math.sin(t * 0.0016)
+        const pulse = vis * (0.55 * bass + 0.95 * beat)
+        const scale = 1 + 0.014 * breathe * (1 - vis) + 0.075 * pulse
+        const cx = W * LOGO.cx
+        const cy = H * LOGO.cy
 
+        const R = lh * (0.8 + 0.4 * pulse + 0.05 * breathe)
+        const halo = ctx.createRadialGradient(cx, cy, R * 0.08, cx, cy, R)
+        halo.addColorStop(0, `rgba(70, 150, 255, ${0.26 + 0.1 * breathe * (1 - vis) + 0.4 * pulse})`)
+        halo.addColorStop(0.55, `rgba(60, 90, 255, ${0.1 + 0.2 * pulse})`)
+        halo.addColorStop(1, 'rgba(230, 80, 60, 0)')
+        ctx.fillStyle = halo
+        ctx.fillRect(0, 0, W, H)
+
+        ctx.save()
+        ctx.translate(cx, cy)
+        ctx.scale(scale, scale)
+        ctx.shadowColor = `rgba(80, 160, 255, ${0.5 + 0.4 * Math.min(pulse, 1)})`
+        ctx.shadowBlur = (8 + 24 * pulse) * dpr
+        ctx.globalAlpha = 0.86 + 0.1 * breathe * (1 - vis) + 0.14 * Math.min(pulse, 1)
+        ctx.drawImage(logo, -lw / 2, -lh / 2, lw, lh)
+        ctx.shadowBlur = 0
+
+        // brighter on highs and hits
+        const lift = vis * (0.4 * high + 0.55 * beat)
+        if (lift > 0.01) {
+          ctx.globalCompositeOperation = 'lighter'
+          ctx.globalAlpha = Math.min(lift, 0.65)
+          ctx.drawImage(logo, -lw / 2, -lh / 2, lw, lh)
+        }
+
+        // a sheen crossing the facets, clipped to the logo's own shape
+        const p = ((t % 5600) / 5600) * 1.7 - 0.35
+        sctx.clearRect(0, 0, lw, lh)
+        sctx.globalCompositeOperation = 'source-over'
+        sctx.drawImage(logo, 0, 0, lw, lh)
+        sctx.globalCompositeOperation = 'source-atop'
+        const px = p * lw
+        const sg = sctx.createLinearGradient(px - lw * 0.2, 0, px + lw * 0.2, lh * 0.45)
+        sg.addColorStop(0, 'rgba(255, 255, 255, 0)')
+        sg.addColorStop(0.5, 'rgba(255, 255, 255, 0.95)')
+        sg.addColorStop(1, 'rgba(255, 255, 255, 0)')
+        sctx.fillStyle = sg
+        sctx.fillRect(0, 0, lw, lh)
+        ctx.globalCompositeOperation = 'lighter'
+        ctx.globalAlpha = 0.3 + 0.5 * vis * Math.min(high + beat, 1)
+        ctx.drawImage(sheen, -lw / 2, -lh / 2)
+        ctx.restore()
+      }
+
+      {
         // keep the microphone and pop filter in front of the screen
         ctx.globalCompositeOperation = 'destination-out'
         ctx.filter = `blur(${2.2 * dpr}px)`
@@ -248,7 +303,7 @@ export default function MonitorViz({ player }) {
         ctx.globalCompositeOperation = 'source-over'
       }
 
-      if (playing || vis > 0.01 || alive) raf = requestAnimationFrame(frame)
+      raf = requestAnimationFrame(frame)
     }
 
     kick.current = () => {
