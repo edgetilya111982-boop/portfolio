@@ -140,16 +140,24 @@
 .mshelf__vinyl[data-playing] {
   transform: translateX(62%);
 }
+.mshelf__spin {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  animation: mshelf-spin 2.8s linear infinite;
+  animation-play-state: paused;
+}
+.mshelf__vinyl[data-playing] .mshelf__spin {
+  animation-play-state: running;
+}
+/* grooves plus a few uneven light wedges, so the turning is easy to see */
 .mshelf__grooves {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: repeating-radial-gradient(circle closest-side at 50% 50%, #08080a 0 1.6px, #15151a 2.2px 3.2px);
-  animation: mshelf-spin 2.8s linear infinite;
-  animation-play-state: paused;
-}
-.mshelf__vinyl[data-playing] .mshelf__grooves {
-  animation-play-state: running;
+  background:
+    conic-gradient(from 0deg, rgba(255, 255, 255, 0) 0 8%, rgba(255, 255, 255, 0.09) 12%, rgba(255, 255, 255, 0) 18% 47%, rgba(255, 255, 255, 0.07) 53%, rgba(255, 255, 255, 0) 60% 100%),
+    repeating-radial-gradient(circle closest-side at 50% 50%, #08080a 0 1.6px, #15151a 2.2px 3.2px);
 }
 @keyframes mshelf-spin {
   to { transform: rotate(1turn); }

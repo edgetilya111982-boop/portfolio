@@ -174,9 +174,11 @@ export default function MusicPage() {
           <>
             <div className="mshelf__slot" ref={slotRef}>
               <div className="mshelf__vinyl" data-playing={isPlaying ? '' : undefined}>
-                <div className="mshelf__grooves" />
-                <div className="mshelf__label">
-                  <img src={albumCover(album)} alt="" />
+                <div className="mshelf__spin">
+                  <div className="mshelf__grooves" />
+                  <div className="mshelf__label">
+                    <img src={albumCover(album)} alt="" />
+                  </div>
                 </div>
               </div>
               <div className="mshelf__sleeve">
