@@ -6,13 +6,13 @@ import './MusicPage.css'
 
 const BASE = import.meta.env.BASE_URL
 
-// Geometry of the four shelves in music/shelf_v2.webp, as % of the image:
+// Geometry of the four shelves in music/shelf_v3.webp, as % of the image:
 // the clickable row band and the spot where the record sits.
 const SHELVES = {
-  rock:      { top: 0.3,  h: 25.9, x: 66.4, y: 18.3, color: '#ff2fa0' },
-  lounge:    { top: 26.6, h: 22.0, x: 66.4, y: 41.0, color: '#ff9a3c' },
-  chillout:  { top: 48.8, h: 22.7, x: 66.8, y: 63.6, color: '#22e0d0' },
-  cinematic: { top: 71.5, h: 28.3, x: 65.5, y: 86.8, color: '#3d7bff' },
+  rock:      { top: 0.3,  h: 25.9, x: 66.4, y: 18.3, color: '#ff2fa0', neon: { left: 20.2, top: 5.9, width: 13.4 } },
+  lounge:    { top: 26.6, h: 22.0, x: 66.4, y: 41.0, color: '#ff9a3c', neon: { left: 19.6, top: 28.7, width: 17.4 } },
+  chillout:  { top: 48.8, h: 22.7, x: 66.8, y: 63.6, color: '#22e0d0', neon: { left: 16.8, top: 51.5, width: 20.4 } },
+  cinematic: { top: 71.5, h: 28.3, x: 65.5, y: 86.8, color: '#3d7bff', neon: { left: 7.2, top: 73.3, width: 45.1 } },
 }
 
 const FLIGHT_MS = 1100
@@ -23,6 +23,7 @@ export default function MusicPage() {
   const [open, setOpen] = useState(null) // genre id
   const [pos, setPos] = useState(0) // album position inside the genre
   const [soon, setSoon] = useState(null)
+  const [closing, setClosing] = useState(false)
   const shelfRef = useRef(null)
   const slotRef = useRef(null)
   const animRef = useRef(null)
@@ -78,6 +79,7 @@ export default function MusicPage() {
     if (open) window.history.replaceState(state, '')
     else window.history.pushState(state, '')
     setPos(0)
+    setClosing(false)
     setOpen(id)
   }
 
@@ -87,11 +89,16 @@ export default function MusicPage() {
       window.history.back() // popstate below runs the same closing animation
       return
     }
+    setClosing(true) // the shelf starts to come back into focus right away
     const a = animRef.current
-    if (!a) return setOpen(null)
+    if (!a) {
+      setClosing(false)
+      return setOpen(null)
+    }
     a.onfinish = () => {
       animRef.current = null
       setOpen(null)
+      setClosing(false)
     }
     a.playbackRate = -1.4
     a.play()
@@ -108,6 +115,7 @@ export default function MusicPage() {
       if (id === cur) return
       if (id) {
         setPos(0)
+        setClosing(false)
         setOpen(id)
       } else closeNow(true)
     }
@@ -127,14 +135,21 @@ export default function MusicPage() {
   return (
     <div className="works-music">
       <h2 className="sr-only">Музыка по жанрам: рок, лаунж, чиллаут, кинематографичная музыка</h2>
-      <div className="mshelf" data-open={open ? '' : undefined}>
+      <div className="mshelf" data-open={open && !closing ? '' : undefined}>
         <div className="mshelf__shelf" ref={shelfRef}>
-          <img className="mshelf__img" src={`${BASE}music/shelf_v2.webp`} alt="Стеллаж с жанрами музыки" draggable="false" />
-          <NeonSign
-            className="neon--rock"
-            src={`${BASE}music/neon_rock.webp`}
-            style={{ left: '20.2%', top: '5.9%', width: '13.4%' }}
-          />
+          <img className="mshelf__img" src={`${BASE}music/shelf_v3.webp`} alt="Стеллаж с жанрами музыки" draggable="false" />
+          {MUSIC_GENRES.map((g) => (
+            <NeonSign
+              key={g.id}
+              className={`neon--${g.id}`}
+              src={`${BASE}music/neon_${g.id}.webp`}
+              style={{
+                left: `${SHELVES[g.id].neon.left}%`,
+                top: `${SHELVES[g.id].neon.top}%`,
+                width: `${SHELVES[g.id].neon.width}%`,
+              }}
+            />
+          ))}
           {MUSIC_GENRES.map((g) => {
             const s = SHELVES[g.id]
             const empty = byGenre[g.id].length === 0
