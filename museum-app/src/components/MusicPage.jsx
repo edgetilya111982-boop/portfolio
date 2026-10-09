@@ -49,7 +49,7 @@ export default function MusicPage() {
         display="var(--font-sans)"
         indexLabel=""
         defaultIndex={0}
-        loop={MUSIC_ALBUMS.length > 1}
+        loop={MUSIC_ALBUMS.length > 2}
         reviews={false}
         frame={false}
         hint=""
