@@ -24,8 +24,8 @@ const CRYSTAL = {
   baseZ: [[1015, 838], [1090, 822], [1140, 808], [1190, 792], [1240, 775], [1305, 758]],
   anchorX: 1010, // the point of the render that is put at the logo position
   anchorY: 770,
-  cx: 0.31, // logo position on the screen, fractions
-  by: 0.74,
+  cx: 0.44, // logo position on the screen, fractions
+  by: 0.8,
   k: 0.3, // screen heights per 267 px of original render
 }
 
@@ -81,6 +81,7 @@ function useViewport() {
 export default function MonitorViz({ player }) {
   const [host, setHost] = useState(null)
   const canvasRef = useRef(null)
+  const spillRef = useRef(null)
   const vp = useViewport()
   const geo = place(vp)
   const live = useRef({ playing: false, volume: 1, analyserRef: null })
@@ -135,6 +136,13 @@ export default function MonitorViz({ player }) {
         lvl: 0,
       })
     }
+    const sl = document.createElement('canvas')
+    sl.width = 1
+    sl.height = Math.max(3, Math.round(4 * dpr))
+    const slc = sl.getContext('2d')
+    slc.fillStyle = 'rgba(0, 0, 10, 0.55)'
+    slc.fillRect(0, 0, 1, Math.max(1, Math.round(dpr)))
+    const scan = ctx.createPattern(sl, 'repeat')
     const lc = document.createElement('canvas')
     lc.width = W
     lc.height = H
@@ -262,7 +270,11 @@ export default function MonitorViz({ player }) {
       beat = Math.max(beat * 0.9, Math.min(onset * 2.4, 1))
 
       ctx.clearRect(0, 0, W, H)
-      ctx.fillStyle = 'rgba(2, 6, 26, 0.93)'
+      const back = ctx.createRadialGradient(W * 0.48, H * 0.62, 0, W * 0.48, H * 0.62, W * 0.72)
+      back.addColorStop(0, 'rgba(10, 34, 96, 0.95)')
+      back.addColorStop(0.6, 'rgba(4, 14, 48, 0.95)')
+      back.addColorStop(1, 'rgba(1, 4, 18, 0.97)')
+      ctx.fillStyle = back
       ctx.fillRect(0, 0, W, H)
 
       // the wave stays behind the logo while music plays
@@ -339,11 +351,15 @@ export default function MonitorViz({ player }) {
         ctx.fillRect(0, 0, W, H)
 
         ctx.save()
+        ctx.globalCompositeOperation = 'screen'
         ctx.shadowColor = `rgba(80, 160, 255, ${0.35 + 0.4 * Math.min(pulse, 1)})`
         ctx.shadowBlur = (6 + 18 * pulse) * dpr
-        ctx.globalAlpha = 0.94
+        ctx.globalAlpha = 1
         ctx.drawImage(lc, 0, 0)
         ctx.shadowBlur = 0
+        ctx.globalCompositeOperation = 'lighter'
+        ctx.globalAlpha = 0.22
+        ctx.drawImage(lc, 0, 0)
         const lift = vis * (0.3 * high + 0.5 * beat)
         if (lift > 0.01) {
           ctx.globalCompositeOperation = 'lighter'
@@ -351,6 +367,39 @@ export default function MonitorViz({ player }) {
           ctx.drawImage(lc, 0, 0)
         }
         ctx.restore()
+      }
+
+      // make it part of the screen: cool grade, scan lines, glass glare, dark corners
+      {
+        ctx.save()
+        ctx.globalCompositeOperation = 'soft-light'
+        ctx.fillStyle = `rgba(40, 110, 255, ${0.22 + 0.08 * (1 - vis)})`
+        ctx.fillRect(0, 0, W, H)
+        ctx.restore()
+
+        if (scan) {
+          ctx.save()
+          ctx.globalAlpha = 0.16
+          ctx.fillStyle = scan
+          ctx.fillRect(0, 0, W, H)
+          ctx.restore()
+        }
+
+        const glare = ctx.createLinearGradient(0, 0, W * 0.75, H * 0.9)
+        glare.addColorStop(0, 'rgba(190, 220, 255, 0.11)')
+        glare.addColorStop(0.32, 'rgba(190, 220, 255, 0.03)')
+        glare.addColorStop(0.55, 'rgba(190, 220, 255, 0)')
+        ctx.fillStyle = glare
+        ctx.fillRect(0, 0, W, H)
+
+        const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.66)
+        vig.addColorStop(0, 'rgba(0, 4, 20, 0)')
+        vig.addColorStop(1, 'rgba(0, 4, 20, 0.42)')
+        ctx.fillStyle = vig
+        ctx.fillRect(0, 0, W, H)
+
+        // the screen lights the room: spill on the wall and desk follows the beat
+        if (spillRef.current) spillRef.current.style.opacity = String(0.55 + 0.4 * Math.min(1, vis * (0.5 * bass + beat)))
       }
 
       {
@@ -384,8 +433,28 @@ export default function MonitorViz({ player }) {
   }, [player.playing])
 
   if (!host) return null
+  const spillW = geo.width * 1.9
+  const spillH = geo.height * 2.1
   return createPortal(
-    <canvas
+    <>
+      <div
+        ref={spillRef}
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          zIndex: -1,
+          left: geo.left + geo.width / 2 - spillW / 2,
+          top: geo.top + geo.height * 0.55 - spillH / 2,
+          width: spillW,
+          height: spillH,
+          background:
+            'radial-gradient(closest-side, rgba(60, 150, 255, 0.34), rgba(40, 90, 255, 0.14) 55%, rgba(30, 60, 255, 0) 100%)',
+          mixBlendMode: 'screen',
+          pointerEvents: 'none',
+          opacity: 0.55,
+        }}
+      />
+      <canvas
       ref={canvasRef}
       aria-hidden="true"
       style={{
@@ -399,7 +468,8 @@ export default function MonitorViz({ player }) {
         pointerEvents: 'none',
         borderRadius: 2,
       }}
-    />,
+    />
+    </>,
     host
   )
 }
