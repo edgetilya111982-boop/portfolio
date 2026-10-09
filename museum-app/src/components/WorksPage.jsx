@@ -24,6 +24,13 @@ const WORKS_DATA = {
       poster: `${BASE}posters/work_02.webp`,
       video: `${BASE}work_02.mp4`,
     },
+    {
+      id: 'w03',
+      title: 'Ролик 3',
+      tools: '',
+      poster: `${BASE}posters/work_03.webp`,
+      video: `${BASE}work_03.mp4`,
+    },
   ],
   art: [],
   music: [],
