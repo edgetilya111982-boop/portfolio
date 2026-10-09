@@ -30,6 +30,18 @@ export const MUSIC_ALBUMS = [
   },
 ]
 
+/*
+ * Genres shown as tiles above the discs. Labels are short for the UI;
+ * `seo` is the full phrase for aria-labels and the page heading.
+ * Assign an album to a genre with `genre: 'rock'` (an id from this list).
+ */
+export const MUSIC_GENRES = [
+  { id: 'rock', label: 'Рок', seo: 'Рок-музыка' },
+  { id: 'lounge', label: 'Лаунж', seo: 'Лаунж-музыка' },
+  { id: 'chillout', label: 'Чиллаут', seo: 'Чиллаут и расслабляющая музыка' },
+  { id: 'cinematic', label: 'Кинематографичная', seo: 'Кинематографичная музыка для фильмов и видео' },
+]
+
 const pad = (n) => String(n).padStart(2, '0')
 
 export const albumCover = (album) => `${BASE}music/${album.id}/cover.webp`
