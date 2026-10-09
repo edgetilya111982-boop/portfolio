@@ -133,7 +133,14 @@ export default function MusicPage() {
   const step = (d) => setPos((p) => (p + d + list.length) % list.length)
 
   return (
-    <div className="works-music">
+    <div
+      className="works-music"
+      onClick={(e) => {
+        // a click on empty space puts the record back; the music keeps playing
+        if (!open || e.target.closest('.mshelf__slot, .mshelf__panel, .mshelf__row')) return
+        close()
+      }}
+    >
       <h2 className="sr-only">Музыка по жанрам: рок, лаунж, чиллаут, кинематографичная музыка</h2>
       <div className="mshelf" data-open={open && !closing ? '' : undefined}>
         <div className="mshelf__shelf" ref={shelfRef}>
