@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navigation from './components/Navigation'
 import GridLines from './components/GridLines'
 import SectionIndicator from './components/SectionIndicator'
@@ -16,8 +16,33 @@ export default function App() {
   const [showQuiz, setShowQuiz] = useState(false)
   const [worksCategory, setWorksCategory] = useState(null)
 
-  const openQuiz  = () => setShowQuiz(true)
-  const closeQuiz = () => setShowQuiz(false)
+  // Overlays (works page, quiz) live in the browser history, so "Back" closes
+  // them instead of leaving the site.
+  useEffect(() => {
+    const onPop = (e) => {
+      setWorksCategory(e.state?.works ?? null)
+      setShowQuiz(!!e.state?.quiz)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  const openWorks = (cat) => {
+    window.history.pushState({ works: cat }, '')
+    setWorksCategory(cat)
+  }
+  const closeWorks = () => {
+    if (window.history.state?.works) window.history.back()
+    else setWorksCategory(null)
+  }
+  const openQuiz = () => {
+    window.history.pushState({ works: worksCategory, quiz: true }, '')
+    setShowQuiz(true)
+  }
+  const closeQuiz = () => {
+    if (window.history.state?.quiz) window.history.back()
+    else setShowQuiz(false)
+  }
   const handleOrder = () => {
     setShowQuiz(false)
     window.dispatchEvent(new CustomEvent('goto-section', { detail: { index: 2 } }))
@@ -35,11 +60,11 @@ export default function App() {
       <TextOverlay
         scrollData={scrollData}
         onOpenQuiz={openQuiz}
-        onOpenCategory={setWorksCategory}
+        onOpenCategory={openWorks}
       />
 
       {showQuiz && <Quiz onClose={closeQuiz} onOrder={handleOrder} />}
-      {worksCategory && <WorksPage category={worksCategory} onClose={() => setWorksCategory(null)} />}
+      {worksCategory && <WorksPage category={worksCategory} onClose={closeWorks} />}
     </div>
   )
 }
