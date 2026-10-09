@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import NeonSign from './NeonSign'
+import MonitorViz from './MonitorViz'
 import { MusicPanel, useMusicPlayer } from './MusicPlayer'
 import { MUSIC_ALBUMS, MUSIC_GENRES, albumCover } from '../data/musicAlbums'
 import './MusicPage.css'
@@ -141,6 +142,7 @@ export default function MusicPage() {
         close()
       }}
     >
+      <MonitorViz player={player} />
       <h2 className="sr-only">Музыка по жанрам: рок, лаунж, чиллаут, кинематографичная музыка</h2>
       <div className="mshelf" data-open={open && !closing ? '' : undefined}>
         <div className="mshelf__shelf" ref={shelfRef}>

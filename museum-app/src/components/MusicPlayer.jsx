@@ -32,6 +32,7 @@ function readVolume() {
 export function useMusicPlayer(albums) {
   const audioRef = useRef(null)
   const nowRef = useRef(null)
+  const analyserRef = useRef(null)
   const [now, setNowState] = useState(null)
   const [playing, setPlaying] = useState(false)
   const [time, setTime] = useState(0)
@@ -65,7 +66,36 @@ export function useMusicPlayer(albums) {
 
     const onTime = () => setTime(el.currentTime)
     const onMeta = () => setDuration(el.duration || 0)
-    const onPlay = () => setPlaying(true)
+    // Live spectrum for the monitor on the Music page. Same-origin files, so the
+    // analyser can read them; if the browser refuses, the page falls back to a faked wave.
+    let ctx = null
+    const ensureAnalyser = () => {
+      if (ctx) {
+        if (ctx.state === 'suspended') ctx.resume().catch(() => {})
+        return
+      }
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext
+        if (!AC) return
+        ctx = new AC()
+        const src = ctx.createMediaElementSource(el)
+        const an = ctx.createAnalyser()
+        an.fftSize = 2048
+        an.smoothingTimeConstant = 0.65
+        an.minDecibels = -92
+        an.maxDecibels = -6 // loud masters would otherwise pin the low bars at the top
+        src.connect(an)
+        an.connect(ctx.destination)
+        analyserRef.current = an
+      } catch {
+        ctx = null
+        analyserRef.current = null
+      }
+    }
+    const onPlay = () => {
+      setPlaying(true)
+      ensureAnalyser()
+    }
     const onPause = () => setPlaying(false)
     const onEnded = () => {
       const n = nowRef.current
@@ -86,6 +116,8 @@ export function useMusicPlayer(albums) {
       el.pause()
       el.removeAttribute('src')
       el.load()
+      if (ctx) ctx.close().catch(() => {})
+      analyserRef.current = null
       el.removeEventListener('timeupdate', onTime)
       el.removeEventListener('loadedmetadata', onMeta)
       el.removeEventListener('play', onPlay)
@@ -150,7 +182,7 @@ export function useMusicPlayer(albums) {
     setTime(sec)
   }
 
-  return { now, playing, time, duration, volume, muted, play, toggle, step, seek, setVolume, toggleMute }
+  return { now, playing, time, duration, volume, muted, analyserRef, play, toggle, step, seek, setVolume, toggleMute }
 }
 
 const Icon = {
