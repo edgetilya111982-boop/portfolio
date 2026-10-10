@@ -12,21 +12,22 @@ const BASE = import.meta.env.BASE_URL
 // The crystal DZ (music/logo_crystal.webp) is a crop of a 2000x1105 render, saved at half size.
 // Its columns are stretched like equalizer bars; BASE_* is the line where they meet the plate.
 const CRYSTAL = {
-  x0: 600, // crop origin in the original render
-  y0: 230,
-  scale: 0.5, // saved size / original size
-  w: 410,
-  h: 385,
-  left: 705, // crystals span this range (the gap between D and Z has no columns)
-  right: 1310,
-  gap: [990, 1015],
-  baseD: [[705, 715], [790, 738], [850, 770], [890, 777], [940, 745], [990, 705]],
-  baseZ: [[1015, 838], [1090, 822], [1140, 808], [1190, 792], [1240, 775], [1305, 758]],
-  anchorX: 1010, // the point of the render that is put at the logo position
-  anchorY: 770,
+  x0: 380, // crop origin in the original render
+  y0: 0,
+  scale: 0.4, // saved size / original size
+  w: 496,
+  h: 432,
+  left: 440, // crystals span this range (the gap between D and Z has no columns)
+  right: 1550,
+  gap: [1045, 1065],
+  // where the columns stand on the plate, a few px above the real tips
+  baseD: [[450, 804], [480, 806], [495, 842], [545, 846], [580, 854], [625, 854], [662, 861], [705, 861], [750, 856], [795, 846], [845, 829], [895, 814], [937, 776], [977, 736], [1003, 689], [1025, 640], [1045, 620]],
+  baseZ: [[1070, 794], [1120, 779], [1160, 774], [1200, 771], [1250, 771], [1300, 769], [1340, 766], [1370, 761], [1410, 756], [1450, 754], [1495, 749], [1540, 739]],
+  anchorX: 995, // the point of the render that is put at the logo position
+  anchorY: 830,
   cx: 0.44, // logo position on the screen, fractions
   by: 0.8,
-  k: 0.3, // screen heights per 267 px of original render
+  k: 0.155, // screen heights per 267 px of original render
 }
 
 function lerpLine(line, x) {
@@ -113,7 +114,7 @@ export default function MonitorViz({ player }) {
     let raf = 0
 
     const logo = new Image()
-    logo.src = `${BASE}music/logo_crystal.webp`
+    logo.src = `${BASE}music/logo_crystal_v2.webp`
     let logoReady = false
     logo.onload = () => {
       logoReady = true
