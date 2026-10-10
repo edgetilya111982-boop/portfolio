@@ -26,8 +26,8 @@ const CRYSTAL = {
   anchorX: 995, // the point of the render that is put at the logo position
   anchorY: 830,
   cx: 0.44, // logo position on the screen, fractions
-  by: 0.8,
-  k: 0.155, // screen heights per 267 px of original render
+  by: 0.69,
+  k: 0.145, // screen heights per 267 px of original render
 }
 
 function lerpLine(line, x) {
@@ -318,7 +318,7 @@ export default function MonitorViz({ player }) {
             target = vis * (0.34 * band * vary * (1 + 0.6 * st.u) + 0.08 * beat) + (1 - vis) * idle
           }
           st.lvl += (target - st.lvl) * (target > st.lvl ? 0.45 : 0.14)
-          const f = 1 + Math.min(Math.max(st.lvl, -0.06), 0.4)
+          const f = 1 + Math.min(Math.max(st.lvl, -0.06), 0.32)
           const dx = cxPx + (st.xo - CRYSTAL.anchorX) * kk
           const dw = (SW / CRYSTAL.scale) * kk + 0.7
           const baseDest = byPx + ((st.live ? st.baseO : CRYSTAL.y0) - CRYSTAL.anchorY) * kk
