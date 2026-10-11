@@ -6,7 +6,7 @@ const CATEGORIES = [
     id: 'animation',
     label: 'Анимация видео',
     sub: 'AI motion & video',
-    accent: '#ff5a1f',
+    accent: '#b8893f',
     preview: 'video',
     previewSrc: `${import.meta.env.BASE_URL}work_01.mp4`,
   },
