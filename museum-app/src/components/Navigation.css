@@ -93,7 +93,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-bronze));
 }
 
 .nav__btn {
@@ -112,9 +112,9 @@
 }
 
 .nav__btn:hover {
-  border-color: var(--accent-blue);
-  color: var(--accent-blue);
-  box-shadow: 0 0 12px rgba(0, 196, 255, 0.2);
+  border-color: var(--accent-bronze);
+  color: var(--accent-bronze);
+  box-shadow: 0 0 12px rgba(184, 137, 63, 0.2);
 }
 
 @media (max-width: 640px) {

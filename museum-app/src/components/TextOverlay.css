@@ -106,7 +106,7 @@
   margin-bottom: 0.8rem;
 }
 
-.works-counter { color: var(--accent-blue); font-weight: 400; }
+.works-counter { color: var(--accent-bronze); font-weight: 400; }
 
 .works-card {
   display: flex;
@@ -165,10 +165,10 @@
   gap: 0.5rem;
   padding-top: 0.4rem;
   padding-left: 1.2rem;
-  border-left: 1px solid rgba(56, 217, 255, 0.18);
+  border-left: 1px solid rgba(184, 137, 63, 0.18);
 }
 
-.works-card__num { color: var(--accent-blue); }
+.works-card__num { color: var(--accent-bronze); }
 
 .works-card__title { margin: 0.3rem 0; }
 
@@ -205,10 +205,10 @@
 }
 
 .works-nav__btn:hover {
-  border-color: var(--accent-blue);
-  color: var(--accent-blue);
-  background: rgba(0, 196, 255, 0.08);
-  box-shadow: 0 0 12px rgba(0, 196, 255, 0.2);
+  border-color: var(--accent-bronze);
+  color: var(--accent-bronze);
+  background: rgba(184, 137, 63, 0.08);
+  box-shadow: 0 0 12px rgba(184, 137, 63, 0.2);
 }
 
 .works-nav__dots {
@@ -228,9 +228,9 @@
 }
 
 .works-nav__dot--active {
-  background: var(--accent-blue);
+  background: var(--accent-bronze);
   transform: scale(1.4);
-  box-shadow: 0 0 8px var(--accent-blue);
+  box-shadow: 0 0 8px var(--accent-bronze);
 }
 
 /* ─── Category cards — minimal floating ─── */
@@ -427,7 +427,7 @@
   transition: border-color 0.2s;
 }
 
-.contact-link-inline:hover { border-color: var(--accent-blue); }
+.contact-link-inline:hover { border-color: var(--accent-bronze); }
 
 .contact-sep {
   color: rgba(184, 204, 224, 0.4);
@@ -464,7 +464,7 @@
 
 .contact-form__input {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(56, 217, 255, 0.18);
+  border: 1px solid rgba(184, 137, 63, 0.18);
   border-radius: 3px;
   color: #e8eef4;
   font-family: var(--font-sans, sans-serif);
@@ -480,8 +480,8 @@
 .contact-form__input::placeholder { color: rgba(184, 204, 224, 0.45); }
 
 .contact-form__input:focus {
-  border-color: rgba(56, 217, 255, 0.55);
-  background: rgba(56, 217, 255, 0.06);
+  border-color: rgba(184, 137, 63, 0.55);
+  background: rgba(184, 137, 63, 0.06);
 }
 
 .contact-form__input:disabled { opacity: 0.5; }
@@ -493,9 +493,9 @@
   margin-top: 0.2rem;
   padding: 0.65rem 1.6rem;
   background: transparent;
-  border: 1px solid rgba(56, 217, 255, 0.5);
+  border: 1px solid rgba(184, 137, 63, 0.5);
   border-radius: 2px;
-  color: #38d9ff;
+  color: #b8893f;
   font-family: var(--font-sans, sans-serif);
   font-size: 0.9rem;
   letter-spacing: 0.08em;
@@ -504,9 +504,9 @@
 }
 
 .contact-form__btn:hover:not(:disabled) {
-  background: rgba(56, 217, 255, 0.1);
-  border-color: #38d9ff;
-  box-shadow: 0 0 16px rgba(56, 217, 255, 0.2);
+  background: rgba(184, 137, 63, 0.1);
+  border-color: #b8893f;
+  box-shadow: 0 0 16px rgba(184, 137, 63, 0.2);
 }
 
 .contact-form__btn:disabled { opacity: 0.4; cursor: default; }
@@ -531,7 +531,7 @@
   transition: border-color 0.2s;
 }
 
-.contact-link:hover { border-color: var(--accent-blue); }
+.contact-link:hover { border-color: var(--accent-bronze); }
 
 .contact-link__label { color: var(--text-secondary); }
 
@@ -555,20 +555,20 @@
 .contact-quiz-btn {
   background: none;
   border: none;
-  color: var(--accent-blue, #00c4ff);
+  color: var(--accent-bronze);
   font-family: var(--font-sans, sans-serif);
   font-size: 0.9rem;
   letter-spacing: 0.04em;
   cursor: pointer;
   padding: 0;
-  border-bottom: 1px solid rgba(0, 196, 255, 0.35);
+  border-bottom: 1px solid rgba(184, 137, 63, 0.35);
   transition: border-color 0.2s;
 }
 
-.contact-quiz-btn:hover { border-color: var(--accent-blue, #00c4ff); }
+.contact-quiz-btn:hover { border-color: var(--accent-bronze); }
 
 .contact-quiz-btn:focus-visible {
-  outline: 2px solid var(--accent-blue, #00c4ff);
+  outline: 2px solid var(--accent-bronze);
   outline-offset: 3px;
 }
 
@@ -707,15 +707,15 @@
   .contact-form__btn {
     width: 100%;
     text-align: center;
-    border-color: rgba(56, 217, 255, 0.75);
+    border-color: rgba(184, 137, 63, 0.75);
     color: #5ce8ff;
-    box-shadow: 0 0 18px rgba(56, 217, 255, 0.18);
+    box-shadow: 0 0 18px rgba(184, 137, 63, 0.18);
   }
 
   .contact-quiz-btn {
     color: #5ce8ff;
-    border-bottom-color: rgba(56, 217, 255, 0.65);
-    text-shadow: 0 0 12px rgba(56, 217, 255, 0.45);
+    border-bottom-color: rgba(184, 137, 63, 0.65);
+    text-shadow: 0 0 12px rgba(184, 137, 63, 0.45);
   }
 
   .contact-link-inline .contact-link__value {
