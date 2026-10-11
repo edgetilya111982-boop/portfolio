@@ -14,7 +14,7 @@ const CATEGORIES = [
     id: 'art',
     label: 'Арт визуал',
     sub: 'Generative art',
-    accent: '#c084fc',
+    accent: '#b8893f',
     preview: 'art',
   },
   {
