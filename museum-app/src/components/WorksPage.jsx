@@ -99,7 +99,7 @@ function neonPlacement(vp) {
 }
 
 const CAT_META = {
-  animation: { label: 'Анимация видео', accent: '#38d9ff' },
+  animation: { label: 'Анимация видео', accent: '#ff5a1f' },
   art:       { label: 'Арт визуал',     accent: '#b8893f' },
   music:     { label: 'Музыка',         accent: '#4da6ff' },
 }

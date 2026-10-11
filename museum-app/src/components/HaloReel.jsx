@@ -38,7 +38,7 @@ export default function HaloReel({
   pauseOnHover = true,
   spread = 1.1,
   maxCards = 64,
-  accent = '#38d9ff',
+  accent = '#ff5a1f',
   onOpen,
 }) {
   const stageRef = useRef(null)
