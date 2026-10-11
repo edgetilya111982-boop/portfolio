@@ -13,8 +13,8 @@
   /* Digital Zak brand palette */
   --accent-blue: #00c4ff;
   --accent-cyan: #00e5ff;
-  --accent-purple: #7a2fff;
-  --accent-pink: #ff4da0;
+  --accent-purple: #ff5a1f;   /* was purple: now ember, the warm accent of the whole site */
+  --accent-pink: #c8643a;     /* was pink: now copper */
   --accent-gold: #00c4ff;   /* remap gold → brand blue for legacy references */
   --accent-ring: #2563ff;
   --ring-glow: rgba(0, 196, 255, 0.5);
