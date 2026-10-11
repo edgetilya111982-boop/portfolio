@@ -21,7 +21,7 @@ const CATEGORIES = [
     id: 'music',
     label: 'Музыка',
     sub: 'AI sound design',
-    accent: '#4da6ff',
+    accent: '#b8893f',
     preview: 'music',
   },
 ]
