@@ -23,12 +23,13 @@
 }
 
 .hero-accent {
-  font-weight: 500;
-  background: linear-gradient(90deg, #38d9ff 0%, #c084fc 100%);
+  font-weight: 600;
+  /* cold steel-blue into a hot ember: the warm half is saturated so it does not fade into grey */
+  background: linear-gradient(90deg, #4fe0ff 0%, #d8f6ff 40%, #ffd3a0 56%, #ff8a4c 74%, #ff5a1f 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 20px rgba(56, 217, 255, 0.4));
+  filter: drop-shadow(0 0 14px rgba(255, 110, 60, 0.45)) drop-shadow(0 0 22px rgba(56, 217, 255, 0.35));
 }
 
 .headline-medium {
@@ -627,7 +628,7 @@
   }
   .hero-accent {
     text-shadow: none;
-    filter: drop-shadow(0 0 24px rgba(56, 217, 255, 0.5));
+    filter: drop-shadow(0 0 14px rgba(255, 110, 60, 0.55)) drop-shadow(0 0 22px rgba(56, 217, 255, 0.45));
   }
   .headline-medium { font-size: 1.7rem; }
   .body-small {
