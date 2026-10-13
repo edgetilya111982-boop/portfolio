@@ -114,7 +114,7 @@
 .nav__btn:hover {
   border-color: var(--accent-bronze);
   color: var(--accent-bronze);
-  box-shadow: 0 0 12px rgba(184, 137, 63, 0.2);
+  box-shadow: 0 0 12px rgba(207, 157, 92, 0.2);
 }
 
 @media (max-width: 640px) {

@@ -165,7 +165,7 @@
   gap: 0.5rem;
   padding-top: 0.4rem;
   padding-left: 1.2rem;
-  border-left: 1px solid rgba(184, 137, 63, 0.18);
+  border-left: 1px solid rgba(207, 157, 92, 0.18);
 }
 
 .works-card__num { color: var(--accent-bronze); }
@@ -207,8 +207,8 @@
 .works-nav__btn:hover {
   border-color: var(--accent-bronze);
   color: var(--accent-bronze);
-  background: rgba(184, 137, 63, 0.08);
-  box-shadow: 0 0 12px rgba(184, 137, 63, 0.2);
+  background: rgba(207, 157, 92, 0.08);
+  box-shadow: 0 0 12px rgba(207, 157, 92, 0.2);
 }
 
 .works-nav__dots {
@@ -464,7 +464,7 @@
 
 .contact-form__input {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(184, 137, 63, 0.18);
+  border: 1px solid rgba(207, 157, 92, 0.18);
   border-radius: 3px;
   color: #e8eef4;
   font-family: var(--font-sans, sans-serif);
@@ -480,8 +480,8 @@
 .contact-form__input::placeholder { color: rgba(184, 204, 224, 0.45); }
 
 .contact-form__input:focus {
-  border-color: rgba(184, 137, 63, 0.55);
-  background: rgba(184, 137, 63, 0.06);
+  border-color: rgba(207, 157, 92, 0.55);
+  background: rgba(207, 157, 92, 0.06);
 }
 
 .contact-form__input:disabled { opacity: 0.5; }
@@ -493,9 +493,9 @@
   margin-top: 0.2rem;
   padding: 0.65rem 1.6rem;
   background: transparent;
-  border: 1px solid rgba(184, 137, 63, 0.5);
+  border: 1px solid rgba(207, 157, 92, 0.5);
   border-radius: 2px;
-  color: #b8893f;
+  color: #cf9d5c;
   font-family: var(--font-sans, sans-serif);
   font-size: 0.9rem;
   letter-spacing: 0.08em;
@@ -504,12 +504,12 @@
 }
 
 .contact-form__btn:hover:not(:disabled) {
-  background: rgba(184, 137, 63, 0.1);
-  border-color: #b8893f;
-  box-shadow: 0 0 16px rgba(184, 137, 63, 0.2);
+  background: rgba(207, 157, 92, 0.1);
+  border-color: #cf9d5c;
+  box-shadow: 0 0 16px rgba(207, 157, 92, 0.2);
 }
 
-.contact-form__btn:disabled { opacity: 0.4; cursor: default; }
+.contact-form__btn:disabled { opacity: 0.65; cursor: default; }
 
 .contact-form__feedback {
   font-size: 0.88rem;
@@ -561,7 +561,7 @@
   letter-spacing: 0.04em;
   cursor: pointer;
   padding: 0;
-  border-bottom: 1px solid rgba(184, 137, 63, 0.35);
+  border-bottom: 1px solid rgba(207, 157, 92, 0.35);
   transition: border-color 0.2s;
 }
 
@@ -707,15 +707,15 @@
   .contact-form__btn {
     width: 100%;
     text-align: center;
-    border-color: rgba(184, 137, 63, 0.75);
+    border-color: rgba(207, 157, 92, 0.75);
     color: #5ce8ff;
-    box-shadow: 0 0 18px rgba(184, 137, 63, 0.18);
+    box-shadow: 0 0 18px rgba(207, 157, 92, 0.18);
   }
 
   .contact-quiz-btn {
     color: #5ce8ff;
-    border-bottom-color: rgba(184, 137, 63, 0.65);
-    text-shadow: 0 0 12px rgba(184, 137, 63, 0.45);
+    border-bottom-color: rgba(207, 157, 92, 0.65);
+    text-shadow: 0 0 12px rgba(207, 157, 92, 0.45);
   }
 
   .contact-link-inline .contact-link__value {
