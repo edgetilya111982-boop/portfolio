@@ -59,8 +59,10 @@
 .sphere-modal__img {
   display: block;
   width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  max-height: 78dvh;
+  height: auto;
+  object-fit: contain; /* show the whole work: panoramas and portraits alike */
+  background: #050814;
 }
 
 .sphere-modal__close {
