@@ -36,16 +36,14 @@ const WORKS_DATA = {
   music: [],
 }
 
-const ART_FRAMES = ['01', '02'].flatMap(n => [1, 2, 3, 4, 5, 6].map(i => `art_${n}_${i}`))
-
-// placeholder frames cycled to fill the sphere until real artworks are added
-const ART_IMAGES = Array.from({ length: 30 }, (_, i) => {
-  const frame = ART_FRAMES[i % ART_FRAMES.length]
+// the five artworks for the art sphere: files in public/art/work_01..05.webp
+const ART_IMAGES = [1, 2, 3, 4, 5].map((n) => {
+  const file = `work_${String(n).padStart(2, '0')}`
   return {
-    id: `art-${i}`,
-    src: `${BASE}art/${frame}.webp`,
-    alt: `Арт визуал ${i + 1}`,
-    title: `Арт визуал ${i + 1}`,
+    id: file,
+    src: `${BASE}art/${file}.webp`,
+    alt: `Работа ${n}`,
+    title: `Работа ${n}`,
   }
 })
 
@@ -149,7 +147,7 @@ export default function WorksPage({ category, onClose }) {
           images={ART_IMAGES}
           containerSize={sphereSize}
           sphereRadius={sphereSize * 0.4}
-          baseImageScale={0.24}
+          baseImageScale={0.4}
           accent={meta.accent}
         />
         <p className="works-sphere__hint">Потяните, чтобы вращать · клик — открыть</p>
