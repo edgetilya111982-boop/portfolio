@@ -44,7 +44,7 @@ export default function SphereImageGrid({
   perspective = 1000,
   autoRotate = true,
   autoRotateSpeed = 0.2,
-  accent = '#b8893f',
+  accent = '#cf9d5c',
 }) {
   const [rotation, setRotation] = useState({ x: 15, y: 15 })
   const [selected, setSelected] = useState(null)

@@ -99,9 +99,9 @@ function neonPlacement(vp) {
 }
 
 const CAT_META = {
-  animation: { label: 'Анимация видео', accent: '#b8893f' },
-  art:       { label: 'Арт визуал',     accent: '#b8893f' },
-  music:     { label: 'Музыка',         accent: '#b8893f' },
+  animation: { label: 'Анимация видео', accent: '#cf9d5c' },
+  art:       { label: 'Арт визуал',     accent: '#cf9d5c' },
+  music:     { label: 'Музыка',         accent: '#cf9d5c' },
 }
 
 function VideoModal({ src, onClose }) {
