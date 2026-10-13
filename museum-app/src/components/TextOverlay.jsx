@@ -5,7 +5,7 @@ const CATEGORIES = [
   {
     id: 'animation',
     label: 'Анимация видео',
-    sub: 'AI motion & video',
+    sub: 'Видео и motion',
     accent: '#cf9d5c',
     preview: 'video',
     previewSrc: `${import.meta.env.BASE_URL}work_01.mp4`,
@@ -13,14 +13,14 @@ const CATEGORIES = [
   {
     id: 'art',
     label: 'Арт визуал',
-    sub: 'Generative art',
+    sub: 'Генеративный арт',
     accent: '#cf9d5c',
     preview: 'art',
   },
   {
     id: 'music',
     label: 'Музыка',
-    sub: 'AI sound design',
+    sub: 'Саунд-дизайн',
     accent: '#cf9d5c',
     preview: 'music',
   },

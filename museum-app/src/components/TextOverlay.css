@@ -327,7 +327,7 @@
 }
 
 .cat-card__sub {
-  color: rgba(160, 210, 255, 0.60);
+  color: rgba(160, 210, 255, 0.82);
   transition: color 0.3s;
   white-space: nowrap;
   font-size: clamp(0.68rem, 0.75vw, 0.82rem);
@@ -357,7 +357,7 @@
 
 .cat-preview--art {
   background:
-    radial-gradient(ellipse at 20% 80%, rgba(192, 132, 252, 0.55) 0%, transparent 55%),
+    radial-gradient(ellipse at 20% 80%, rgba(207, 157, 92, 0.5) 0%, transparent 55%),
     radial-gradient(ellipse at 80% 20%, rgba(80, 200, 255, 0.35) 0%, transparent 55%);
   transition: filter 0.3s;
 }
@@ -430,7 +430,7 @@
 .contact-link-inline:hover { border-color: var(--accent-bronze); }
 
 .contact-sep {
-  color: rgba(184, 204, 224, 0.4);
+  color: rgba(184, 204, 224, 0.62);
   font-size: 1rem;
 }
 
