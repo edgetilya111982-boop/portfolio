@@ -344,7 +344,9 @@
   width: clamp(72px, 7.5vw, 105px);
   flex-shrink: 0;
   overflow: hidden;
-  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  /* the preview dissolves into the card instead of ending on a hard edge */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 55%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 55%);
 }
 
 .cat-preview--video video {
