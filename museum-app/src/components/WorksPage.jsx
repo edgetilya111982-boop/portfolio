@@ -36,14 +36,14 @@ const WORKS_DATA = {
   music: [],
 }
 
-// the five artworks for the art sphere: files in public/art/work_01..05.webp
-const ART_IMAGES = [1, 2, 3, 4, 5].map((n) => {
+// the artworks for the art sphere: files in public/art/work_01..06.webp
+const ART_IMAGES = [1, 2, 3, 4, 5, 6].map((n) => {
   const file = `work_${String(n).padStart(2, '0')}`
   return {
     id: file,
     src: `${BASE}art/${file}.webp`,
     alt: `Работа ${n}`,
-    title: `Работа ${n}`,
+    title: n === 6 ? 'Tree of Life' : `Работа ${n}`,
   }
 })
 
