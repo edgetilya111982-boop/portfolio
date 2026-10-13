@@ -493,9 +493,9 @@
   margin-top: 0.2rem;
   padding: 0.65rem 1.6rem;
   background: transparent;
-  border: 1px solid rgba(207, 157, 92, 0.5);
+  border: 1px solid var(--accent-bronze);
   border-radius: 2px;
-  color: #cf9d5c;
+  color: var(--accent-bronze);
   font-family: var(--font-sans, sans-serif);
   font-size: 0.9rem;
   letter-spacing: 0.08em;
@@ -509,7 +509,7 @@
   box-shadow: 0 0 16px rgba(207, 157, 92, 0.2);
 }
 
-.contact-form__btn:disabled { opacity: 0.65; cursor: default; }
+.contact-form__btn:disabled { opacity: 0.85; cursor: default; }
 
 .contact-form__feedback {
   font-size: 0.88rem;
@@ -708,12 +708,12 @@
     width: 100%;
     text-align: center;
     border-color: rgba(207, 157, 92, 0.75);
-    color: #5ce8ff;
+    color: var(--accent-bronze);
     box-shadow: 0 0 18px rgba(207, 157, 92, 0.18);
   }
 
   .contact-quiz-btn {
-    color: #5ce8ff;
+    color: var(--accent-bronze);
     border-bottom-color: rgba(207, 157, 92, 0.65);
     text-shadow: 0 0 12px rgba(207, 157, 92, 0.45);
   }
