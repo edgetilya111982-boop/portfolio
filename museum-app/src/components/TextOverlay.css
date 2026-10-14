@@ -341,8 +341,8 @@
   flex-shrink: 0;
   overflow: hidden;
   /* the preview dissolves into the card instead of ending on a hard edge */
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 55%);
-  mask-image: linear-gradient(to right, transparent 0%, #000 55%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 78%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 78%);
 }
 
 .cat-preview--video video {

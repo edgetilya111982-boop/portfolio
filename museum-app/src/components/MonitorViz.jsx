@@ -27,7 +27,7 @@ const CRYSTAL = {
   anchorY: 830,
   cx: 0.44, // logo position on the screen, fractions
   by: 0.69,
-  k: 0.145, // screen heights per 267 px of original render
+  k: 0.2, // screen heights per 267 px of original render
 }
 
 function lerpLine(line, x) {
