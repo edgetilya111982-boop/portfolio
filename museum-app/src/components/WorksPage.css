@@ -182,3 +182,11 @@
   .works-sphere { padding-left: 0; align-items: center; }
   .works-sphere__hint { padding-left: 0; }
 }
+
+/* phones: the music page is a plain dark stage; the monitor block carries its own picture */
+@media (max-width: 760px) {
+  .works-page--music {
+    background-image: none !important;
+    background-color: #040a22;
+  }
+}

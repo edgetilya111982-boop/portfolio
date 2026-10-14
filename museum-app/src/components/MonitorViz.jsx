@@ -79,12 +79,16 @@ function useViewport() {
 }
 
 // A live spectrum on the studio monitor while a track plays.
-export default function MonitorViz({ player }) {
+// `inline` draws the same screen inside its own block (phones): sized by the block, not by the page background.
+export default function MonitorViz({ player, inline = false }) {
   const [host, setHost] = useState(null)
   const canvasRef = useRef(null)
   const spillRef = useRef(null)
   const vp = useViewport()
-  const geo = place(vp)
+  const [inlineSize, setInlineSize] = useState(null)
+  const geo = inline
+    ? inlineSize && { width: inlineSize.w, height: inlineSize.h, s: inlineSize.w / SCREEN.w }
+    : place(vp)
   const live = useRef({ playing: false, volume: 1, analyserRef: null })
   const kick = useRef(() => {})
 
@@ -93,12 +97,25 @@ export default function MonitorViz({ player }) {
   live.current.analyserRef = player.analyserRef
 
   useEffect(() => {
-    setHost(document.querySelector('.works-page'))
-  }, [])
+    setHost(inline ? true : document.querySelector('.works-page'))
+  }, [inline])
+
+  useEffect(() => {
+    const el = canvasRef.current
+    if (!inline || !el) return
+    const measure = () => {
+      const r = el.getBoundingClientRect()
+      setInlineSize({ w: r.width, h: r.height })
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [inline])
 
   useEffect(() => {
     const canvas = canvasRef.current
-    if (!host || !canvas) return
+    if (!host || !canvas || !geo) return
     const ctx = canvas.getContext('2d')
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
     const W = Math.round(geo.width * dpr)
@@ -460,13 +477,25 @@ export default function MonitorViz({ player }) {
       cancelAnimationFrame(raf)
       kick.current = () => {}
     }
-  }, [host, geo.width, geo.height, geo.s])
+  }, [host, geo?.width, geo?.height, geo?.s])
 
   useEffect(() => {
     kick.current()
   }, [player.playing])
 
-  if (!host) return null
+  const canvas = (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      style={
+        inline
+          ? { position: 'absolute', left: '19.56%', top: '35.96%', width: '62.35%', height: '56.8%', opacity: 0, pointerEvents: 'none', borderRadius: 2 }
+          : { position: 'absolute', zIndex: -1, left: geo?.left, top: geo?.top, width: geo?.width, height: geo?.height, opacity: 0, pointerEvents: 'none', borderRadius: 2 }
+      }
+    />
+  )
+  if (inline) return canvas
+  if (!host || !geo) return null
   const spillW = geo.width * 1.9
   const spillH = geo.height * 2.1
   return createPortal(
@@ -488,21 +517,7 @@ export default function MonitorViz({ player }) {
           opacity: 0.55,
         }}
       />
-      <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      style={{
-        position: 'absolute',
-        zIndex: -1,
-        left: geo.left,
-        top: geo.top,
-        width: geo.width,
-        height: geo.height,
-        opacity: 0,
-        pointerEvents: 'none',
-        borderRadius: 2,
-      }}
-    />
+      {canvas}
     </>,
     host
   )

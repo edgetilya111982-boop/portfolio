@@ -21,6 +21,13 @@ const FLIGHT_MS = 1100
 // A shelf of genres: pick one and the record slides out with its track list.
 export default function MusicPage() {
   const player = useMusicPlayer(MUSIC_ALBUMS)
+  // on phones the monitor is a block under the shelf instead of a part of the desk photo
+  const [narrow, setNarrow] = useState(() => window.innerWidth < 760)
+  useEffect(() => {
+    const on = () => setNarrow(window.innerWidth < 760)
+    window.addEventListener('resize', on)
+    return () => window.removeEventListener('resize', on)
+  }, [])
   const [open, setOpen] = useState(null) // genre id
   const [pos, setPos] = useState(0) // album position inside the genre
   const [soon, setSoon] = useState(null)
@@ -142,7 +149,7 @@ export default function MusicPage() {
         close()
       }}
     >
-      <MonitorViz player={player} />
+      {!narrow && <MonitorViz player={player} />}
       <h2 className="sr-only">Музыка по жанрам: рок, лаунж, чиллаут, кинематографичная музыка</h2>
       <div className="mshelf" data-open={open && !closing ? '' : undefined}>
         <div className="mshelf__shelf" ref={shelfRef}>
@@ -179,6 +186,13 @@ export default function MusicPage() {
           })}
         </div>
 
+        {narrow && (
+          <div className="mshelf__monitor">
+            <img src={`${BASE}music/monitor_mobile.webp`} alt="" draggable="false" />
+            <MonitorViz player={player} inline />
+            <NeonSign src={`${BASE}neon_music_v2.webp`} style={{ left: '22.8%', top: '4%', width: '55.9%' }} />
+          </div>
+        )}
         {album ? (
           <>
             <div className="mshelf__slot" ref={slotRef}>
