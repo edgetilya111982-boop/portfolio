@@ -27,7 +27,7 @@ const CRYSTAL = {
   anchorY: 830,
   cx: 0.44, // logo position on the screen, fractions
   by: 0.69,
-  k: 0.2, // screen heights per 267 px of original render
+  k: 0.17, // screen heights per 267 px of original render
 }
 
 function lerpLine(line, x) {
@@ -303,19 +303,13 @@ export default function MonitorViz({ player }) {
         const pulse = vis * (0.5 * bass + 0.9 * beat)
 
         lctx.clearRect(0, 0, W, H)
-        const fpos = (u) => u * (PTS - 1)
         for (let j = 0; j < strips.length; j++) {
           const st = strips[j]
           let target = 0
           if (st.live) {
-            const fi = fpos(st.u)
-            const i0 = Math.floor(fi)
-            const i1 = Math.min(i0 + 1, PTS - 1)
-            const band = shaped[i0] * (1 - (fi - i0)) + shaped[i1] * (fi - i0)
-            const vary = 0.9 + 0.2 * Math.sin(j * 0.53) * Math.sin(j * 0.19 + 1.3)
+            // at rest the columns breathe slowly; while playing the sound moves the whole logo, not its columns
             const idle = 0.03 * Math.sin(t * 0.0013 + st.u * 6.5) + 0.02 * Math.sin(t * 0.0021 + st.u * 15)
-            // the highs (Z) are quieter in any music, so they get a little more gain
-            target = vis * (0.34 * band * vary * (1 + 0.6 * st.u) + 0.08 * beat) + (1 - vis) * idle
+            target = (1 - vis) * idle
           }
           st.lvl += (target - st.lvl) * (target > st.lvl ? 0.45 : 0.14)
           const f = 1 + Math.min(Math.max(st.lvl, -0.06), 0.32)
@@ -341,6 +335,43 @@ export default function MonitorViz({ player }) {
         lctx.fillRect(0, 0, W, H)
         lctx.globalCompositeOperation = 'source-over'
 
+        // the logo is one body that swells from its centre, with a spherical spectrum around it
+        const cyPx = byPx - H * 0.2
+        const sc = 1 + vis * (0.14 * bass + 0.2 * beat)
+        const SR = H * 0.3 * (1 + vis * 0.06 * bass)
+        ctx.save()
+        ctx.globalCompositeOperation = 'lighter'
+        // three flattened rings: the sphere seen slightly from above
+        for (let r = 0; r < 3; r++) {
+          const rr = SR * (0.72 + r * 0.16) * (1 + vis * 0.05 * high)
+          ctx.strokeStyle = `rgba(110, 195, 255, ${(0.3 + 0.2 * (1 - r / 2)) * vis + 0.08})`
+          ctx.lineWidth = 1.5 * dpr
+          ctx.beginPath()
+          ctx.ellipse(cxPx, cyPx, rr, rr * 0.34, 0, 0, Math.PI * 2)
+          ctx.stroke()
+        }
+        // radial rays: every angle reads its own band, so the level wraps the sphere
+        const RAYS = 72
+        for (let k2 = 0; k2 < RAYS; k2++) {
+          const a = (k2 / RAYS) * Math.PI * 2
+          const bi = Math.min(PTS - 1, Math.floor(PTS * (0.5 + 0.5 * Math.sin(a))))
+          const lvl = vis * shaped[bi]
+          const r0 = SR * 0.8
+          const r1 = r0 + SR * (0.06 + 0.9 * lvl)
+          const cA = Math.cos(a)
+          const sA = Math.sin(a) * 0.34
+          const g = ctx.createLinearGradient(cxPx + cA * r0, cyPx + sA * r0, cxPx + cA * r1, cyPx + sA * r1)
+          g.addColorStop(0, 'rgba(120, 220, 255, 0.3)')
+          g.addColorStop(1, `rgba(207, 157, 92, ${0.35 + 0.65 * lvl})`)
+          ctx.strokeStyle = g
+          ctx.lineWidth = 2.5 * dpr
+          ctx.beginPath()
+          ctx.moveTo(cxPx + cA * r0, cyPx + sA * r0)
+          ctx.lineTo(cxPx + cA * r1, cyPx + sA * r1)
+          ctx.stroke()
+        }
+        ctx.restore()
+
         // light spilled around it
         const R = H * (0.62 + 0.3 * pulse)
         const hy = byPx - H * 0.22
@@ -352,6 +383,9 @@ export default function MonitorViz({ player }) {
         ctx.fillRect(0, 0, W, H)
 
         ctx.save()
+        ctx.translate(cxPx, cyPx)
+        ctx.scale(sc, sc)
+        ctx.translate(-cxPx, -cyPx)
         ctx.globalCompositeOperation = 'screen'
         ctx.shadowColor = `rgba(80, 160, 255, ${0.35 + 0.4 * Math.min(pulse, 1)})`
         ctx.shadowBlur = (6 + 18 * pulse) * dpr
@@ -363,7 +397,6 @@ export default function MonitorViz({ player }) {
         ctx.drawImage(lc, 0, 0)
         const lift = vis * (0.3 * high + 0.5 * beat)
         if (lift > 0.01) {
-          ctx.globalCompositeOperation = 'lighter'
           ctx.globalAlpha = Math.min(lift, 0.6)
           ctx.drawImage(lc, 0, 0)
         }
