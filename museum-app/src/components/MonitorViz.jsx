@@ -338,16 +338,16 @@ export default function MonitorViz({ player }) {
         // the logo is one body that swells from its centre, with a spherical spectrum around it
         const cyPx = byPx - H * 0.2
         const sc = 1 + vis * (0.14 * bass + 0.2 * beat)
-        const SR = H * 0.3 * (1 + vis * 0.06 * bass)
+        const SR = H * 0.42 * (1 + vis * 0.06 * bass) // the sphere is larger than the logo it surrounds
         ctx.save()
         ctx.globalCompositeOperation = 'lighter'
         // three flattened rings: the sphere seen slightly from above
         for (let r = 0; r < 3; r++) {
-          const rr = SR * (0.72 + r * 0.16) * (1 + vis * 0.05 * high)
+          const rr = SR * (0.7 + r * 0.15) * (1 + vis * 0.05 * high)
           ctx.strokeStyle = `rgba(110, 195, 255, ${(0.3 + 0.2 * (1 - r / 2)) * vis + 0.08})`
           ctx.lineWidth = 1.5 * dpr
           ctx.beginPath()
-          ctx.ellipse(cxPx, cyPx, rr, rr * 0.34, 0, 0, Math.PI * 2)
+          ctx.ellipse(cxPx, cyPx, rr, rr * 0.5, 0, 0, Math.PI * 2)
           ctx.stroke()
         }
         // radial rays: every angle reads its own band, so the level wraps the sphere
@@ -356,10 +356,10 @@ export default function MonitorViz({ player }) {
           const a = (k2 / RAYS) * Math.PI * 2
           const bi = Math.min(PTS - 1, Math.floor(PTS * (0.5 + 0.5 * Math.sin(a))))
           const lvl = vis * shaped[bi]
-          const r0 = SR * 0.8
+          const r0 = SR * 0.92
           const r1 = r0 + SR * (0.06 + 0.9 * lvl)
           const cA = Math.cos(a)
-          const sA = Math.sin(a) * 0.34
+          const sA = Math.sin(a) * 0.5
           const g = ctx.createLinearGradient(cxPx + cA * r0, cyPx + sA * r0, cxPx + cA * r1, cyPx + sA * r1)
           g.addColorStop(0, 'rgba(120, 220, 255, 0.3)')
           g.addColorStop(1, `rgba(207, 157, 92, ${0.35 + 0.65 * lvl})`)
