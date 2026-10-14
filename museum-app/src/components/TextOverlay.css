@@ -24,12 +24,8 @@
 
 .hero-accent {
   font-weight: 600;
-  /* cold steel-blue into a hot ember: the warm half is saturated so it does not fade into grey */
-  background: linear-gradient(90deg, #4fe0ff 0%, #d8f6ff 36%, #f1dcb8 52%, #e3b57a 70%, #cf9d5c 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  /* no neon glow on the accent text: the gradient carries it on its own */
+  /* one solid warm accent: no gradient, no glow. Blue stays the base, bronze the single highlight */
+  color: var(--accent-bronze);
 }
 
 .headline-medium {

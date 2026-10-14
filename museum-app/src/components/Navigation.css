@@ -45,10 +45,7 @@
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.22em;
-  background: linear-gradient(90deg, #4fe0ff 0%, #d8f6ff 45%, #f1dcb8 62%, #e3b57a 80%, #cf9d5c 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--accent-bronze);
   line-height: 1.1;
 }
 
@@ -93,7 +90,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, var(--accent-blue), var(--accent-bronze));
+  background: var(--accent-blue);
 }
 
 .nav__btn {
