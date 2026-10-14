@@ -177,7 +177,7 @@ export default function WorksPage({ category, onClose }) {
 
   return (
     <div
-      className="works-page"
+      className={`works-page${category === 'music' ? ' works-page--music' : ''}`}
       style={{
         backgroundImage: pageBackground(category),
       }}
@@ -190,7 +190,7 @@ export default function WorksPage({ category, onClose }) {
 
       <div className="works-page__body">{content}</div>
 
-      {category === 'music' && <NeonSign src={`${BASE}neon_music_v2.webp`} style={neonPlacement(viewport)} />}
+      {category === 'music' && viewport.w >= 760 && <NeonSign src={`${BASE}neon_music_v2.webp`} style={neonPlacement(viewport)} />}
 
       {openVideo && <VideoModal src={openVideo} onClose={() => setOpenVideo(null)} />}
     </div>
