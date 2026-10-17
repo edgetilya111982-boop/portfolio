@@ -132,6 +132,40 @@
   --neon-c3: rgba(20, 70, 230, 0.6);
 }
 
+/* signs on the film rack: warm tubes, each with its own rhythm and phase */
+.neon--film-animation,
+.neon--film-ads,
+.neon--film-cinema {
+  --neon-g1: 1px;
+  --neon-g2: 5px;
+  --neon-g3: 16px;
+  --neon-halo-1: rgba(255, 140, 60, 0.3);
+  --neon-halo-2: rgba(220, 80, 20, 0.16);
+  --neon-c1: rgba(255, 225, 190, 0.95);
+  --neon-c2: rgba(255, 120, 40, 0.8);
+  --neon-c3: rgba(220, 70, 20, 0.55);
+}
+.neon--film-animation .neon__halo,
+.neon--film-ads .neon__halo,
+.neon--film-cinema .neon__halo {
+  inset: -80% -12%;
+}
+.neon--film-animation { --neon-cycle: 10s; --neon-delay: -2.6s; }
+.neon--film-ads {
+  --neon-cycle: 12s;
+  --neon-delay: -8.4s;
+  --neon-halo-1: rgba(255, 90, 60, 0.28);
+  --neon-c2: rgba(255, 85, 50, 0.8);
+  --neon-c3: rgba(220, 40, 20, 0.55);
+}
+.neon--film-cinema {
+  --neon-cycle: 9.5s;
+  --neon-delay: -5.5s;
+  --neon-halo-1: rgba(255, 175, 70, 0.28);
+  --neon-c2: rgba(255, 150, 40, 0.8);
+  --neon-c3: rgba(230, 100, 20, 0.55);
+}
+
 /*
  * 11s cycle of a tired tube: a faint hum all the time, one group of three quick blinks
  * around 30%, one pair of blinks around 79%. Never more than three flashes in a second.
