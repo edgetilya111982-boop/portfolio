@@ -4,11 +4,11 @@ import './FilmShelf.css'
 
 const BASE = import.meta.env.BASE_URL
 
-// Three shelves of the film-reel rack. Positions are % of the picture (1200x1031).
+// Three shelves of the film-reel rack. Positions are % of the picture (2000x1718).
 export const FILM_SHELVES = [
-  { id: 'animation', label: 'Анимация', top: 9, h: 27, neon: { left: 30.2, top: 5.3, width: 39.6 }, seo: 'Анимация видео' },
-  { id: 'ads', label: 'Реклама', top: 41, h: 27, neon: { left: 33.4, top: 36.2, width: 33.3 }, seo: 'Рекламные ролики' },
-  { id: 'cinema', label: 'Кино', top: 73, h: 25, neon: { left: 40, top: 65.5, width: 20 }, seo: 'Кинематографические ролики' },
+  { id: 'animation', label: 'Анимация', top: 9, h: 27, neon: { left: 30, top: 5.65, width: 40 }, seo: 'Анимация видео' },
+  { id: 'ads', label: 'Реклама', top: 41, h: 27, neon: { left: 33.5, top: 36.25, width: 33 }, seo: 'Рекламные ролики' },
+  { id: 'cinema', label: 'Кино', top: 73, h: 25, neon: { left: 40, top: 65.85, width: 20 }, seo: 'Кинематографические ролики' },
 ]
 
 export const FILM_TITLES = { animation: 'Анимация', ads: 'Реклама', cinema: 'Кино' }
