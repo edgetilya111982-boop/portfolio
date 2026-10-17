@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import SphereImageGrid from './SphereImageGrid'
 import HaloReel from './HaloReel'
+import FilmShelf, { FILM_TITLES } from './FilmShelf'
 import MusicPage from './MusicPage'
 import NeonSign from './NeonSign'
 import './WorksPage.css'
@@ -12,6 +13,7 @@ const WORKS_DATA = {
   animation: [
     {
       id: 'w01',
+      film: 'animation',
       title: 'Анимация',
       tools: 'Higgsfield AI',
       poster: `${BASE}posters/work_01.webp`,
@@ -19,6 +21,7 @@ const WORKS_DATA = {
     },
     {
       id: 'w02',
+      film: 'ads',
       title: 'Рекламный ролик',
       tools: 'Higgsfield AI',
       poster: `${BASE}posters/work_02.webp`,
@@ -26,6 +29,7 @@ const WORKS_DATA = {
     },
     {
       id: 'w03',
+      film: 'cinema',
       title: 'Ролик 3',
       tools: '',
       poster: `${BASE}posters/work_03.webp`,
@@ -138,6 +142,25 @@ export default function WorksPage({ category, onClose }) {
   const sphereSize = useSphereSize()
   const viewport = useViewport()
   const [openVideo, setOpenVideo] = useState(null)
+  // animation is two levels: the shelf (null) and a page of videos for the chosen shelf
+  const [filmCat, setFilmCat] = useState(null)
+  const filmWorks = useMemo(() => works.filter((w) => w.film === filmCat), [works, filmCat])
+  const filmCounts = works.reduce((m, w) => ({ ...m, [w.film]: (m[w.film] || 0) + 1 }), {})
+
+  useEffect(() => {
+    const onPop = (e) => setFilmCat(e.state?.film ?? null)
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  const openFilm = (id) => {
+    window.history.pushState({ works: 'animation', film: id }, '')
+    setFilmCat(id)
+  }
+  const goBack = () => {
+    if (category === 'animation' && filmCat) window.history.back()
+    else onClose()
+  }
 
   let content
   if (category === 'art') {
@@ -162,11 +185,24 @@ export default function WorksPage({ category, onClose }) {
         <p className="works-page__empty-text">Работы скоро появятся</p>
       </div>
     )
+  } else if (category === 'animation' && !filmCat) {
+    content = (
+      <div className="works-film">
+        <FilmShelf counts={filmCounts} onChange={openFilm} />
+      </div>
+    )
+  } else if (category === 'animation' && filmWorks.length === 0) {
+    content = (
+      <div className="works-page__empty">
+        <span className="works-page__empty-icon">◈</span>
+        <p className="works-page__empty-text">Ролики этой категории скоро появятся</p>
+      </div>
+    )
   } else {
     content = (
       <div className="works-reel">
         <HaloReel
-          items={works}
+          items={category === 'animation' ? filmWorks : works}
           accent={meta.accent}
           onOpen={(w) => setOpenVideo(w.video)}
         />
@@ -184,8 +220,10 @@ export default function WorksPage({ category, onClose }) {
       onWheel={e => e.stopPropagation()}
     >
       <div className="works-page__header">
-        <button className="works-page__back" onClick={onClose}>← Назад</button>
-        <h1 className="works-page__title" style={{ color: meta.accent }}>{meta.label}</h1>
+        <button className="works-page__back" onClick={goBack}>← Назад</button>
+        <h1 className="works-page__title" style={{ color: meta.accent }}>
+          {category === 'animation' && filmCat ? FILM_TITLES[filmCat] : meta.label}
+        </h1>
       </div>
 
       <div className="works-page__body">{content}</div>

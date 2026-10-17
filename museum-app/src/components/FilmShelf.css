@@ -1,0 +1,53 @@
+.film-shelf {
+  width: clamp(280px, 40vw, 700px);
+  max-height: 84vh;
+}
+.works-film {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 5vw;
+}
+.film-shelf__pic {
+  position: relative;
+}
+.film-shelf__pic img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.5));
+}
+.film-shelf__row {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.film-shelf__pic img { max-height: 84vh; width: auto; max-width: 100%; }
+.film-shelf__row:hover,
+.film-shelf__row:focus-visible {
+  background: radial-gradient(70% 80% at 50% 50%, rgba(184, 137, 63, 0.22), transparent 70%);
+}
+.film-shelf__row.is-empty { cursor: default; }
+.film-shelf__name {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(3, 7, 32, 0.7);
+  color: #fff;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  transition: opacity 0.3s;
+}
+.film-shelf__row:hover .film-shelf__name { opacity: 1; }
