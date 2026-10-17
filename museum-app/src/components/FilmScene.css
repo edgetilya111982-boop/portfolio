@@ -4,6 +4,15 @@
   z-index: 1;
   pointer-events: none;
 }
+.film-scene__bg {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  -webkit-mask-image: linear-gradient(to bottom, transparent var(--edge-y), #000 calc(var(--edge-y) + 90px)), linear-gradient(to right, transparent var(--edge-x), #000 calc(var(--edge-x) + 80px));
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent var(--edge-y), #000 calc(var(--edge-y) + 90px)), linear-gradient(to right, transparent var(--edge-x), #000 calc(var(--edge-x) + 80px));
+  mask-composite: intersect;
+}
 .film-scene__row {
   pointer-events: auto;
 }
