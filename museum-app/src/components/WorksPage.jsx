@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import SphereImageGrid from './SphereImageGrid'
 import HaloReel from './HaloReel'
 import FilmShelf, { FILM_TITLES } from './FilmShelf'
+import FilmScene from './FilmScene'
 import MusicPage from './MusicPage'
 import NeonSign from './NeonSign'
 import './WorksPage.css'
@@ -65,7 +66,8 @@ function useSphereSize() {
 
 const BG_SHADE = 'linear-gradient(90deg, rgba(4,8,22,0.55) 0%, rgba(4,8,22,0.1) 60%)'
 
-function pageBackground(category) {
+function pageBackground(category, filmHub) {
+  if (filmHub) return `url(${BASE}works_bg_film.webp)`
   if (category === 'art') return `url(${BASE}works_bg_art.webp)`
   if (category === 'music') return `url(${BASE}works_bg_music.webp)`
   return `${BG_SHADE}, url(${BASE}works_bg.webp)`
@@ -162,6 +164,7 @@ export default function WorksPage({ category, onClose }) {
     else onClose()
   }
 
+  const wideHub = category === 'animation' && !filmCat && viewport.w >= 760
   let content
   if (category === 'art') {
     content = (
@@ -185,6 +188,8 @@ export default function WorksPage({ category, onClose }) {
         <p className="works-page__empty-text">Работы скоро появятся</p>
       </div>
     )
+  } else if (category === 'animation' && !filmCat && wideHub) {
+    content = null // the scene is drawn over the whole page, below
   } else if (category === 'animation' && !filmCat) {
     content = (
       <div className="works-film">
@@ -215,7 +220,8 @@ export default function WorksPage({ category, onClose }) {
     <div
       className={`works-page${category === 'music' ? ' works-page--music' : ''}`}
       style={{
-        backgroundImage: pageBackground(category),
+        backgroundImage: pageBackground(category, wideHub),
+        backgroundPosition: wideHub ? 'left center' : undefined,
       }}
       onWheel={e => e.stopPropagation()}
     >
@@ -228,6 +234,7 @@ export default function WorksPage({ category, onClose }) {
 
       <div className="works-page__body">{content}</div>
 
+      {wideHub && <FilmScene viewport={viewport} counts={filmCounts} onChange={openFilm} />}
       {category === 'music' && viewport.w >= 760 && <NeonSign src={`${BASE}neon_music_v2.webp`} style={neonPlacement(viewport)} />}
 
       {openVideo && <VideoModal src={openVideo} onClose={() => setOpenVideo(null)} />}
