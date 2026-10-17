@@ -132,38 +132,49 @@
   --neon-c3: rgba(20, 70, 230, 0.6);
 }
 
-/* signs on the film rack: warm tubes, each with its own rhythm and phase */
+/* signs on the film rack: tubes only (no baked glow), so the glow here is thicker; each sign has its own rhythm */
 .neon--film-animation,
 .neon--film-ads,
 .neon--film-cinema {
-  --neon-g1: 1px;
-  --neon-g2: 5px;
-  --neon-g3: 16px;
-  --neon-halo-1: rgba(255, 140, 60, 0.3);
-  --neon-halo-2: rgba(220, 80, 20, 0.16);
-  --neon-c1: rgba(255, 225, 190, 0.95);
-  --neon-c2: rgba(255, 120, 40, 0.8);
-  --neon-c3: rgba(220, 70, 20, 0.55);
+  --neon-g1: 2px;
+  --neon-g2: 8px;
+  --neon-g3: 26px;
+  --neon-halo-1: rgba(255, 140, 60, 0.34);
+  --neon-halo-2: rgba(220, 80, 20, 0.18);
+  --neon-c1: rgba(255, 215, 160, 0.95);
+  --neon-c2: rgba(255, 120, 40, 0.85);
+  --neon-c3: rgba(220, 70, 20, 0.6);
 }
 .neon--film-animation .neon__halo,
 .neon--film-ads .neon__halo,
 .neon--film-cinema .neon__halo {
-  inset: -80% -12%;
+  inset: -110% -14%;
+  animation-name: neon-tired-halo;
 }
-.neon--film-animation { --neon-cycle: 10s; --neon-delay: -2.6s; }
+.neon--film-animation .neon__on,
+.neon--film-ads .neon__on,
+.neon--film-cinema .neon__on {
+  animation-name: neon-tired;
+}
+.neon--film-animation .neon__glint,
+.neon--film-ads .neon__glint,
+.neon--film-cinema .neon__glint {
+  animation-name: neon-glint, neon-tired;
+}
+.neon--film-animation { --neon-cycle: 7.3s; --neon-delay: -2.6s; }
 .neon--film-ads {
-  --neon-cycle: 12s;
-  --neon-delay: -8.4s;
-  --neon-halo-1: rgba(255, 90, 60, 0.28);
-  --neon-c2: rgba(255, 85, 50, 0.8);
-  --neon-c3: rgba(220, 40, 20, 0.55);
+  --neon-cycle: 8.9s;
+  --neon-delay: -6.1s;
+  --neon-halo-1: rgba(255, 90, 60, 0.3);
+  --neon-c2: rgba(255, 85, 50, 0.85);
+  --neon-c3: rgba(220, 40, 20, 0.6);
 }
 .neon--film-cinema {
-  --neon-cycle: 9.5s;
-  --neon-delay: -5.5s;
-  --neon-halo-1: rgba(255, 175, 70, 0.28);
-  --neon-c2: rgba(255, 150, 40, 0.8);
-  --neon-c3: rgba(230, 100, 20, 0.55);
+  --neon-cycle: 6.2s;
+  --neon-delay: -4.4s;
+  --neon-halo-1: rgba(255, 175, 70, 0.3);
+  --neon-c2: rgba(255, 150, 40, 0.85);
+  --neon-c3: rgba(230, 100, 20, 0.6);
 }
 
 /*
@@ -243,4 +254,76 @@
     --d2: 0.65;
     --d3: 0.55;
   }
+}
+
+/*
+ * A very tired tube: it hums unevenly all the time, then twice per cycle it chokes —
+ * a burst of 4–5 stutters of different depth — and the light sags before it catches again.
+ */
+@keyframes neon-tired {
+  0%     { opacity: 1; }
+  5%     { opacity: 0.86; }
+  9%     { opacity: 1; }
+  14%    { opacity: 0.92; }
+  18%    { opacity: 1; }
+  22%    { opacity: var(--d1); }
+  23.2%  { opacity: 0.95; }
+  24.4%  { opacity: var(--d2); }
+  25.2%  { opacity: 0.9; }
+  26.6%  { opacity: var(--d1); }
+  27.4%  { opacity: 0.55; }
+  28.6%  { opacity: var(--d3); }
+  30%    { opacity: 1; }
+  38%    { opacity: 0.88; }
+  43%    { opacity: 1; }
+  52%    { opacity: 0.93; }
+  58%    { opacity: 0.8; }
+  60%    { opacity: 1; }
+  66%    { opacity: 0.9; }
+  70%    { opacity: 1; }
+  71%    { opacity: var(--d2); }
+  72.3%  { opacity: 1; }
+  74%    { opacity: var(--d1); }
+  75%    { opacity: 0.6; }
+  76.4%  { opacity: var(--d3); }
+  77.4%  { opacity: 0.9; }
+  78.4%  { opacity: var(--d2); }
+  80%    { opacity: 1; }
+  88%    { opacity: 0.9; }
+  93%    { opacity: 1; }
+  100%   { opacity: 1; }
+}
+
+@keyframes neon-tired-halo {
+  0%     { opacity: 1; }
+  5%     { opacity: 0.92; }
+  9%     { opacity: 1; }
+  14%    { opacity: 0.95; }
+  18%    { opacity: 1; }
+  22%    { opacity: calc(0.35 + 0.65 * var(--d1)); }
+  23.2%  { opacity: 0.97; }
+  24.4%  { opacity: calc(0.35 + 0.65 * var(--d2)); }
+  25.2%  { opacity: 0.94; }
+  26.6%  { opacity: calc(0.35 + 0.65 * var(--d1)); }
+  27.4%  { opacity: 0.7; }
+  28.6%  { opacity: calc(0.35 + 0.65 * var(--d3)); }
+  30%    { opacity: 1; }
+  38%    { opacity: 0.92; }
+  43%    { opacity: 1; }
+  52%    { opacity: 0.95; }
+  58%    { opacity: 0.88; }
+  60%    { opacity: 1; }
+  66%    { opacity: 0.94; }
+  70%    { opacity: 1; }
+  71%    { opacity: calc(0.35 + 0.65 * var(--d2)); }
+  72.3%  { opacity: 1; }
+  74%    { opacity: calc(0.35 + 0.65 * var(--d1)); }
+  75%    { opacity: 0.75; }
+  76.4%  { opacity: calc(0.35 + 0.65 * var(--d3)); }
+  77.4%  { opacity: 0.95; }
+  78.4%  { opacity: calc(0.35 + 0.65 * var(--d2)); }
+  80%    { opacity: 1; }
+  88%    { opacity: 0.94; }
+  93%    { opacity: 1; }
+  100%   { opacity: 1; }
 }
