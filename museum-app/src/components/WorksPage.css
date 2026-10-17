@@ -21,6 +21,8 @@
     rgba(6, 9, 26, 0.92) 100%
   );
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .works-page__back {
