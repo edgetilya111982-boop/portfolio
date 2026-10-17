@@ -4,7 +4,7 @@ import './FilmScene.css'
 
 const BASE = import.meta.env.BASE_URL
 
-// works_bg_film.webp is 2000x1105, shown with background-size: cover, pinned to the left edge so the
+// works_bg_film.webp is 2000x1105, scaled like background-size: cover and pinned to the left edge so the
 // rack stays in view on narrow windows. Everything below is in that picture's pixels.
 const BG = { w: 2000, h: 1105 }
 
@@ -23,12 +23,27 @@ const ROWS = {
 }
 const ROW_X = { x: 0, w: 780 }
 
+// the picture sits lower and a bit to the right of a plain cover fit: the top sign clears the page title
+const DROP = 85
+const SHIFT_X = 70
+
 export default function FilmScene({ viewport, counts, onChange }) {
   const s = Math.max(viewport.w / BG.w, viewport.h / BG.h)
-  const oy = (viewport.h - BG.h * s) / 2
+  const oy = (viewport.h - BG.h * s) / 2 + DROP * s
+  const ox = SHIFT_X * s
   const px = (v) => v * s
   return (
     <nav className="film-scene" aria-label="Категории видео">
+      <div
+        className="film-scene__bg"
+        style={{
+          backgroundImage: `url(${BASE}works_bg_film.webp)`,
+          backgroundSize: `${px(BG.w)}px ${px(BG.h)}px`,
+          backgroundPosition: `${ox}px ${oy}px`,
+          '--edge-y': `${oy}px`,
+          '--edge-x': `${ox}px`,
+        }}
+      />
       {FILM_SHELVES.map((sh) => {
         const g = SIGNS[sh.id]
         return (
@@ -40,7 +55,7 @@ export default function FilmScene({ viewport, counts, onChange }) {
             draggable="false"
             aria-hidden="true"
             style={{
-              left: px(g.x),
+              left: ox + px(g.x),
               top: oy + px(g.y),
               width: px(g.w),
               height: px(g.h),
@@ -58,7 +73,7 @@ export default function FilmScene({ viewport, counts, onChange }) {
             key={sh.id}
             type="button"
             className={`film-shelf__row film-scene__row${n === 0 ? ' is-empty' : ''}`}
-            style={{ left: px(ROW_X.x), top: oy + px(r.y), width: px(ROW_X.w), height: px(r.h) }}
+            style={{ left: ox + px(ROW_X.x), top: oy + px(r.y), width: px(ROW_X.w), height: px(r.h) }}
             aria-label={sh.seo}
             title={sh.seo}
             onClick={() => onChange(sh.id)}

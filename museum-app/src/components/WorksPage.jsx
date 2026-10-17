@@ -66,8 +66,7 @@ function useSphereSize() {
 
 const BG_SHADE = 'linear-gradient(90deg, rgba(4,8,22,0.55) 0%, rgba(4,8,22,0.1) 60%)'
 
-function pageBackground(category, filmHub) {
-  if (filmHub) return `url(${BASE}works_bg_film.webp)`
+function pageBackground(category) {
   if (category === 'art') return `url(${BASE}works_bg_art.webp)`
   if (category === 'music') return `url(${BASE}works_bg_music.webp)`
   return `${BG_SHADE}, url(${BASE}works_bg.webp)`
@@ -220,8 +219,7 @@ export default function WorksPage({ category, onClose }) {
     <div
       className={`works-page${category === 'music' ? ' works-page--music' : ''}`}
       style={{
-        backgroundImage: pageBackground(category, wideHub),
-        backgroundPosition: wideHub ? 'left center' : undefined,
+        backgroundImage: wideHub ? 'none' : pageBackground(category),
       }}
       onWheel={e => e.stopPropagation()}
     >
