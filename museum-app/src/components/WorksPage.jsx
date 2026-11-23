@@ -29,6 +29,14 @@ const WORKS_DATA = {
       video: `${BASE}work_02.mp4`,
     },
     {
+      id: 'w04',
+      film: 'ads',
+      title: 'Жилет Zima',
+      tools: '',
+      poster: `${BASE}posters/work_04.webp`,
+      video: `${BASE}work_04.mp4`,
+    },
+    {
       id: 'w03',
       film: 'cinema',
       title: 'Ролик 3',
