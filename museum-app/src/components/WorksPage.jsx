@@ -22,7 +22,7 @@ const WORKS_DATA = {
     },
     {
       id: 'w02',
-      film: 'ads',
+      film: 'animation',
       title: 'Рекламный ролик',
       tools: 'Higgsfield AI',
       poster: `${BASE}posters/work_02.webp`,
