@@ -53,15 +53,12 @@ function HeroText({ opacity }) {
     <div className="overlay-section overlay-hero" style={{ opacity }}>
       <div className="overlay-hero__headline">
         <h1 className="headline-large">
-          Я создаю образы
-        </h1>
-      </div>
-      <div className="overlay-hero__body">
-        <p className="body-small">
           Ваши желания<br />
           Наши идеи<br />
           Моё исполнение
-        </p>
+        </h1>
+      </div>
+      <div className="overlay-hero__body">
         <p className="body-small">
           Zak — AI-креатор, саунд-дизайнер<br />
           и автор визуального контента.<br />
