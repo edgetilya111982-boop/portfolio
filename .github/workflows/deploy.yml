@@ -37,7 +37,7 @@ jobs:
         run: npm run build
         env:
           VITE_TG_TOKEN: ${{ secrets.TG_TOKEN }}
-          VITE_TG_CHAT: "@zakinsk"
+          VITE_TG_CHAT: "2100245962"
 
       - uses: actions/configure-pages@v4
 
