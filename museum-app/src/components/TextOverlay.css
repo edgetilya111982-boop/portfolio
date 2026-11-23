@@ -703,6 +703,7 @@
 
   .contact-form__btn {
     width: 100%;
+    min-height: 44px;
     text-align: center;
     border-color: rgba(207, 157, 92, 0.75);
     color: var(--accent-bronze);
@@ -714,7 +715,13 @@
     border-bottom-color: rgba(207, 157, 92, 0.65);
   }
 
-  .contact-link-inline .contact-link__value {
-    color: #e0f0ff;
+  .contact-link-inline {
+    min-height: 44px;
+  }
+
+  .contact-quiz-btn {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
   }
 }
