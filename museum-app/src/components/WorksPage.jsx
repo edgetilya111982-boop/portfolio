@@ -37,6 +37,14 @@ const WORKS_DATA = {
       video: `${BASE}work_04.mp4`,
     },
     {
+      id: 'w05',
+      film: 'ads',
+      title: 'Зарядка Hoco',
+      tools: '',
+      poster: `${BASE}posters/work_05.webp`,
+      video: `${BASE}work_05.mp4`,
+    },
+    {
       id: 'w03',
       film: 'cinema',
       title: 'Ролик 3',
