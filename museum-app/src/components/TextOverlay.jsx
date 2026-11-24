@@ -153,65 +153,7 @@ function ContactText({ opacity, onOpenQuiz }) {
           </a>
         </div>
 
-        <form className="contact-form" onSubmit={handleSubmit}>
-          <div className="contact-form__row">
-            <div className="contact-form__field">
-              <label className="label-tiny">Ваше имя</label>
-              <input
-                className="contact-form__input"
-                type="text"
-                placeholder="Иван"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                disabled={status === 'sending'}
-                maxLength={80}
-              />
-            </div>
-            <div className="contact-form__field">
-              <label className="label-tiny">Telegram / телефон</label>
-              <input
-                className="contact-form__input"
-                type="text"
-                placeholder="@username или +7..."
-                value={contact}
-                onChange={e => setContact(e.target.value)}
-                disabled={status === 'sending'}
-                maxLength={80}
-              />
-            </div>
-          </div>
-          <div className="contact-form__field">
-            <label className="label-tiny">О проекте</label>
-            <textarea
-              className="contact-form__input contact-form__textarea"
-              placeholder="Расскажите, что хотите создать..."
-              value={msg}
-              onChange={e => setMsg(e.target.value)}
-              disabled={status === 'sending'}
-              maxLength={1000}
-              rows={2}
-            />
-          </div>
-
-          {status === 'ok' && (
-            <p className="contact-form__feedback contact-form__feedback--ok">
-              ✓ Заявка отправлена — скоро свяжусь
-            </p>
-          )}
-          {status === 'err' && (
-            <p className="contact-form__feedback contact-form__feedback--err">
-              Ошибка отправки — напишите напрямую в Telegram
-            </p>
-          )}
-
-          <button
-            className="contact-form__btn"
-            type="submit"
-            disabled={status === 'sending' || !name.trim() || !contact.trim() || !msg.trim()}
-          >
-            {status === 'sending' ? 'Отправка...' : 'Отправить заявку →'}
-          </button>
-        </form>
+        
 
         <div className="contact-quiz-alt">
           <span className="contact-sep">или</span>
