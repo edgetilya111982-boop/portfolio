@@ -93,33 +93,11 @@
   background: var(--accent-blue);
 }
 
-.nav__btn {
-  font-family: var(--font-sans);
-  font-size: 0.65rem;
-  font-weight: 400;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-primary);
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 0.4rem 1rem;
-  cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
-  border-radius: 2px;
-}
-
-.nav__btn:hover {
-  border-color: var(--accent-bronze);
-  color: var(--accent-bronze);
-  box-shadow: 0 0 12px rgba(207, 157, 92, 0.2);
-}
-
 @media (max-width: 640px) {
   .nav {
     padding: 0 1.2rem;
   }
-  .nav__links,
-  .nav__cta {
+  .nav__links {
     display: none;
   }
 }
