@@ -119,6 +119,215 @@ function ContactText({ opacity, onOpenQuiz }) {
   const [name,    setName]    = useState('')
   const [contact, setContact] = useState('')
   const [msg,     setMsg]     = useState('')
+  const [status,  setStatus]  = useState('f (cat.preview === 'art') {
+    return <div className="cat-preview cat-preview--art" />
+  }
+  if (cat.preview === 'music') {
+    return (
+      <div className="cat-preview cat-preview--music">
+        {[1, 2, 3, 4, 5].map(i => <span key={i} className="eq-bar" />)}
+      </div>
+    )
+  }
+  return null
+}
+
+// Section 0 — Hero
+function HeroText({ opacity }) {
+  return (
+    <div className="overlay-section overlay-hero" style={{ opacity }}>
+      <div className="overlay-hero__headline">
+        <h1 className="headline-large">
+          Ваши желания<br />
+          Наши идеи<br />
+          <span className="hero-accent">Моё исполнение</span>
+        </h1>
+      </div>
+      <div className="overlay-hero__body">
+        <p className="body-small">
+          Zak — AI-креатор, саунд-дизайнер<br />
+          и автор визуального контента.<br />
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// Section 1 — Category cards
+function CategoryCards({ opacity, onOpenCategory }) {
+  return (
+    <div
+      className="overlay-section overlay-categories"
+      style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}
+    >
+      <div className="categories-grid">
+        {CATEGORIES.map(cat => (
+          <button
+            key={cat.id}
+            className="cat-card"
+            style={{ '--cat-accent': cat.accent }}
+            onClick={() => onOpenCategory(cat.id)}
+          >
+            <div className="cat-card__glow" />
+            <div className="cat-card__body">
+              <h2 className="cat-card__name">{cat.label}</h2>
+              <span className="cat-card__sub label-tiny">{cat.sub}</span>
+            </div>
+            <CatPreview cat={cat} />
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+
+const TG_TOKEN = import.meta.env.VITE_TG_TOKEN
+const TG_CHAT  = import.meta.env.VITE_TG_CHAT || '@zakinsk'
+
+async function sendToTelegram(name, contact, message) {
+  const text =
+    `🎨 <b>Новая заявка с сайта</b>\n\n` +
+    `👤 <b>Имя:</b> ${name}\n` +
+    `📱 <b>Контакт:</b> ${contact}\n` +
+    `💬 <b>Проект:</b> ${message}`
+  const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: TG_CHAT, text, parse_mode: 'HTML' }),
+  })
+  if (!res.ok) throw new Error('Telegram error')
+}
+
+// Section 2 — Contacts
+function ContactText({ opacity, onOpenQuiz }) {
+  const [name,    setName]    = useState('')
+  const [contact, setContact] = useState('')
+  const [msg,     setMsg]     = useState('')
+  const [status,  setStatus]  = useState('idle')
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!name.trim() || !contact.trim() || !msg.trim()) return
+    setStatus('sending')
+    try {
+      await sendToTelegram(name.trim(), contact.trim(), msg.trim())
+      setStatus('ok')
+      setName(''); setContact(''); setMsg('')
+    } catch {
+      setStatus('err')
+    }
+  }
+
+  return (
+    <div className="overlay-section overlay-contact" style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}>
+      <div className="contact-inner">
+        <h2 className="headline-large contact-headline">
+          Создадим <span className="hero-accent">что‑то невероятное</span>
+        </h2>
+
+        <div className="contact-links-row">
+          <a href="https://t.me/zakinskiy" className="contact-link-inline" target="_blank" rel="noreferrer">
+            <span className="label-tiny">TG</span>
+            <span className="contact-link__value">@zakinskiy</span>
+          </a>
+          <span className="contact-sep">·</span>
+          <a href="mailto:qeepil@bk.ru" className="contact-link-inline">
+            <span className="label-tiny">Email</span>
+            <span className="contact-link__value">qeepil@bk.ru</span>
+          </a>
+        </div>
+
+        
+
+        
+    )
+  }
+  if (cat.preview === 'art') {
+    return <div className="cat-preview cat-preview--art" />
+  }
+  if (cat.preview === 'music') {
+    return (
+      <div className="cat-preview cat-preview--music">
+        {[1, 2, 3, 4, 5].map(i => <span key={i} className="eq-bar" />)}
+      </div>
+    )
+  }
+  return null
+}
+
+// Section 0 — Hero
+function HeroText({ opacity }) {
+  return (
+    <div className="overlay-section overlay-hero" style={{ opacity }}>
+      <div className="overlay-hero__headline">
+        <h1 className="headline-large">
+          Ваши желания<br />
+          Наши идеи<br />
+          <span className="hero-accent">Моё исполнение</span>
+        </h1>
+      </div>
+      <div className="overlay-hero__body">
+        <p className="body-small">
+          Zak — AI-креатор, саунд-дизайнер<br />
+          и автор визуального контента.<br />
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// Section 1 — Category cards
+function CategoryCards({ opacity, onOpenCategory }) {
+  return (
+    <div
+      className="overlay-section overlay-categories"
+      style={{ opacity, pointerEvents: opacity > 0.3 ? 'auto' : 'none' }}
+    >
+      <div className="categories-grid">
+        {CATEGORIES.map(cat => (
+          <button
+            key={cat.id}
+            className="cat-card"
+            style={{ '--cat-accent': cat.accent }}
+            onClick={() => onOpenCategory(cat.id)}
+          >
+            <div className="cat-card__glow" />
+            <div className="cat-card__body">
+              <h2 className="cat-card__name">{cat.label}</h2>
+              <span className="cat-card__sub label-tiny">{cat.sub}</span>
+            </div>
+            <CatPreview cat={cat} />
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+
+const TG_TOKEN = import.meta.env.VITE_TG_TOKEN
+const TG_CHAT  = import.meta.env.VITE_TG_CHAT || '@zakinsk'
+
+async function sendToTelegram(name, contact, message) {
+  const text =
+    `🎨 <b>Новая заявка с сайта</b>\n\n` +
+    `👤 <b>Имя:</b> ${name}\n` +
+    `📱 <b>Контакт:</b> ${contact}\n` +
+    `💬 <b>Проект:</b> ${message}`
+  const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: TG_CHAT, text, parse_mode: 'HTML' }),
+  })
+  if (!res.ok) throw new Error('Telegram error')
+}
+
+// Section 2 — Contacts
+function ContactText({ opacity, onOpenQuiz }) {
+  const [name,    setName]    = useState('')
+  const [contact, setContact] = useState('')
+  const [msg,     setMsg]     = useState('')
   const [status,  setStatus]  = useState('idle')
 
   const handleSubmit = async (e) => {
