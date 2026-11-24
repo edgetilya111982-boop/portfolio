@@ -96,34 +96,9 @@ function CategoryCards({ opacity, onOpenCategory }) {
   )
 }
 
-
-const TG_TOKEN = import.meta.env.VITE_TG_TOKEN
-const TG_CHAT  = import.meta.env.VITE_TG_CHAT || '@zakinsk'
-
-async function sendToTelegram(name, contact, message) {
-  const text =
-    `🎨 <b>Новая заявка с сайта</b>\n\n` +
-    `👤 <b>Имя:</b> ${name}\n` +
-    `📱 <b>Контакт:</b> ${contact}\n` +
-    `💬 <b>Проект:</b> ${message}`
-  const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: TG_CHAT, text, parse_mode: 'HTML' }),
-  })
-  if (!res.ok) throw new Error('Telegram error')
-}
-
 // Section 2 — Contacts
-function ContactText({ opacity, onOpenQuiz }) {
-  const [name,    setName]    = useState('')
-  const [contact, setContact] = useState('')
-  const [msg,     setMsg]     = useState('')
-  const [status,  setStatus]  = useState('f (cat.preview === 'art') {
-    return <div className="cat-preview cat-preview--art" />
-  }
-  if (cat.preview === 'music') {
-    return (
+function ContactText({ opacity }) {
+  return (
       <div className="cat-preview cat-preview--music">
         {[1, 2, 3, 4, 5].map(i => <span key={i} className="eq-bar" />)}
       </div>
@@ -200,7 +175,7 @@ async function sendToTelegram(name, contact, message) {
 }
 
 // Section 2 — Contacts
-function ContactText({ opacity, onOpenQuiz }) {
+function ContactText({ opacity }) {
   const [name,    setName]    = useState('')
   const [contact, setContact] = useState('')
   const [msg,     setMsg]     = useState('')
@@ -324,7 +299,7 @@ async function sendToTelegram(name, contact, message) {
 }
 
 // Section 2 — Contacts
-function ContactText({ opacity, onOpenQuiz }) {
+function ContactText({ opacity }) {
   const [name,    setName]    = useState('')
   const [contact, setContact] = useState('')
   const [msg,     setMsg]     = useState('')
@@ -388,7 +363,7 @@ export default function TextOverlay({ scrollData, onOpenQuiz, onOpenCategory }) 
     <div className="text-overlay">
       <HeroText opacity={heroOp} />
       <CategoryCards opacity={worksOp} onOpenCategory={onOpenCategory} />
-      <ContactText opacity={contactOp} onOpenQuiz={onOpenQuiz} />
+      <ContactText opacity={contactOp} />
     </div>
   )
 }
