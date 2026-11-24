@@ -59,6 +59,9 @@
 }
 
 .nav__links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   list-style: none;
   gap: 2rem;
