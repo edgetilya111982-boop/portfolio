@@ -21,6 +21,7 @@ export default function ArtStand({ onChange }) {
           <img
             key={`off-${c.id}`}
             className="art-stand__off"
+            data-cat={c.id}
             src={`${BASE}art_off_${c.id}.webp`}
             alt=""
             aria-hidden="true"
