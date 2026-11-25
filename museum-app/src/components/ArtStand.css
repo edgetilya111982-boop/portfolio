@@ -23,52 +23,49 @@
   user-select: none;
 }
 
-/* Each lit panel is a copy of the picture clipped to its box and dimmed in bursts, like a tube stuttering. */
-.art-stand__lit {
+.art-stand__plate {
   position: absolute;
-  will-change: opacity;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  object-fit: fill;
   pointer-events: none;
   user-select: none;
+  will-change: opacity;
   animation-duration: var(--neon-cycle);
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   animation-delay: var(--neon-delay);
 }
-.art-stand__lit[data-cat='paintings'] { animation-name: art-flick-paintings; }
-.art-stand__lit[data-cat='ads'] { animation-name: art-flick-ads; }
-.art-stand__lit[data-cat='photo'] { animation-name: art-flick-photo; }
+.art-stand__plate[data-cat='paintings'] { animation-name: art-plate-paintings; }
+.art-stand__plate[data-cat='ads'] { animation-name: art-plate-ads; }
+.art-stand__plate[data-cat='photo'] { animation-name: art-plate-photo; }
 
-@keyframes art-flick-paintings {
-  0% { opacity: 1; }
-  2.36% { opacity: 1; }
-  2.37% { opacity: 0.3; }
-  20.21% { opacity: 0.7; }
-  26.17% { opacity: 0.3; }
-  42.04% { opacity: 1; }
-  100% { opacity: 1; }
+@keyframes art-plate-paintings {
+  0%, 16.9% { opacity: 1; }
+  17% { opacity: 0.25; }
+  19.8% { opacity: 0.25; }
+  20.2%, 51.6% { opacity: 1; }
+  51.7% { opacity: 0.4; }
+  53.4% { opacity: 0.4; }
+  53.6%, 100% { opacity: 1; }
 }
 
-@keyframes art-flick-ads {
-  0% { opacity: 1; }
-  3.77% { opacity: 1; }
-  3.78% { opacity: 0.08; }
-  23.88% { opacity: 0.5; }
-  30.59% { opacity: 0.08; }
-  48.46% { opacity: 1; }
-  100% { opacity: 1; }
+@keyframes art-plate-ads {
+  0%, 29.6% { opacity: 1; }
+  30% { opacity: 0.2; }
+  33.8% { opacity: 0.2; }
+  34.2%, 70.8% { opacity: 1; }
+  71% { opacity: 0.4; }
+  72.4% { opacity: 0.4; }
+  72.6%, 100% { opacity: 1; }
 }
 
-@keyframes art-flick-photo {
-  0% { opacity: 1; }
-  3.05% { opacity: 1; }
-  3.06% { opacity: 0.08; }
-  15.97% { opacity: 0.9; }
-  20.28% { opacity: 0.08; }
-  31.77% { opacity: 1; }
-  100% { opacity: 1; }
+@keyframes art-plate-photo {
+  0%, 11.9% { opacity: 1; }
+  12% { opacity: 0.15; }
+  15.2% { opacity: 0.15; }
+  15.4%, 62.8% { opacity: 1; }
+  63% { opacity: 0.3; }
+  64.8% { opacity: 0.3; }
+  65%, 100% { opacity: 1; }
 }
 
 .art-stand__panel {
@@ -106,5 +103,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .art-stand__lit { animation: none; }
+  .art-stand__plate { animation: none; }
 }
