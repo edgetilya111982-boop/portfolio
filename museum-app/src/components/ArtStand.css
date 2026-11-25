@@ -1,0 +1,64 @@
+.art-hub {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 6vw;
+}
+
+.art-stand {
+  position: relative;
+  height: min(86%, 760px, calc(88vw * 921 / 591));
+  aspect-ratio: 591 / 921;
+}
+
+.art-stand__pic {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  filter: drop-shadow(0 0 38px rgba(150, 205, 255, 0.22)) drop-shadow(0 24px 40px rgba(0, 0, 0, 0.55));
+}
+
+/* The lit panels are in art_stand.webp; this is the same panel switched off, faded in when the tube stutters. */
+.art-stand__off {
+  --d1: 0.08;
+  --d2: 0.3;
+  --d3: 0.15;
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  animation: film-tired-off var(--neon-cycle) linear infinite;
+  animation-delay: var(--neon-delay);
+}
+
+.art-stand__panel {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: box-shadow 0.25s, background 0.25s;
+}
+.art-stand__panel:hover,
+.art-stand__panel:focus-visible {
+  background: radial-gradient(70% 80% at 50% 50%, rgba(207, 157, 92, 0.16), transparent 75%);
+  box-shadow: 0 0 0 2px rgba(207, 157, 92, 0.55), 0 0 28px rgba(207, 157, 92, 0.35);
+  outline: none;
+}
+
+@media (max-width: 640px) {
+  .art-hub {
+    padding-left: 0;
+    justify-content: center;
+  }
+  .art-stand {
+    height: min(78%, 620px, calc(88vw * 921 / 591));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .art-stand__off { animation: none; }
+}

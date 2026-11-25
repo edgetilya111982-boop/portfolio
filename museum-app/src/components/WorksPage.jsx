@@ -6,6 +6,7 @@ import FilmShelf, { FILM_TITLES } from './FilmShelf'
 import FilmScene from './FilmScene'
 import MusicPage from './MusicPage'
 import NeonSign from './NeonSign'
+import ArtStand, { ART_CATEGORIES } from './ArtStand'
 import './WorksPage.css'
 
 const BASE = import.meta.env.BASE_URL
@@ -124,6 +125,12 @@ const ART_IMAGES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => {
   }
 })
 
+const ART_BY_CATEGORY = {
+  paintings: ART_IMAGES,
+  ads: [],
+  photo: [],
+}
+
 function useSphereSize() {
   const calc = () =>
     Math.round(Math.max(300, Math.min(window.innerHeight - 150, window.innerWidth * 0.92, 680)))
@@ -219,9 +226,13 @@ export default function WorksPage({ category, onClose }) {
   const [filmCat, setFilmCat] = useState(null)
   const filmWorks = useMemo(() => works.filter((w) => w.film === filmCat), [works, filmCat])
   const filmCounts = works.reduce((m, w) => ({ ...m, [w.film]: (m[w.film] || 0) + 1 }), {})
+  const [artCat, setArtCat] = useState(null)
 
   useEffect(() => {
-    const onPop = (e) => setFilmCat(e.state?.film ?? null)
+    const onPop = (e) => {
+      setFilmCat(e.state?.film ?? null)
+      setArtCat(e.state?.art ?? null)
+    }
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [])
@@ -230,18 +241,33 @@ export default function WorksPage({ category, onClose }) {
     window.history.pushState({ works: 'animation', film: id }, '')
     setFilmCat(id)
   }
+  const openArt = (id) => {
+    window.history.pushState({ works: 'art', art: id }, '')
+    setArtCat(id)
+  }
   const goBack = () => {
-    if (category === 'animation' && filmCat) window.history.back()
+    if ((category === 'animation' && filmCat) || (category === 'art' && artCat)) window.history.back()
     else onClose()
   }
+  const artImages = ART_BY_CATEGORY[artCat] || []
 
   const wideHub = category === 'animation' && !filmCat && viewport.w >= 760
   let content
-  if (category === 'art') {
+  if (category === 'art' && !artCat) {
+    content = <ArtStand onChange={openArt} />
+  } else if (category === 'art' && artImages.length === 0) {
+    content = (
+      <div className="works-page__empty">
+        <span className="works-page__empty-icon">◈</span>
+        <p className="works-page__empty-text">Работы скоро появятся</p>
+      </div>
+    )
+  } else if (category === 'art') {
     content = (
       <div className="works-sphere">
         <SphereImageGrid
-          images={ART_IMAGES}
+          key={artCat}
+          images={artImages}
           containerSize={sphereSize}
           sphereRadius={sphereSize * 0.4}
           baseImageScale={0.4}
@@ -298,7 +324,11 @@ export default function WorksPage({ category, onClose }) {
       <div className="works-page__header">
         <button className="works-page__back" onClick={goBack}>← Назад</button>
         <h1 className="works-page__title" style={{ color: meta.accent }}>
-          {category === 'animation' && filmCat ? FILM_TITLES[filmCat] : meta.label}
+          {category === 'animation' && filmCat
+            ? FILM_TITLES[filmCat]
+            : category === 'art' && artCat
+              ? ART_CATEGORIES.find((c) => c.id === artCat)?.label
+              : meta.label}
         </h1>
       </div>
 
