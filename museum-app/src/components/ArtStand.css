@@ -13,43 +13,28 @@
   filter: drop-shadow(0 0 38px rgba(150, 205, 255, 0.22)) drop-shadow(0 24px 40px rgba(0, 0, 0, 0.55));
 }
 
-.art-stand__pic {
+.art-stand__base {
   display: block;
   width: 100%;
   height: 100%;
   user-select: none;
+  filter: brightness(0.22) saturate(0.6);
 }
 
-.art-stand__plate {
-  position: absolute;
-}
-
-.art-stand__plate img {
+.art-stand__lit {
   position: absolute;
   inset: 0;
-  display: block;
   width: 100%;
   height: 100%;
-  object-fit: fill;
   pointer-events: none;
   user-select: none;
-}
-
-.art-stand__off {
-  filter: brightness(0.2) saturate(0.5) contrast(1.15);
-}
-
-.art-stand__on {
-  filter:
-    drop-shadow(0 0 3px rgba(150, 240, 255, 0.9))
-    drop-shadow(0 0 14px rgba(40, 175, 255, 0.7))
-    drop-shadow(0 0 36px rgba(30, 110, 255, 0.45));
-  animation: art-plate-flicker var(--neon-cycle) linear infinite;
+  filter: drop-shadow(0 0 3px rgba(255, 215, 150, 0.8)) drop-shadow(0 0 14px rgba(255, 170, 60, 0.45));
+  animation: art-neon-flicker var(--neon-cycle) linear infinite;
   animation-delay: var(--neon-delay);
   will-change: opacity;
 }
 
-@keyframes art-plate-flicker {
+@keyframes art-neon-flicker {
   0% { opacity: 1; }
   5% { opacity: 0.86; }
   9% { opacity: 1; }
@@ -120,5 +105,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .art-stand__on { animation: none; }
+  .art-stand__lit { animation: none; }
 }
