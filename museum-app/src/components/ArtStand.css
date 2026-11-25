@@ -12,12 +12,15 @@
   aspect-ratio: 591 / 921;
 }
 
+.art-stand {
+  filter: drop-shadow(0 0 38px rgba(150, 205, 255, 0.22)) drop-shadow(0 24px 40px rgba(0, 0, 0, 0.55));
+}
+
 .art-stand__pic {
   display: block;
   width: 100%;
   height: 100%;
   user-select: none;
-  filter: drop-shadow(0 0 38px rgba(150, 205, 255, 0.22)) drop-shadow(0 24px 40px rgba(0, 0, 0, 0.55));
 }
 
 /* Each lit panel is a copy of the picture clipped to its box and dimmed in bursts, like a tube stuttering. */
