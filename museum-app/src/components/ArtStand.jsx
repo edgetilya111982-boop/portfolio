@@ -11,7 +11,6 @@ export const ART_CATEGORIES = [
 ]
 
 const pct = (b) => ({ left: `${b.left}%`, top: `${b.top}%`, width: `${b.width}%`, height: `${b.height}%` })
-const clip = (b) => `inset(${b.top}% ${100 - b.left - b.width}% ${100 - b.top - b.height}% ${b.left}%)`
 
 export default function ArtStand({ onChange }) {
   return (
@@ -19,16 +18,15 @@ export default function ArtStand({ onChange }) {
       <nav className="art-stand" aria-label="Категории арт визуала">
         <img className="art-stand__pic" src={`${BASE}art_stand.webp`} alt="" draggable="false" />
         {ART_CATEGORIES.map((c) => (
-          <img
-            key={`lit-${c.id}`}
-            className="art-stand__lit"
-            data-cat={c.id}
-            src={`${BASE}art_stand.webp`}
-            alt=""
+          <div
+            key={c.id}
+            className="art-stand__plate"
+            style={{ ...pct(c.box), '--neon-cycle': c.cycle, '--neon-delay': c.delay }}
             aria-hidden="true"
-            draggable="false"
-            style={{ clipPath: clip(c.box), '--neon-cycle': c.cycle, '--neon-delay': c.delay }}
-          />
+          >
+            <img className="art-stand__off" src={`${BASE}plate-${c.id}.jpg`} alt="" draggable="false" />
+            <img className="art-stand__on" src={`${BASE}plate-${c.id}.jpg`} alt="" draggable="false" />
+          </div>
         ))}
         {ART_CATEGORIES.map((c) => (
           <button
