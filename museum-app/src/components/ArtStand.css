@@ -26,6 +26,7 @@
 /* Each lit panel is a copy of the picture clipped to its box and dimmed in bursts, like a tube stuttering. */
 .art-stand__lit {
   position: absolute;
+  will-change: opacity;
   inset: 0;
   width: 100%;
   height: 100%;
@@ -41,33 +42,33 @@
 .art-stand__lit[data-cat='photo'] { animation-name: art-flick-photo; }
 
 @keyframes art-flick-paintings {
-  0% { filter: brightness(1); }
-  2.36% { filter: brightness(1); }
-  2.37% { filter: brightness(0.3); }
-  20.21% { filter: brightness(0.7); }
-  26.17% { filter: brightness(0.3); }
-  42.04% { filter: brightness(1); }
-  100% { filter: brightness(1); }
+  0% { opacity: 1; }
+  2.36% { opacity: 1; }
+  2.37% { opacity: 0.3; }
+  20.21% { opacity: 0.7; }
+  26.17% { opacity: 0.3; }
+  42.04% { opacity: 1; }
+  100% { opacity: 1; }
 }
 
 @keyframes art-flick-ads {
-  0% { filter: brightness(1); }
-  3.77% { filter: brightness(1); }
-  3.78% { filter: brightness(0.08); }
-  23.88% { filter: brightness(0.5); }
-  30.59% { filter: brightness(0.08); }
-  48.46% { filter: brightness(1); }
-  100% { filter: brightness(1); }
+  0% { opacity: 1; }
+  3.77% { opacity: 1; }
+  3.78% { opacity: 0.08; }
+  23.88% { opacity: 0.5; }
+  30.59% { opacity: 0.08; }
+  48.46% { opacity: 1; }
+  100% { opacity: 1; }
 }
 
 @keyframes art-flick-photo {
-  0% { filter: brightness(1); }
-  3.05% { filter: brightness(1); }
-  3.06% { filter: brightness(0.08); }
-  15.97% { filter: brightness(0.9); }
-  20.28% { filter: brightness(0.08); }
-  31.77% { filter: brightness(1); }
-  100% { filter: brightness(1); }
+  0% { opacity: 1; }
+  3.05% { opacity: 1; }
+  3.06% { opacity: 0.08; }
+  15.97% { opacity: 0.9; }
+  20.28% { opacity: 0.08; }
+  31.77% { opacity: 1; }
+  100% { opacity: 1; }
 }
 
 .art-stand__panel {
