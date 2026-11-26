@@ -17,11 +17,12 @@ export default function ArtStand({ onChange }) {
   return (
     <div className="art-hub">
       <nav className="art-stand" aria-label="Категории арт визуала">
-        <img className="art-stand__base" src={`${BASE}art_stand.webp`} alt="" draggable="false" />
+        <img className="art-stand__pic" src={`${BASE}art_stand.webp`} alt="" draggable="false" />
         {ART_CATEGORIES.map((c) => (
           <img
             key={`lit-${c.id}`}
             className="art-stand__lit"
+            data-cat={c.id}
             src={`${BASE}art_stand.webp`}
             alt=""
             aria-hidden="true"
