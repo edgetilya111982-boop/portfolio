@@ -114,20 +114,22 @@ const WORKS_DATA = {
   music: [],
 }
 
-// the artworks for the art sphere: files in public/art/work_01..12.webp
-const ART_IMAGES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => {
+// the artworks for the art sphere: files in public/art/work_01..18.webp
+const artImage = (n) => {
   const file = `work_${String(n).padStart(2, '0')}`
   return {
     id: file,
     src: `${BASE}art/${file}.webp`,
-    alt: `Работа ${n}`,
-    title: n === 6 ? 'Tree of Life' : `Работа ${n}`,
+    alt: `\u0420\u0430\u0431\u043e\u0442\u0430 ${n}`,
+    title: n === 6 ? 'Tree of Life' : `\u0420\u0430\u0431\u043e\u0442\u0430 ${n}`,
   }
-})
+}
+const ART_IMAGES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(artImage)
+const AD_IMAGES = [13, 14, 15, 16, 17, 18].map(artImage)
 
 const ART_BY_CATEGORY = {
   paintings: ART_IMAGES.filter((img) => img.id !== 'work_02'),
-  ads: [],
+  ads: AD_IMAGES,
   photo: ART_IMAGES.filter((img) => img.id === 'work_02'),
 }
 
@@ -228,27 +230,8 @@ export default function WorksPage({ category, onClose }) {
   const filmCounts = works.reduce((m, w) => ({ ...m, [w.film]: (m[w.film] || 0) + 1 }), {})
   const [artCat, setArtCat] = useState(null)
 
-  useEffect(() => {
-    const onPop = (e) => {
-      setFilmCat(e.state?.film ?? null)
-      setArtCat(e.state?.art ?? null)
-    }
-    window.addEventListener('popstate', onPop)
-    return () => window.removeEventListener('popstate', onPop)
-  }, [])
-
-  const openFilm = (id) => {
-    window.history.pushState({ works: 'animation', film: id }, '')
-    setFilmCat(id)
-  }
-  const openArt = (id) => {
-    window.history.pushState({ works: 'art', art: id }, '')
-    setArtCat(id)
-  }
-  const goBack = () => {
-    if ((category === 'animation' && filmCat) || (category === 'art' && artCat)) window.history.back()
-    else onClose()
-  }
+  const openFilm = (id) => setFilmCat(id)
+  const openArt = (id) => setArtCat(id)
   const artImages = ART_BY_CATEGORY[artCat] || []
 
   const wideHub = category === 'animation' && !filmCat && viewport.w >= 760
@@ -322,7 +305,7 @@ export default function WorksPage({ category, onClose }) {
       onWheel={e => e.stopPropagation()}
     >
       <div className="works-page__header">
-        <button className="works-page__back" onClick={goBack}>← Назад</button>
+        <button className="works-page__back" onClick={onClose}>← Назад</button>
         <h1 className="works-page__title" style={{ color: meta.accent }}>
           {category === 'animation' && filmCat
             ? FILM_TITLES[filmCat]
