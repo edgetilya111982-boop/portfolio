@@ -126,11 +126,12 @@ const artImage = (n) => {
 }
 const ART_IMAGES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(artImage)
 const AD_IMAGES = [13, 14, 15, 16, 17, 18].map(artImage)
+const PHOTO_IMAGES = [19, 20, 21].map(artImage)
 
 const ART_BY_CATEGORY = {
   paintings: ART_IMAGES.filter((img) => img.id !== 'work_02' && img.id !== 'work_09'),
   ads: AD_IMAGES,
-  photo: ART_IMAGES.filter((img) => img.id === 'work_02' || img.id === 'work_09'),
+  photo: [...ART_IMAGES.filter((img) => img.id === 'work_02' || img.id === 'work_09'), ...PHOTO_IMAGES],
 }
 
 function useSphereSize() {
