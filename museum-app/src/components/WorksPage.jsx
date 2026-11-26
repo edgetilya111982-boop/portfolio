@@ -126,9 +126,9 @@ const ART_IMAGES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => {
 })
 
 const ART_BY_CATEGORY = {
-  paintings: ART_IMAGES,
+  paintings: ART_IMAGES.filter((img) => img.id !== 'work_02'),
   ads: [],
-  photo: [],
+  photo: ART_IMAGES.filter((img) => img.id === 'work_02'),
 }
 
 function useSphereSize() {
