@@ -83,20 +83,13 @@ export default function MusicPage() {
     }
     clearSoon()
     if (id === open) return
-    const state = { works: 'music', shelf: id }
-    if (open) window.history.replaceState(state, '')
-    else window.history.pushState(state, '')
     setPos(0)
     setClosing(false)
     setOpen(id)
   }
 
-  const close = (fromHistory = false) => {
+  const close = () => {
     if (!open) return
-    if (!fromHistory && window.history.state?.shelf) {
-      window.history.back() // popstate below runs the same closing animation
-      return
-    }
     setClosing(true) // the shelf starts to come back into focus right away
     const a = animRef.current
     if (!a) {
@@ -112,28 +105,12 @@ export default function MusicPage() {
     a.play()
   }
 
-  // One stable listener: App re-renders during the same popstate event, so
-  // re-subscribing on every render would make this listener miss it.
   const latest = useRef(null)
   latest.current = { open, close }
   useEffect(() => {
-    const onPop = (e) => {
-      const { open: cur, close: closeNow } = latest.current
-      const id = e.state?.shelf ?? null
-      if (id === cur) return
-      if (id) {
-        setPos(0)
-        setClosing(false)
-        setOpen(id)
-      } else closeNow(true)
-    }
     const onKey = (e) => e.key === 'Escape' && latest.current.open && latest.current.close()
-    window.addEventListener('popstate', onPop)
     window.addEventListener('keydown', onKey)
-    return () => {
-      window.removeEventListener('popstate', onPop)
-      window.removeEventListener('keydown', onKey)
-    }
+    return () => window.removeEventListener('keydown', onKey)
   }, [])
 
   useEffect(() => () => window.clearTimeout(soonTimer.current), [])
