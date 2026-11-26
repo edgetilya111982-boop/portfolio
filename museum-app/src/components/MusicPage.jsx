@@ -19,7 +19,7 @@ const SHELVES = {
 const FLIGHT_MS = 1100
 
 // A shelf of genres: pick one and the record slides out with its track list.
-export default function MusicPage() {
+export default function MusicPage({ shelf, onShelf }) {
   const player = useMusicPlayer(MUSIC_ALBUMS)
   // on phones the monitor is a block under the shelf instead of a part of the desk photo
   const [narrow, setNarrow] = useState(() => window.innerWidth < 760)
@@ -28,7 +28,7 @@ export default function MusicPage() {
     window.addEventListener('resize', on)
     return () => window.removeEventListener('resize', on)
   }, [])
-  const [open, setOpen] = useState(null) // genre id
+  const open = shelf // genre id
   const [pos, setPos] = useState(0) // album position inside the genre
   const [soon, setSoon] = useState(null)
   const [closing, setClosing] = useState(false)
@@ -85,7 +85,7 @@ export default function MusicPage() {
     if (id === open) return
     setPos(0)
     setClosing(false)
-    setOpen(id)
+    onShelf(id)
   }
 
   const close = () => {
@@ -94,11 +94,11 @@ export default function MusicPage() {
     const a = animRef.current
     if (!a) {
       setClosing(false)
-      return setOpen(null)
+      return onShelf(null)
     }
     a.onfinish = () => {
       animRef.current = null
-      setOpen(null)
+      onShelf(null)
       setClosing(false)
     }
     a.playbackRate = -1.4

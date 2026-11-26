@@ -229,9 +229,39 @@ export default function WorksPage({ category, onClose }) {
   const filmWorks = useMemo(() => works.filter((w) => w.film === filmCat), [works, filmCat])
   const filmCounts = works.reduce((m, w) => ({ ...m, [w.film]: (m[w.film] || 0) + 1 }), {})
   const [artCat, setArtCat] = useState(null)
+  const [musicShelf, setMusicShelf] = useState(null)
 
-  const openFilm = (id) => setFilmCat(id)
-  const openArt = (id) => setArtCat(id)
+  const openFilm = (id) => {
+    window.history.pushState({ works: category, film: id }, '')
+    setFilmCat(id)
+  }
+  const openArt = (id) => {
+    window.history.pushState({ works: category, art: id }, '')
+    setArtCat(id)
+  }
+  const chooseShelf = (id) => {
+    const state = { works: category, music: id }
+    if (id && window.history.state?.music) window.history.replaceState(state, '')
+    else if (id) window.history.pushState(state, '')
+    else if (window.history.state?.music) window.history.back()
+    setMusicShelf(id)
+  }
+  const goBack = () => {
+    if (filmCat || artCat || musicShelf) window.history.back()
+    else onClose()
+  }
+
+  useEffect(() => {
+    const onPop = (e) => {
+      const same = e.state?.works === category
+      setFilmCat(same ? e.state.film ?? null : null)
+      setArtCat(same ? e.state.art ?? null : null)
+      setMusicShelf(same ? e.state.music ?? null : null)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [category])
+
   const artImages = ART_BY_CATEGORY[artCat] || []
 
   const wideHub = category === 'animation' && !filmCat && viewport.w >= 760
@@ -260,7 +290,7 @@ export default function WorksPage({ category, onClose }) {
       </div>
     )
   } else if (category === 'music') {
-    content = <MusicPage />
+    content = <MusicPage shelf={musicShelf} onShelf={chooseShelf} />
   } else if (works.length === 0) {
     content = (
       <div className="works-page__empty">
@@ -305,7 +335,7 @@ export default function WorksPage({ category, onClose }) {
       onWheel={e => e.stopPropagation()}
     >
       <div className="works-page__header">
-        <button className="works-page__back" onClick={onClose}>← Назад</button>
+        <button className="works-page__back" onClick={goBack}>← Назад</button>
         <h1 className="works-page__title" style={{ color: meta.accent }}>
           {category === 'animation' && filmCat
             ? FILM_TITLES[filmCat]
